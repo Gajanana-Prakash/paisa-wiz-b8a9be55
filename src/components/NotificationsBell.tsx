@@ -207,12 +207,14 @@ export function NotificationsBell() {
               const Icon =
                 n.type === "mismatch" ? AlertTriangle :
                 n.type === "review" ? AlertTriangle :
+                n.type === "overdue" ? AlertTriangle :
                 n.type === "validated" ? CheckCircle2 :
                 n.type === "uploaded" ? Upload :
                 n.type === "doc_fulfilled" ? Inbox :
                 n.type === "due_soon" ? CalendarClock : FileText;
               const tone =
                 n.type === "mismatch" ? "text-rose-600 bg-rose-500/10" :
+                n.type === "overdue" ? "text-rose-600 bg-rose-500/10" :
                 n.type === "review" ? "text-amber-600 bg-amber-500/10" :
                 n.type === "validated" ? "text-emerald-600 bg-emerald-500/10" :
                 n.type === "doc_fulfilled" ? "text-emerald-600 bg-emerald-500/10" :
