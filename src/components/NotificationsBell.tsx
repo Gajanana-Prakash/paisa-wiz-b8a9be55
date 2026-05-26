@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-type NType = "uploaded" | "review" | "validated" | "processing" | "mismatch" | "doc_fulfilled" | "due_soon";
+type NType = "uploaded" | "review" | "validated" | "processing" | "mismatch" | "doc_fulfilled" | "due_soon" | "overdue";
 
 type Notif = {
   id: string;
@@ -42,6 +42,7 @@ function buildInvoiceNotif(row: any): Notif {
     mismatch: "GST mismatch detected",
     doc_fulfilled: "Document request fulfilled",
     due_soon: "Filing due soon",
+    overdue: "Compliance overdue",
   };
   return {
     id: row.id,
@@ -102,7 +103,10 @@ export function NotificationsBell() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [{ data: inv }, { data: req }] = await Promise.all([
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const in7 = new Date(today.getTime() + 7 * 86400000);
+      const toISO = (d: Date) => d.toISOString().slice(0, 10);
+      const [{ data: inv }, { data: req }, { data: dls }] = await Promise.all([
         supabase.from("invoices")
           .select("id,status,vendor_name,invoice_number,file_name,validation_flags,created_at,updated_at")
           .order("updated_at", { ascending: false }).limit(15),
@@ -110,15 +114,32 @@ export function NotificationsBell() {
           .select("id,doc_type,period_label,status,fulfilled_at,updated_at")
           .eq("status", "complete")
           .order("fulfilled_at", { ascending: false }).limit(10),
+        supabase.from("compliance_deadlines")
+          .select("id,due_date,status,period_label,updated_at,clients!inner(business_name),compliance_types!inner(name)")
+          .in("status", ["PENDING", "IN_PROGRESS"])
+          .lte("due_date", toISO(in7))
+          .order("due_date", { ascending: true }).limit(20),
       ]);
       if (!mounted) return;
+      const complianceNotifs: Notif[] = (dls ?? []).map((d: any) => {
+        const overdue = d.due_date < toISO(today);
+        return {
+          id: `dl-${d.id}`,
+          type: overdue ? "overdue" : "due_soon",
+          title: overdue ? `${d.compliance_types?.name ?? "Compliance"} overdue` : `${d.compliance_types?.name ?? "Compliance"} due soon`,
+          detail: `${d.clients?.business_name ?? ""} · ${d.period_label} · ${new Date(d.due_date).toLocaleDateString()}`,
+          at: d.updated_at || new Date().toISOString(),
+        };
+      });
       const merged: Notif[] = [
         ...(dueSoonNotif ? [dueSoonNotif] : []),
+        ...complianceNotifs,
         ...(inv ?? []).map(buildInvoiceNotif),
         ...(req ?? []).map(buildDocReqNotif),
-      ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 25);
+      ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 30);
       setItems(merged);
     })();
+
 
     const ch = supabase
       .channel("notif-feed")
@@ -186,12 +207,14 @@ export function NotificationsBell() {
               const Icon =
                 n.type === "mismatch" ? AlertTriangle :
                 n.type === "review" ? AlertTriangle :
+                n.type === "overdue" ? AlertTriangle :
                 n.type === "validated" ? CheckCircle2 :
                 n.type === "uploaded" ? Upload :
                 n.type === "doc_fulfilled" ? Inbox :
                 n.type === "due_soon" ? CalendarClock : FileText;
               const tone =
                 n.type === "mismatch" ? "text-rose-600 bg-rose-500/10" :
+                n.type === "overdue" ? "text-rose-600 bg-rose-500/10" :
                 n.type === "review" ? "text-amber-600 bg-amber-500/10" :
                 n.type === "validated" ? "text-emerald-600 bg-emerald-500/10" :
                 n.type === "doc_fulfilled" ? "text-emerald-600 bg-emerald-500/10" :

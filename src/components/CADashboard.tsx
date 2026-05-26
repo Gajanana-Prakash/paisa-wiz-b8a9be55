@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { inviteClient } from "@/lib/tenant.functions";
+import { getComplianceSummary } from "@/lib/compliance.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,9 @@ export function CADashboard() {
   const [aggs, setAggs] = useState<Map<string, InvAgg>>(new Map());
   const [openInvite, setOpenInvite] = useState(false);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [overdueCount, setOverdueCount] = useState(0);
+  const [dueThisWeek, setDueThisWeek] = useState(0);
+  const summaryFn = useServerFn(getComplianceSummary);
 
   const load = async () => {
     if (!firm?.id) return;
@@ -88,10 +92,18 @@ export function CADashboard() {
 
   useEffect(() => {
     load();
+    summaryFn({ data: undefined as any })
+      .then((s: any) => { setOverdueCount(s?.overdue ?? 0); setDueThisWeek(s?.dueThisWeek ?? 0); })
+      .catch(() => {});
     const ch = supabase
       .channel("ca-dashboard")
       .on("postgres_changes", { event: "*", schema: "public", table: "invoices" }, () => load())
       .on("postgres_changes", { event: "*", schema: "public", table: "clients" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "compliance_deadlines" }, () => {
+        summaryFn({ data: undefined as any })
+          .then((s: any) => { setOverdueCount(s?.overdue ?? 0); setDueThisWeek(s?.dueThisWeek ?? 0); })
+          .catch(() => {});
+      })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,6 +134,23 @@ export function CADashboard() {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-8 max-w-[1400px] mx-auto space-y-6">
+      {overdueCount > 0 && (
+        <Link to="/ca/compliance-calendar" className="block">
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive px-5 py-4 flex items-center justify-between gap-3 hover:bg-destructive/15 transition">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="size-5 shrink-0" />
+              <div>
+                <div className="font-semibold text-sm">
+                  {overdueCount} overdue compliance deadline{overdueCount === 1 ? "" : "s"}
+                  {dueThisWeek > 0 && <span className="text-destructive/80 font-normal"> · {dueThisWeek} due this week</span>}
+                </div>
+                <div className="text-xs text-destructive/80 mt-0.5">Click to review and reassign in the compliance calendar.</div>
+              </div>
+            </div>
+            <ArrowRight className="size-4 shrink-0" />
+          </div>
+        </Link>
+      )}
       {/* Hero / firm header */}
       <div className="rounded-3xl p-6 md:p-8 text-primary-foreground relative overflow-hidden"
         style={{ background: "var(--gradient-hero)" }}>

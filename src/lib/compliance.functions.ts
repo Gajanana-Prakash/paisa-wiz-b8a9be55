@@ -2,156 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-
-/* ------------------------------------------------------------------ */
-/* Helpers                                                             */
-/* ------------------------------------------------------------------ */
-
-function clampDay(year: number, monthIdx: number, day: number): Date {
-  const last = new Date(year, monthIdx + 1, 0).getDate();
-  return new Date(year, monthIdx, Math.min(day, last));
-}
+import { regenerateDeadlines } from "@/lib/compliance.server";
 
 function toISODate(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
-}
-
-/** Indian Financial Year for a given date (FY runs Apr 1 → Mar 31). */
-function fyFor(date: Date) {
-  const y = date.getFullYear();
-  const startYear = date.getMonth() >= 3 ? y : y - 1;
-  const endYear = startYear + 1;
-  return {
-    startYear,
-    endYear,
-    start: new Date(startYear, 3, 1),
-    end: new Date(endYear, 2, 31),
-    label: `FY${String(startYear).slice(2)}-${String(endYear).slice(2)}`,
-  };
-}
-
-/** Quarter (1-4) within the Indian FY. */
-function fyQuarter(date: Date) {
-  const m = date.getMonth(); // 0..11
-  // FY months: Apr(3),May(4),Jun(5)=Q1; Jul(6)..Sep(8)=Q2; Oct(9)..Dec(11)=Q3; Jan(0)..Mar(2)=Q4
-  if (m >= 3 && m <= 5) return 1;
-  if (m >= 6 && m <= 8) return 2;
-  if (m >= 9 && m <= 11) return 3;
-  return 4;
-}
-
-const MONTH_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-type ComplianceType = {
-  id: string;
-  code: string;
-  name: string;
-  category: string;
-  applies_to: "ALL" | "GST_REGISTERED" | "COMPANIES_ONLY" | "TDS_DEDUCTOR" | "EMPLOYER";
-  recurrence: "MONTHLY" | "QUARTERLY" | "ANNUAL" | "EVENT_BASED";
-  default_due_day: number;
-  default_due_month: number | null;
-  is_active: boolean;
-};
-
-type ClientProfile = {
-  client_id: string;
-  ca_firm_id: string;
-  is_gst_registered: boolean;
-  is_company: boolean;
-  is_tds_deductor: boolean;
-  has_employees: boolean;
-  is_audit_applicable: boolean;
-  entity_type: string;
-  gst_filing_frequency: "monthly" | "quarterly";
-};
-
-function typeApplies(t: ComplianceType, p: ClientProfile): boolean {
-  if (!t.is_active) return false;
-  // GST monthly vs quarterly filter
-  if (t.code === "GSTR_1_M" || t.code === "GSTR_3B_M") {
-    return p.is_gst_registered && p.gst_filing_frequency === "monthly";
-  }
-  if (t.code === "GSTR_1_Q" || t.code === "GSTR_3B_Q") {
-    return p.is_gst_registered && p.gst_filing_frequency === "quarterly";
-  }
-  // Tax audit
-  if (t.code === "TAX_AUDIT_3CA_3CB") return p.is_audit_applicable;
-  // ITR_COMPANY_AUDIT also for audit cases
-  if (t.code === "ITR_COMPANY_AUDIT") return p.is_company || p.is_audit_applicable;
-  switch (t.applies_to) {
-    case "ALL": return true;
-    case "GST_REGISTERED": return p.is_gst_registered;
-    case "COMPANIES_ONLY": return p.is_company;
-    case "TDS_DEDUCTOR": return p.is_tds_deductor;
-    case "EMPLOYER": return p.has_employees;
-    default: return false;
-  }
-}
-
-/** Build the list of (period_label, due_date) to generate for one type. */
-function periodsFor(t: ComplianceType, today: Date): Array<{ period: string; due: Date }> {
-  const out: Array<{ period: string; due: Date }> = [];
-  const fy = fyFor(today);
-
-  if (t.recurrence === "MONTHLY") {
-    // From start of previous month through end of FY
-    const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    let cur = new Date(start);
-    while (cur <= fy.end) {
-      // Period = data month; due = default_due_day of NEXT month
-      const periodMonth = cur.getMonth();
-      const periodYear = cur.getFullYear();
-      const dueMonthIdx = periodMonth + 1;
-      const due = clampDay(periodYear, dueMonthIdx, t.default_due_day);
-      out.push({
-        period: `${MONTH_SHORT[periodMonth]} ${periodYear}`,
-        due,
-      });
-      cur = new Date(periodYear, periodMonth + 1, 1);
-    }
-    return out;
-  }
-
-  if (t.recurrence === "QUARTERLY") {
-    // FY Q1: Apr-Jun (due 13 Jul), Q2: Jul-Sep (due 13 Oct), Q3: Oct-Dec (due 13 Jan next), Q4: Jan-Mar (due 13 Apr next)
-    const quarters = [
-      { q: 1, dueMonth: 6, dueYear: fy.startYear }, // Jul
-      { q: 2, dueMonth: 9, dueYear: fy.startYear }, // Oct
-      { q: 3, dueMonth: 0, dueYear: fy.endYear   }, // Jan next
-      { q: 4, dueMonth: 3, dueYear: fy.endYear   }, // Apr next
-    ];
-    for (const q of quarters) {
-      const due = clampDay(q.dueYear, q.dueMonth, t.default_due_day);
-      out.push({ period: `Q${q.q} ${fy.label}`, due });
-    }
-    return out;
-  }
-
-  if (t.recurrence === "ANNUAL") {
-    const m = (t.default_due_month ?? 12) - 1; // 1-12 → 0-11
-    // Pick the FY whose due date lies inside it
-    // Annual deadlines for current FY use the next instance of (month, day) AFTER fy.start
-    let year = fy.startYear;
-    if (m < 3) year = fy.endYear; // Jan/Feb/Mar fall in second calendar year of FY
-    const due = clampDay(year, m, t.default_due_day);
-    out.push({ period: fy.label, due });
-    return out;
-  }
-
-  return out; // EVENT_BASED → no auto-generation
-}
-
-async function loadTypes(): Promise<ComplianceType[]> {
-  const { data, error } = await supabaseAdmin
-    .from("compliance_types")
-    .select("id, code, name, category, applies_to, recurrence, default_due_day, default_due_month, is_active")
-    .eq("is_active", true);
-  if (error) throw new Error(error.message);
-  return (data ?? []) as any;
 }
 
 async function assertFirmAccess(userId: string): Promise<string> {
@@ -172,54 +29,12 @@ async function assertClientAccess(userId: string, clientId: string): Promise<{ c
     .eq("id", clientId)
     .maybeSingle();
   if (!client) throw new Error("Client not found");
-
   const firmId = await assertFirmAccess(userId);
   if (firmId !== client.ca_firm_id) throw new Error("Forbidden: client belongs to another firm");
   return { caFirmId: client.ca_firm_id as string };
 }
 
-async function regenerate(clientId: string, caFirmId: string) {
-  const { data: profile } = await supabaseAdmin
-    .from("client_compliance_profile")
-    .select("*")
-    .eq("client_id", clientId)
-    .maybeSingle();
-  if (!profile) return { inserted: 0 };
 
-  const p = profile as unknown as ClientProfile;
-  const types = await loadTypes();
-  const applicable = types.filter((t) => typeApplies(t, p));
-
-  const today = new Date();
-  const rows: Array<{
-    ca_firm_id: string;
-    client_id: string;
-    compliance_type_id: string;
-    due_date: string;
-    period_label: string;
-  }> = [];
-
-  for (const t of applicable) {
-    const periods = periodsFor(t, today);
-    for (const { period, due } of periods) {
-      rows.push({
-        ca_firm_id: caFirmId,
-        client_id: clientId,
-        compliance_type_id: t.id,
-        due_date: toISODate(due),
-        period_label: period,
-      });
-    }
-  }
-
-  if (rows.length === 0) return { inserted: 0 };
-
-  const { error } = await supabaseAdmin
-    .from("compliance_deadlines")
-    .upsert(rows, { onConflict: "client_id,compliance_type_id,period_label", ignoreDuplicates: true });
-  if (error) throw new Error(error.message);
-  return { inserted: rows.length };
-}
 
 /* ------------------------------------------------------------------ */
 /* Server functions                                                    */
@@ -278,7 +93,7 @@ export const upsertClientComplianceProfile = createServerFn({ method: "POST" })
       );
     if (error) throw new Error(error.message);
 
-    const result = await regenerate(data.clientId, caFirmId);
+    const result = await regenerateDeadlines(data.clientId, caFirmId);
     return { ok: true, ...result };
   });
 
@@ -287,7 +102,7 @@ export const regenerateClientDeadlines = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ clientId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { caFirmId } = await assertClientAccess(context.userId, data.clientId);
-    return regenerate(data.clientId, caFirmId);
+    return regenerateDeadlines(data.clientId, caFirmId);
   });
 
 export const listFirmDeadlines = createServerFn({ method: "POST" })

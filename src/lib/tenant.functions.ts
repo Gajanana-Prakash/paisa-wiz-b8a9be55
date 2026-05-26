@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { ensureDefaultComplianceProfile, regenerateDeadlines } from "@/lib/compliance.server";
+
 
 // ---------- CA OWNER ONBOARDING ----------
 
@@ -98,6 +100,15 @@ export const inviteClient = createServerFn({ method: "POST" })
         created_by: userId,
       });
     if (iErr) throw new Error(iErr.message);
+
+    // Seed default compliance profile + pre-generate deadlines (no-op until
+    // profile flags are toggled on).
+    try {
+      await ensureDefaultComplianceProfile(client.id, firm.ca_firm_id);
+      await regenerateDeadlines(client.id, firm.ca_firm_id);
+    } catch (e) {
+      console.error("compliance bootstrap failed", e);
+    }
 
     return { ok: true, clientId: client.id, token };
   });
