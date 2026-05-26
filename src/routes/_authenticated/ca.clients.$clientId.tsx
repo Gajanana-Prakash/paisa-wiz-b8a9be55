@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { logActivity, type ActivityLog as ActivityLogRow } from "@/lib/activity";
+import { ClientCompliancePanel } from "@/components/compliance/ClientCompliancePanel";
 
 export const Route = createFileRoute("/_authenticated/ca/clients/$clientId")({
   component: ClientWorkspace,
@@ -140,6 +141,7 @@ function ClientWorkspace() {
       <Tabs defaultValue="overview" className="mt-6">
         <TabsList className="bg-muted/60">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="compliance">Compliance</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="requests">Requests</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
@@ -178,6 +180,10 @@ function ClientWorkspace() {
               </dl>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="compliance" className="mt-5">
+          <ClientCompliancePanel clientId={clientId} />
         </TabsContent>
 
         <TabsContent value="documents" className="mt-5">
