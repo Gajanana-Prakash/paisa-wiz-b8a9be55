@@ -93,7 +93,7 @@ export const upsertClientComplianceProfile = createServerFn({ method: "POST" })
       );
     if (error) throw new Error(error.message);
 
-    const result = await regenerate(data.clientId, caFirmId);
+    const result = await regenerateDeadlines(data.clientId, caFirmId);
     return { ok: true, ...result };
   });
 
@@ -102,7 +102,7 @@ export const regenerateClientDeadlines = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ clientId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { caFirmId } = await assertClientAccess(context.userId, data.clientId);
-    return regenerate(data.clientId, caFirmId);
+    return regenerateDeadlines(data.clientId, caFirmId);
   });
 
 export const listFirmDeadlines = createServerFn({ method: "POST" })
