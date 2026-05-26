@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { inviteClient } from "@/lib/tenant.functions";
+import { getComplianceSummary } from "@/lib/compliance.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,9 @@ export function CADashboard() {
   const [aggs, setAggs] = useState<Map<string, InvAgg>>(new Map());
   const [openInvite, setOpenInvite] = useState(false);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [overdueCount, setOverdueCount] = useState(0);
+  const [dueThisWeek, setDueThisWeek] = useState(0);
+  const summaryFn = useServerFn(getComplianceSummary);
 
   const load = async () => {
     if (!firm?.id) return;
