@@ -101,6 +101,15 @@ export const inviteClient = createServerFn({ method: "POST" })
       });
     if (iErr) throw new Error(iErr.message);
 
+    // Seed default compliance profile + pre-generate deadlines (no-op until
+    // profile flags are toggled on).
+    try {
+      await ensureDefaultComplianceProfile(client.id, firm.ca_firm_id);
+      await regenerateDeadlines(client.id, firm.ca_firm_id);
+    } catch (e) {
+      console.error("compliance bootstrap failed", e);
+    }
+
     return { ok: true, clientId: client.id, token };
   });
 
