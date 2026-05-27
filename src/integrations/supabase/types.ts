@@ -783,6 +783,188 @@ export type Database = {
         }
         Relationships: []
       }
+      task_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          task_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          task_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          task_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_attachments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_subtasks: {
+        Row: {
+          created_at: string
+          id: string
+          is_done: boolean
+          sort_order: number
+          task_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          sort_order?: number
+          task_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          sort_order?: number
+          task_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          assigned_to: string | null
+          ca_firm_id: string
+          client_id: string | null
+          completed_at: string | null
+          compliance_deadline_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          due_date: string | null
+          estimated_hours: number | null
+          id: string
+          is_recurring: boolean
+          parent_task_id: string | null
+          period_label: string | null
+          priority: Database["public"]["Enums"]["task_priority"]
+          recurrence_rule: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          task_type: Database["public"]["Enums"]["task_type"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          ca_firm_id: string
+          client_id?: string | null
+          completed_at?: string | null
+          compliance_deadline_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          is_recurring?: boolean
+          parent_task_id?: string | null
+          period_label?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          recurrence_rule?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          task_type?: Database["public"]["Enums"]["task_type"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          ca_firm_id?: string
+          client_id?: string | null
+          completed_at?: string | null
+          compliance_deadline_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          is_recurring?: boolean
+          parent_task_id?: string | null
+          period_label?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          recurrence_rule?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          task_type?: Database["public"]["Enums"]["task_type"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           ca_firm_id: string | null
@@ -914,6 +1096,17 @@ export type Database = {
         | "monthly_day"
         | "stale_upload_days"
         | "manual"
+      task_priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+      task_status: "TODO" | "IN_PROGRESS" | "REVIEW" | "COMPLETED" | "CANCELLED"
+      task_type:
+        | "GST_FILING"
+        | "TDS_RETURN"
+        | "ITR_FILING"
+        | "AUDIT"
+        | "BOOKKEEPING"
+        | "NOTICE_REPLY"
+        | "DOCUMENT_COLLECTION"
+        | "OTHER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1105,6 +1298,18 @@ export const Constants = {
         "monthly_day",
         "stale_upload_days",
         "manual",
+      ],
+      task_priority: ["LOW", "MEDIUM", "HIGH", "URGENT"],
+      task_status: ["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED", "CANCELLED"],
+      task_type: [
+        "GST_FILING",
+        "TDS_RETURN",
+        "ITR_FILING",
+        "AUDIT",
+        "BOOKKEEPING",
+        "NOTICE_REPLY",
+        "DOCUMENT_COLLECTION",
+        "OTHER",
       ],
     },
   },

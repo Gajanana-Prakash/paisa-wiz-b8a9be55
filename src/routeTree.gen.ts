@@ -28,11 +28,13 @@ import { Route as AuthenticatedCaIndexRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedClientUploadRouteImport } from './routes/_authenticated/client.upload'
 import { Route as AuthenticatedClientRequestsRouteImport } from './routes/_authenticated/client.requests'
 import { Route as AuthenticatedClientDashboardRouteImport } from './routes/_authenticated/client.dashboard'
+import { Route as AuthenticatedCaTasksRouteImport } from './routes/_authenticated/ca.tasks'
 import { Route as AuthenticatedCaSettingsRouteImport } from './routes/_authenticated/ca.settings'
 import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authenticated/ca.reports'
 import { Route as AuthenticatedCaDashboardRouteImport } from './routes/_authenticated/ca.dashboard'
 import { Route as AuthenticatedCaComplianceCalendarRouteImport } from './routes/_authenticated/ca.compliance-calendar'
 import { Route as AuthenticatedCaClientsRouteImport } from './routes/_authenticated/ca.clients'
+import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authenticated/ca.tasks.my-tasks'
 import { Route as AuthenticatedCaClientsClientIdRouteImport } from './routes/_authenticated/ca.clients.$clientId'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
 
@@ -134,6 +136,11 @@ const AuthenticatedClientDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedClientRoute,
   } as any)
+const AuthenticatedCaTasksRoute = AuthenticatedCaTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedCaRoute,
+} as any)
 const AuthenticatedCaSettingsRoute = AuthenticatedCaSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -161,6 +168,12 @@ const AuthenticatedCaClientsRoute = AuthenticatedCaClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
+const AuthenticatedCaTasksMyTasksRoute =
+  AuthenticatedCaTasksMyTasksRouteImport.update({
+    id: '/my-tasks',
+    path: '/my-tasks',
+    getParentRoute: () => AuthenticatedCaTasksRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdRoute =
   AuthenticatedCaClientsClientIdRouteImport.update({
     id: '/$clientId',
@@ -193,12 +206,14 @@ export interface FileRoutesByFullPath {
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/reports': typeof AuthenticatedCaReportsRoute
   '/ca/settings': typeof AuthenticatedCaSettingsRoute
+  '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca/': typeof AuthenticatedCaIndexRoute
   '/client/': typeof AuthenticatedClientIndexRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
 }
 export interface FileRoutesByTo {
@@ -217,12 +232,14 @@ export interface FileRoutesByTo {
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/reports': typeof AuthenticatedCaReportsRoute
   '/ca/settings': typeof AuthenticatedCaSettingsRoute
+  '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca': typeof AuthenticatedCaIndexRoute
   '/client': typeof AuthenticatedClientIndexRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
 }
 export interface FileRoutesById {
@@ -246,12 +263,14 @@ export interface FileRoutesById {
   '/_authenticated/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/_authenticated/ca/reports': typeof AuthenticatedCaReportsRoute
   '/_authenticated/ca/settings': typeof AuthenticatedCaSettingsRoute
+  '/_authenticated/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/_authenticated/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/_authenticated/client/requests': typeof AuthenticatedClientRequestsRoute
   '/_authenticated/client/upload': typeof AuthenticatedClientUploadRoute
   '/_authenticated/ca/': typeof AuthenticatedCaIndexRoute
   '/_authenticated/client/': typeof AuthenticatedClientIndexRoute
   '/_authenticated/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/_authenticated/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
 }
 export interface FileRouteTypes {
@@ -275,12 +294,14 @@ export interface FileRouteTypes {
     | '/ca/dashboard'
     | '/ca/reports'
     | '/ca/settings'
+    | '/ca/tasks'
     | '/client/dashboard'
     | '/client/requests'
     | '/client/upload'
     | '/ca/'
     | '/client/'
     | '/ca/clients/$clientId'
+    | '/ca/tasks/my-tasks'
     | '/ca/clients/$clientId/compliance'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -299,12 +320,14 @@ export interface FileRouteTypes {
     | '/ca/dashboard'
     | '/ca/reports'
     | '/ca/settings'
+    | '/ca/tasks'
     | '/client/dashboard'
     | '/client/requests'
     | '/client/upload'
     | '/ca'
     | '/client'
     | '/ca/clients/$clientId'
+    | '/ca/tasks/my-tasks'
     | '/ca/clients/$clientId/compliance'
   id:
     | '__root__'
@@ -327,12 +350,14 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/dashboard'
     | '/_authenticated/ca/reports'
     | '/_authenticated/ca/settings'
+    | '/_authenticated/ca/tasks'
     | '/_authenticated/client/dashboard'
     | '/_authenticated/client/requests'
     | '/_authenticated/client/upload'
     | '/_authenticated/ca/'
     | '/_authenticated/client/'
     | '/_authenticated/ca/clients/$clientId'
+    | '/_authenticated/ca/tasks/my-tasks'
     | '/_authenticated/ca/clients/$clientId/compliance'
   fileRoutesById: FileRoutesById
 }
@@ -480,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientDashboardRouteImport
       parentRoute: typeof AuthenticatedClientRoute
     }
+    '/_authenticated/ca/tasks': {
+      id: '/_authenticated/ca/tasks'
+      path: '/tasks'
+      fullPath: '/ca/tasks'
+      preLoaderRoute: typeof AuthenticatedCaTasksRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
     '/_authenticated/ca/settings': {
       id: '/_authenticated/ca/settings'
       path: '/settings'
@@ -514,6 +546,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ca/clients'
       preLoaderRoute: typeof AuthenticatedCaClientsRouteImport
       parentRoute: typeof AuthenticatedCaRoute
+    }
+    '/_authenticated/ca/tasks/my-tasks': {
+      id: '/_authenticated/ca/tasks/my-tasks'
+      path: '/my-tasks'
+      fullPath: '/ca/tasks/my-tasks'
+      preLoaderRoute: typeof AuthenticatedCaTasksMyTasksRouteImport
+      parentRoute: typeof AuthenticatedCaTasksRoute
     }
     '/_authenticated/ca/clients/$clientId': {
       id: '/_authenticated/ca/clients/$clientId'
@@ -562,12 +601,24 @@ const AuthenticatedCaClientsRouteWithChildren =
     AuthenticatedCaClientsRouteChildren,
   )
 
+interface AuthenticatedCaTasksRouteChildren {
+  AuthenticatedCaTasksMyTasksRoute: typeof AuthenticatedCaTasksMyTasksRoute
+}
+
+const AuthenticatedCaTasksRouteChildren: AuthenticatedCaTasksRouteChildren = {
+  AuthenticatedCaTasksMyTasksRoute: AuthenticatedCaTasksMyTasksRoute,
+}
+
+const AuthenticatedCaTasksRouteWithChildren =
+  AuthenticatedCaTasksRoute._addFileChildren(AuthenticatedCaTasksRouteChildren)
+
 interface AuthenticatedCaRouteChildren {
   AuthenticatedCaClientsRoute: typeof AuthenticatedCaClientsRouteWithChildren
   AuthenticatedCaComplianceCalendarRoute: typeof AuthenticatedCaComplianceCalendarRoute
   AuthenticatedCaDashboardRoute: typeof AuthenticatedCaDashboardRoute
   AuthenticatedCaReportsRoute: typeof AuthenticatedCaReportsRoute
   AuthenticatedCaSettingsRoute: typeof AuthenticatedCaSettingsRoute
+  AuthenticatedCaTasksRoute: typeof AuthenticatedCaTasksRouteWithChildren
   AuthenticatedCaIndexRoute: typeof AuthenticatedCaIndexRoute
 }
 
@@ -578,6 +629,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaDashboardRoute: AuthenticatedCaDashboardRoute,
   AuthenticatedCaReportsRoute: AuthenticatedCaReportsRoute,
   AuthenticatedCaSettingsRoute: AuthenticatedCaSettingsRoute,
+  AuthenticatedCaTasksRoute: AuthenticatedCaTasksRouteWithChildren,
   AuthenticatedCaIndexRoute: AuthenticatedCaIndexRoute,
 }
 

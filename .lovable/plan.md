@@ -1,115 +1,86 @@
+## Task Management System
 
-# Compliance Calendar Engine
+A firm-wide task management module for CA Owners and Staff, integrated with existing clients, compliance deadlines, and notifications.
 
-A new module in GSTify that tracks every Indian regulatory deadline (GST, TDS, ITR, ROC/MCA, PF/ESI, Audit) for each client of a CA firm, with calendar + list views, per-client profiles, auto-generated deadlines, and reminders.
-
-## 1. Database (one migration)
+### 1. Database (single migration)
 
 New enums:
-- `compliance_category`: GST, TDS, ITR, ROC_MCA, PF_ESI, AUDIT
-- `compliance_applies_to`: ALL, GST_REGISTERED, COMPANIES_ONLY, TDS_DEDUCTOR, EMPLOYER
-- `compliance_recurrence`: MONTHLY, QUARTERLY, ANNUAL, EVENT_BASED
-- `compliance_status`: PENDING, IN_PROGRESS, COMPLETED, OVERDUE, NOT_APPLICABLE
-- `entity_type`: PROPRIETOR, PARTNERSHIP, LLP, PRIVATE_LTD, PUBLIC_LTD, TRUST
+- `task_type`: GST_FILING, TDS_RETURN, ITR_FILING, AUDIT, BOOKKEEPING, NOTICE_REPLY, DOCUMENT_COLLECTION, OTHER
+- `task_priority`: LOW, MEDIUM, HIGH, URGENT
+- `task_status`: TODO, IN_PROGRESS, REVIEW, COMPLETED, CANCELLED
 
-New tables (all RLS-enabled, scoped via existing `can_access_client` / `is_ca_firm_member` helpers):
+Tables (all in `public`, RLS on, scoped by `ca_firm_id` — matching existing convention; `tenant_id` in the spec maps to our existing `ca_firm_id`):
 
-- `compliance_types` — global catalogue (no tenant), readable by all authenticated users, writable only by service role. Columns: id, name, category, description, applies_to, recurrence, default_due_day, default_due_month (nullable, for annual items), is_active.
-- `client_compliance_profile` — one row per client. Columns per spec + `created_at/updated_at`. Unique on `client_id`.
-- `compliance_deadlines` — generated per (client, type, period). Unique on (client_id, compliance_type_id, period_label) to make generation idempotent. Indexed on (ca_firm_id, due_date) and (client_id, status).
+- **tasks** — id, ca_firm_id, client_id (nullable), compliance_deadline_id (nullable), title, description, task_type, priority, assigned_to (uuid → user), created_by, due_date, estimated_hours numeric, status, period_label, is_recurring bool, recurrence_rule text, parent_task_id (self FK), completed_at, timestamps. Indexes on (ca_firm_id, status), (assigned_to, status), (client_id), (due_date).
+- **task_subtasks** — id, task_id, title, is_done, sort_order, timestamps. (Spec mentions "subtasks: checklist items" in the drawer; using a lightweight checklist table rather than nested `tasks` rows.)
+- **task_comments** — id, task_id, user_id, comment, created_at.
+- **task_attachments** — id, task_id, file_url, file_name, uploaded_by, created_at.
 
-Note: spec uses `tenant_id` — mapped to existing `ca_firm_id` column name to stay consistent with the rest of the schema. `assigned_to` references `auth.users(id)` (CA staff are users with a `ca_staff` role row, no separate `ca_staff` table exists).
+RLS / GRANT pattern:
+- Reuse `is_ca_firm_member`, `is_ca_owner`, `can_access_client`.
+- SELECT/INSERT/UPDATE: any ca_firm_member of the firm; staff can update tasks assigned to them or that they created; CA Owner can do everything (including delete and reassign).
+- Comments/attachments/subtasks: any firm member with access to the parent task; only author or CA Owner can delete.
+- GRANTs to `authenticated` + `service_role`, no `anon`.
 
-RLS:
-- compliance_types: SELECT to authenticated.
-- client_compliance_profile / compliance_deadlines: select/update via `can_access_client`; insert/delete via `is_ca_firm_member` + client-firm membership check.
+New storage bucket `task-attachments` (private), with policies scoped by `{ca_firm_id}/{task_id}/...` path.
 
-## 2. Seed data
+### 2. Server functions (`src/lib/tasks.functions.ts` + `tasks.server.ts`)
 
-Insert all compliance types listed in the spec. Stored with default_due_day (and default_due_month for annual). GSTR-3B quarterly uses the later of the two state dates (24) and is flagged in description.
+All protected with `requireSupabaseAuth`:
+- `listTasks({ scope: 'firm'|'mine'|'client', clientId?, filters })` — returns tasks grouped/filterable.
+- `getTask({ id })` — full task with subtasks, comments, attachments, assignee profile.
+- `createTask(input)` — validates with Zod, inserts task. If `is_recurring` stored only on parent.
+- `updateTask({ id, patch })` — partial update; if status moves to COMPLETED and `is_recurring`, call `generateNextRecurrence` (server helper) to clone task with new `due_date` derived from `recurrence_rule` (MONTHLY/QUARTERLY/ANNUAL) and notify CA Owner via `activity_logs` + `compliance_notification_log`‑style insert (we'll use `activity_logs`).
+- `addComment`, `deleteComment`.
+- `addSubtask`, `toggleSubtask`, `deleteSubtask`.
+- `addAttachment` (after client uploads to bucket), `deleteAttachment`.
+- `listAssignableStaff({ caFirmId })` — returns CA Owner + ca_staff users in the firm.
 
-## 3. Auto-generation logic
+Helper: `getEscalationCounts(caFirmId)` — returns `{ overdueHighUrgent, overdue3Plus }` for nav badge.
 
-Server function `regenerateClientDeadlines({ clientId })`:
-- Loads client profile.
-- Filters `compliance_types` by `applies_to` and the profile flags.
-- For each matching type, computes the deadlines that fall inside [today − 30d, end of current FY]:
-  - MONTHLY → one per month from current month forward through FY end
-  - QUARTERLY → one per quarter
-  - ANNUAL → one for the current FY
-  - EVENT_BASED → skipped (created manually)
-- Upserts on (client_id, compliance_type_id, period_label) so it's safe to re-run.
-- Sets status PENDING; OVERDUE is derived dynamically (and via a daily refresh) using `due_date < today`.
+### 3. Routes & UI
 
-Called from:
-- `upsertClientComplianceProfile` server fn (after profile save).
-- `inviteClient` / on client creation (with default profile of all-false → no deadlines until profile filled).
+```text
+src/routes/_authenticated/
+  ca.tasks.tsx                 -> /ca/tasks  (Kanban + List toggle)
+  ca.tasks.my-tasks.tsx        -> /ca/tasks/my-tasks
+  ca.clients.$clientId.tasks.tsx -> /ca/clients/:id/tasks (tab content)
+```
 
-## 4. Server functions (new file `src/lib/compliance.functions.ts`)
+Components in `src/components/tasks/`:
+- `TaskBoard.tsx` — Kanban with 4 columns, drag/drop using `@dnd-kit/core` + `@dnd-kit/sortable` (installed). Optimistic status update via `useMutation`.
+- `TaskListView.tsx` — table fallback, sortable by due date / priority.
+- `TaskCard.tsx` — client tag, title, priority badge, assignee avatar (initials), due date pill (red if overdue, orange if today), task-type icon, comment count.
+- `TaskFiltersBar.tsx` — My Tasks toggle, client/staff/type/priority/date filters, search.
+- `NewTaskDialog.tsx` — full form with internal-task toggle, compliance deadline link, recurrence picker.
+- `TaskDetailDrawer.tsx` — uses `Sheet`; editable fields (CA Owner / creator / assignee), subtasks checklist, comments, attachments uploader, simple activity log derived from `activity_logs`.
+- `MyTasksList.tsx` — today highlighted, quick status buttons.
+- `tasks/utils.ts` — date helpers (isOverdue, isToday, nextRecurrence), priority styling, type icon map.
 
-- `listComplianceTypes()` — public catalogue.
-- `getClientComplianceProfile({ clientId })`.
-- `upsertClientComplianceProfile({ clientId, profile })` → regenerates deadlines.
-- `listFirmDeadlines({ from, to, category?, status?, assignedTo?, clientId?, search? })` — for calendar + list.
-- `listClientDeadlines({ clientId })`.
-- `updateDeadline({ id, patch })` — status, assigned_to, notes, filing_reference, completed_at.
-- `bulkUpdateDeadlines({ ids, patch })` — for list view bulk actions.
-- `getComplianceSummary()` — counts for the four summary cards (overdue, due-this-week, due-this-month, completed-this-month).
-- `regenerateClientDeadlines({ clientId })` (also exposed for manual refresh).
+Add "Tasks" item to CA nav in `CADashboard` / sidebar with red badge when `overdue3Plus > 0`. Inject the new "Tasks" tab into `ca.clients.$clientId.tsx` next to Compliance.
 
-All use `requireSupabaseAuth` + `supabaseAdmin` with explicit firm-membership checks (consistent with existing pattern in `tenant.functions.ts`).
+### 4. Recurring + escalation
 
-## 5. UI
+- `generateNextRecurrence` runs inside `updateTask` when status flips to COMPLETED + `is_recurring`. Inserts `activity_logs` row "Next occurrence created" for the CA Owner.
+- Escalation badge: realtime/poll `getEscalationCounts` every 60s in `NotificationsBell` parent; show on Tasks nav link.
+- Add "overdue task" entries to existing `NotificationsBell` (alongside compliance overdue) for HIGH/URGENT overdue 1+ day.
+- Daily 8AM digest email: defer — requires email infra (already noted as a follow-up). I'll stub the server helper `sendDailyTaskDigest` but not wire pg_cron until email domain is configured. I will call out this limitation in the final response.
 
-New route `src/routes/_authenticated/ca.compliance-calendar.tsx`:
-- Page header + 4 summary cards (red/orange/yellow/green).
-- Filter bar: Category select, Status select, Assigned Staff select, Search.
-- View toggle (Calendar / List). Defaults to List on viewports < 768px.
-- **Calendar view**: month grid built with `date-fns`, today highlighted (light blue), each cell shows up to 3 colored pills + a "+N more" overflow. Prev/next month + "Today" buttons.
-- **List view**: deadlines grouped into "This Week / Next Week / This Month / Later". Row checkboxes for bulk actions. Sortable headers (due_date, client, type).
-- Clicking a pill or row opens a `Sheet` drawer with: client name, compliance type/category, period, due date with color, assigned staff (select), status (select), notes, filing_reference, action buttons (Mark Complete, Reassign, Save).
+### 5. Design
 
-New route `src/routes/_authenticated/ca.clients.$clientId.compliance.tsx`:
-- Lives next to the existing client detail page; rendered as a section there (or accessed via tab).
-- Shows that client's deadlines (list only) + an "Edit Compliance Profile" button opening a modal form with all profile fields.
-- Saving the profile calls `upsertClientComplianceProfile`, which regenerates deadlines.
+- Kanban columns: `bg-card` with subtle `border`, column header with status name + count badge, drag-handle cursor on cards.
+- Priority colors via tokens: add `--priority-urgent/high/medium/low` in `src/styles.css` (oklch), use through Tailwind utility classes via `cn` helpers — no raw hex in components.
+- Mobile: columns stack with horizontal scroll + snap (`overflow-x-auto snap-x snap-mandatory`).
+- Smooth drag animation via `@dnd-kit` default transitions.
 
-Add a "Compliance Calendar" link to the CA sidebar in `CADashboard`.
+### Out of scope (called out in closing message)
 
-## 6. Notifications
+- Time tracking ("Start Timer" button) — placeholder UI only; Feature 3 will own the logic.
+- Daily 8AM digest email — server fn scaffolded but not scheduled; needs email infra setup first.
 
-In-app notifications use the existing notifications system (reused by `NotificationsBell`). Two paths:
+### Technical notes
 
-1. On open/refresh of compliance views, server fn `evaluateDueSoonNotifications()` (idempotent — unique key per deadline + bucket "T-7" / "T-3" / "OVERDUE") inserts notification rows for any deadlines crossing the thresholds.
-2. CA Dashboard shows a red banner when the current user (or their firm) has overdue deadlines.
-
-Email reminders for "T-3" and daily overdue digests are scaffolded as a TODO note inside the server fn since they require the email infra to be set up — flagged in the closing message rather than silently enabling.
-
-## 7. Design
-
-Uses existing tokens from `src/styles.css` — no new colors. Status pill component maps:
-- COMPLETED → muted/gray
-- OVERDUE → destructive red
-- due in ≤3d → orange (use `--accent` with a warm overlay, or define `--warning` / `--warning-foreground` if not present, scoped to status pills)
-- due in ≤7d → yellow (`--secondary` shade)
-- > 7d → primary/green tone
-
-If `--warning` / `--info` semantic tokens aren't already defined, add minimal `oklch` tokens to `styles.css` and use them via Tailwind utility classes — no hard-coded hex.
-
-## Technical notes
-
-- `period_label` is canonicalized so upserts dedupe cleanly: monthly = `YYYY-MM`, quarterly = `FYxx-yy-Qn`, annual = `FYxx-yy`.
-- All due dates clamped to last day of month if `default_due_day` exceeds month length (handles Feb / 30-day months).
-- "Overdue" is derived in queries (`due_date < CURRENT_DATE AND status NOT IN ('COMPLETED','NOT_APPLICABLE')`) rather than stored, so it stays accurate without a cron — `status` field stores only user intent.
-- File scope:
-  - Migration: 1 new file under `supabase/migrations/`.
-  - Server fns: `src/lib/compliance.functions.ts`.
-  - UI: 2 route files + 4–5 small components under `src/components/compliance/` (CalendarGrid, DeadlinePill, DeadlineDrawer, ListView, ProfileEditor, SummaryCards).
-  - Sidebar: small edit to `CADashboard`.
-
-## Out of scope (will note in handoff)
-
-- Email reminders (need `setup_email_infra` + scaffold step).
-- Push/WhatsApp reminders.
-- EVENT_BASED deadlines (manual creation only — generation skipped).
-- Editing the global `compliance_types` catalogue from the UI.
+- Install: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `date-fns` (already present, verify).
+- Migration must include GRANTs per project rules.
+- All server-side admin work goes through `supabaseAdmin` only where strictly needed (recurrence cloning); rest uses authenticated client so RLS applies.
+- Subtasks modeled as `task_subtasks` (not nested tasks) for simpler UI/RLS — `parent_task_id` on `tasks` is kept for future nested task hierarchies as the spec defines it.
