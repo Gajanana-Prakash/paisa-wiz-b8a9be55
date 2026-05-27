@@ -99,6 +99,15 @@
   --sidebar-border: oklch(0.3 0.05 160);
   --sidebar-ring: oklch(0.78 0.13 85);
 
+  --priority-urgent: oklch(0.58 0.22 27);
+  --priority-high: oklch(0.68 0.18 50);
+  --priority-medium: oklch(0.78 0.16 85);
+  --priority-medium-foreground: oklch(0.4 0.1 70);
+  --color-priority-urgent: var(--priority-urgent);
+  --color-priority-high: var(--priority-high);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-foreground: var(--priority-medium-foreground);
+
   --gradient-hero: linear-gradient(135deg, oklch(0.22 0.05 160), oklch(0.36 0.09 160) 60%, oklch(0.5 0.12 160));
   --gradient-gold: linear-gradient(135deg, oklch(0.78 0.13 85), oklch(0.85 0.1 95));
   --shadow-elegant: 0 30px 60px -20px color-mix(in oklab, oklch(0.22 0.05 160) 40%, transparent);
