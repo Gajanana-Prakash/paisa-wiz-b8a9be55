@@ -106,18 +106,38 @@ function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [email, setEmail] = useState<string>("");
+  const [tasksOverdue, setTasksOverdue] = useState(0);
+  const loadEscalation = useServerFn(getEscalationCounts);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, []);
 
+  const isCA = role === "ca_owner" || role === "ca_staff";
+
+  useEffect(() => {
+    if (!isCA) return;
+    let cancelled = false;
+    const refresh = () => loadEscalation({ data: undefined as any })
+      .then((r: any) => { if (!cancelled) setTasksOverdue(r?.overdueTotal ?? 0); })
+      .catch(() => {});
+    refresh();
+    const t = setInterval(refresh, 60_000);
+    const ch = supabase
+      .channel("nav-tasks")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, refresh)
+      .subscribe();
+    return () => { cancelled = true; clearInterval(t); supabase.removeChannel(ch); };
+  }, [isCA, loadEscalation]);
+
   const signOut = async () => { await supabase.auth.signOut(); navigate({ to: "/" }); };
   const initials = email ? email.slice(0, 2).toUpperCase() : "GS";
 
-  const isCA = role === "ca_owner" || role === "ca_staff";
   const nav = isCA ? CA_NAV : CLIENT_NAV;
   const settingsTo = isCA ? "/ca/settings" : "/client/dashboard";
   const uploadTo = isCA ? "/ca/clients" : "/client/upload";
+
+  const badges: Record<string, number> = { tasksOverdue };
 
 
   const SidebarInner = (
@@ -133,20 +153,28 @@ function AppShell() {
       </Link>
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {!collapsed && <div className="px-3 pb-2 text-[10px] uppercase tracking-widest text-sidebar-foreground/40">Workspace</div>}
-        {nav.map((i) => (
-          <Link
-            key={i.to}
-            to={i.to}
-            onClick={() => setMobileOpen(false)}
-            activeProps={{ className: "bg-sidebar-accent text-sidebar-primary shadow-sm border-sidebar-primary/30" }}
-            inactiveProps={{ className: "text-sidebar-foreground/80 border-transparent" }}
-            className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm border hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all"
-            title={collapsed ? i.label : undefined}
-          >
-            <i.icon className="size-[18px] shrink-0" />
-            {!collapsed && <span className="font-medium">{i.label}</span>}
-          </Link>
-        ))}
+        {nav.map((i) => {
+          const badge = (i as any).badgeKey ? badges[(i as any).badgeKey] : 0;
+          return (
+            <Link
+              key={i.to}
+              to={i.to}
+              onClick={() => setMobileOpen(false)}
+              activeProps={{ className: "bg-sidebar-accent text-sidebar-primary shadow-sm border-sidebar-primary/30" }}
+              inactiveProps={{ className: "text-sidebar-foreground/80 border-transparent" }}
+              className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm border hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all"
+              title={collapsed ? i.label : undefined}
+            >
+              <i.icon className="size-[18px] shrink-0" />
+              {!collapsed && <span className="font-medium flex-1">{i.label}</span>}
+              {badge > 0 && (
+                <span className={`${collapsed ? "absolute top-1 right-1" : ""} min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold grid place-items-center`}>
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
       {!collapsed && firm && (
         <div className="px-4 py-3 border-t border-sidebar-border/50 text-[11px] text-sidebar-foreground/60">
