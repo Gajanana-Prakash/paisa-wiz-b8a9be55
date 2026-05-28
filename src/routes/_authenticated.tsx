@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
-  Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell,
+  Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { NotificationsBell } from "@/components/NotificationsBell";
 import { TenantProvider, useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { finalizeCAOnboarding, acceptInvite } from "@/lib/tenant.functions";
+import { getEscalationCounts } from "@/lib/tasks.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -84,6 +85,7 @@ function NoAccessScreen() {
 const CA_NAV = [
   { to: "/ca/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/ca/clients", icon: Users, label: "Clients" },
+  { to: "/ca/tasks", icon: KanbanSquare, label: "Tasks", badgeKey: "tasksOverdue" as const },
   { to: "/ca/reports", icon: FileDown, label: "Reports" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
