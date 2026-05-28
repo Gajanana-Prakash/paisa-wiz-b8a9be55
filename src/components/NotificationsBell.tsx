@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-type NType = "uploaded" | "review" | "validated" | "processing" | "mismatch" | "doc_fulfilled" | "due_soon" | "overdue";
+type NType = "uploaded" | "review" | "validated" | "processing" | "mismatch" | "doc_fulfilled" | "due_soon" | "overdue" | "task_overdue" | "task_due_soon";
 
 type Notif = {
   id: string;
@@ -43,6 +43,8 @@ function buildInvoiceNotif(row: any): Notif {
     doc_fulfilled: "Document request fulfilled",
     due_soon: "Filing due soon",
     overdue: "Compliance overdue",
+    task_overdue: "Task overdue",
+    task_due_soon: "Task due soon",
   };
   return {
     id: row.id,
@@ -106,7 +108,7 @@ export function NotificationsBell() {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const in7 = new Date(today.getTime() + 7 * 86400000);
       const toISO = (d: Date) => d.toISOString().slice(0, 10);
-      const [{ data: inv }, { data: req }, { data: dls }] = await Promise.all([
+      const [{ data: inv }, { data: req }, { data: dls }, { data: tks }] = await Promise.all([
         supabase.from("invoices")
           .select("id,status,vendor_name,invoice_number,file_name,validation_flags,created_at,updated_at")
           .order("updated_at", { ascending: false }).limit(15),
@@ -117,6 +119,12 @@ export function NotificationsBell() {
         supabase.from("compliance_deadlines")
           .select("id,due_date,status,period_label,updated_at,clients!inner(business_name),compliance_types!inner(name)")
           .in("status", ["PENDING", "IN_PROGRESS"])
+          .lte("due_date", toISO(in7))
+          .order("due_date", { ascending: true }).limit(20),
+        supabase.from("tasks")
+          .select("id,title,due_date,status,updated_at,clients(business_name)")
+          .not("status", "in", "(COMPLETED,CANCELLED)")
+          .not("due_date", "is", null)
           .lte("due_date", toISO(in7))
           .order("due_date", { ascending: true }).limit(20),
       ]);
@@ -131,9 +139,20 @@ export function NotificationsBell() {
           at: d.updated_at || new Date().toISOString(),
         };
       });
+      const taskNotifs: Notif[] = (tks ?? []).map((t: any) => {
+        const overdue = t.due_date < toISO(today);
+        return {
+          id: `tk-${t.id}`,
+          type: overdue ? "task_overdue" : "task_due_soon",
+          title: overdue ? "Task overdue" : "Task due soon",
+          detail: `${t.title}${t.clients?.business_name ? ` · ${t.clients.business_name}` : ""} · ${new Date(t.due_date).toLocaleDateString()}`,
+          at: t.updated_at || new Date().toISOString(),
+        };
+      });
       const merged: Notif[] = [
         ...(dueSoonNotif ? [dueSoonNotif] : []),
         ...complianceNotifs,
+        ...taskNotifs,
         ...(inv ?? []).map(buildInvoiceNotif),
         ...(req ?? []).map(buildDocReqNotif),
       ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 30);
@@ -208,17 +227,21 @@ export function NotificationsBell() {
                 n.type === "mismatch" ? AlertTriangle :
                 n.type === "review" ? AlertTriangle :
                 n.type === "overdue" ? AlertTriangle :
+                n.type === "task_overdue" ? AlertTriangle :
                 n.type === "validated" ? CheckCircle2 :
                 n.type === "uploaded" ? Upload :
                 n.type === "doc_fulfilled" ? Inbox :
-                n.type === "due_soon" ? CalendarClock : FileText;
+                n.type === "due_soon" ? CalendarClock :
+                n.type === "task_due_soon" ? CalendarClock : FileText;
               const tone =
                 n.type === "mismatch" ? "text-rose-600 bg-rose-500/10" :
                 n.type === "overdue" ? "text-rose-600 bg-rose-500/10" :
+                n.type === "task_overdue" ? "text-rose-600 bg-rose-500/10" :
                 n.type === "review" ? "text-amber-600 bg-amber-500/10" :
                 n.type === "validated" ? "text-emerald-600 bg-emerald-500/10" :
                 n.type === "doc_fulfilled" ? "text-emerald-600 bg-emerald-500/10" :
                 n.type === "due_soon" ? "text-amber-600 bg-amber-500/10" :
+                n.type === "task_due_soon" ? "text-amber-600 bg-amber-500/10" :
                 "text-primary bg-primary/10";
               const isNew = new Date(n.at).getTime() > readAt;
               return (
