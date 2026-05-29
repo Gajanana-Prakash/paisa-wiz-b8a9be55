@@ -666,6 +666,42 @@ export type Database = {
           },
         ]
       }
+      leave_records: {
+        Row: {
+          approved_by: string | null
+          ca_firm_id: string
+          created_at: string
+          id: string
+          leave_date: string
+          leave_type: Database["public"]["Enums"]["leave_type"]
+          reason: string | null
+          staff_user_id: string
+          status: Database["public"]["Enums"]["leave_status"]
+        }
+        Insert: {
+          approved_by?: string | null
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          leave_date: string
+          leave_type: Database["public"]["Enums"]["leave_type"]
+          reason?: string | null
+          staff_user_id: string
+          status?: Database["public"]["Enums"]["leave_status"]
+        }
+        Update: {
+          approved_by?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          leave_date?: string
+          leave_type?: Database["public"]["Enums"]["leave_type"]
+          reason?: string | null
+          staff_user_id?: string
+          status?: Database["public"]["Enums"]["leave_status"]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -780,6 +816,51 @@ export type Database = {
           sent_at?: string | null
           sent_by?: string | null
           status?: Database["public"]["Enums"]["reminder_status"]
+        }
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: {
+          billing_rate_per_hour: number
+          ca_firm_id: string
+          cost_rate_per_hour: number
+          created_at: string
+          designation: string | null
+          id: string
+          is_active: boolean
+          joining_date: string | null
+          leave_balance: number
+          updated_at: string
+          user_id: string
+          weekly_target_hours: number
+        }
+        Insert: {
+          billing_rate_per_hour?: number
+          ca_firm_id: string
+          cost_rate_per_hour?: number
+          created_at?: string
+          designation?: string | null
+          id?: string
+          is_active?: boolean
+          joining_date?: string | null
+          leave_balance?: number
+          updated_at?: string
+          user_id: string
+          weekly_target_hours?: number
+        }
+        Update: {
+          billing_rate_per_hour?: number
+          ca_firm_id?: string
+          cost_rate_per_hour?: number
+          created_at?: string
+          designation?: string | null
+          id?: string
+          is_active?: boolean
+          joining_date?: string | null
+          leave_balance?: number
+          updated_at?: string
+          user_id?: string
+          weekly_target_hours?: number
         }
         Relationships: []
       }
@@ -965,6 +1046,54 @@ export type Database = {
           },
         ]
       }
+      time_logs: {
+        Row: {
+          billable_amount: number
+          billing_rate_per_hour: number
+          ca_firm_id: string
+          client_id: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          ended_at: string | null
+          id: string
+          is_billable: boolean
+          staff_user_id: string
+          started_at: string
+          task_id: string | null
+        }
+        Insert: {
+          billable_amount?: number
+          billing_rate_per_hour?: number
+          ca_firm_id: string
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          is_billable?: boolean
+          staff_user_id: string
+          started_at?: string
+          task_id?: string | null
+        }
+        Update: {
+          billable_amount?: number
+          billing_rate_per_hour?: number
+          ca_firm_id?: string
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          is_billable?: boolean
+          staff_user_id?: string
+          started_at?: string
+          task_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           ca_firm_id: string | null
@@ -1089,6 +1218,8 @@ export type Database = {
         | "filed"
         | "error"
         | "approved"
+      leave_status: "PENDING" | "APPROVED" | "REJECTED"
+      leave_type: "CASUAL" | "SICK" | "EARNED" | "HALF_DAY" | "COMP_OFF"
       reminder_channel: "in_app" | "email" | "whatsapp"
       reminder_status: "scheduled" | "sent" | "skipped" | "failed"
       reminder_trigger:
@@ -1291,6 +1422,8 @@ export const Constants = {
         "error",
         "approved",
       ],
+      leave_status: ["PENDING", "APPROVED", "REJECTED"],
+      leave_type: ["CASUAL", "SICK", "EARNED", "HALF_DAY", "COMP_OFF"],
       reminder_channel: ["in_app", "email", "whatsapp"],
       reminder_status: ["scheduled", "sent", "skipped", "failed"],
       reminder_trigger: [
