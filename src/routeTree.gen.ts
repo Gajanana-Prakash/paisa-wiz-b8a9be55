@@ -28,6 +28,7 @@ import { Route as AuthenticatedCaIndexRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedClientUploadRouteImport } from './routes/_authenticated/client.upload'
 import { Route as AuthenticatedClientRequestsRouteImport } from './routes/_authenticated/client.requests'
 import { Route as AuthenticatedClientDashboardRouteImport } from './routes/_authenticated/client.dashboard'
+import { Route as AuthenticatedCaTimesheetsRouteImport } from './routes/_authenticated/ca.timesheets'
 import { Route as AuthenticatedCaTasksRouteImport } from './routes/_authenticated/ca.tasks'
 import { Route as AuthenticatedCaSettingsRouteImport } from './routes/_authenticated/ca.settings'
 import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authenticated/ca.reports'
@@ -136,6 +137,12 @@ const AuthenticatedClientDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedClientRoute,
   } as any)
+const AuthenticatedCaTimesheetsRoute =
+  AuthenticatedCaTimesheetsRouteImport.update({
+    id: '/timesheets',
+    path: '/timesheets',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
 const AuthenticatedCaTasksRoute = AuthenticatedCaTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -207,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/ca/reports': typeof AuthenticatedCaReportsRoute
   '/ca/settings': typeof AuthenticatedCaSettingsRoute
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
+  '/ca/timesheets': typeof AuthenticatedCaTimesheetsRoute
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
@@ -233,6 +241,7 @@ export interface FileRoutesByTo {
   '/ca/reports': typeof AuthenticatedCaReportsRoute
   '/ca/settings': typeof AuthenticatedCaSettingsRoute
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
+  '/ca/timesheets': typeof AuthenticatedCaTimesheetsRoute
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
@@ -264,6 +273,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/reports': typeof AuthenticatedCaReportsRoute
   '/_authenticated/ca/settings': typeof AuthenticatedCaSettingsRoute
   '/_authenticated/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
+  '/_authenticated/ca/timesheets': typeof AuthenticatedCaTimesheetsRoute
   '/_authenticated/client/dashboard': typeof AuthenticatedClientDashboardRoute
   '/_authenticated/client/requests': typeof AuthenticatedClientRequestsRoute
   '/_authenticated/client/upload': typeof AuthenticatedClientUploadRoute
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/ca/reports'
     | '/ca/settings'
     | '/ca/tasks'
+    | '/ca/timesheets'
     | '/client/dashboard'
     | '/client/requests'
     | '/client/upload'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/ca/reports'
     | '/ca/settings'
     | '/ca/tasks'
+    | '/ca/timesheets'
     | '/client/dashboard'
     | '/client/requests'
     | '/client/upload'
@@ -351,6 +363,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/reports'
     | '/_authenticated/ca/settings'
     | '/_authenticated/ca/tasks'
+    | '/_authenticated/ca/timesheets'
     | '/_authenticated/client/dashboard'
     | '/_authenticated/client/requests'
     | '/_authenticated/client/upload'
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientDashboardRouteImport
       parentRoute: typeof AuthenticatedClientRoute
     }
+    '/_authenticated/ca/timesheets': {
+      id: '/_authenticated/ca/timesheets'
+      path: '/timesheets'
+      fullPath: '/ca/timesheets'
+      preLoaderRoute: typeof AuthenticatedCaTimesheetsRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
     '/_authenticated/ca/tasks': {
       id: '/_authenticated/ca/tasks'
       path: '/tasks'
@@ -619,6 +639,7 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaReportsRoute: typeof AuthenticatedCaReportsRoute
   AuthenticatedCaSettingsRoute: typeof AuthenticatedCaSettingsRoute
   AuthenticatedCaTasksRoute: typeof AuthenticatedCaTasksRouteWithChildren
+  AuthenticatedCaTimesheetsRoute: typeof AuthenticatedCaTimesheetsRoute
   AuthenticatedCaIndexRoute: typeof AuthenticatedCaIndexRoute
 }
 
@@ -630,6 +651,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaReportsRoute: AuthenticatedCaReportsRoute,
   AuthenticatedCaSettingsRoute: AuthenticatedCaSettingsRoute,
   AuthenticatedCaTasksRoute: AuthenticatedCaTasksRouteWithChildren,
+  AuthenticatedCaTimesheetsRoute: AuthenticatedCaTimesheetsRoute,
   AuthenticatedCaIndexRoute: AuthenticatedCaIndexRoute,
 }
 
@@ -700,13 +722,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
