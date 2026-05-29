@@ -291,13 +291,18 @@ export const getStaff = createServerFn({ method: "POST" })
     if (!role) throw new Error("Staff member not found in this firm");
 
     const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
-    const [{ data: monthLogs }, { data: leaves }, { data: tasksDone }, { data: tasksOverdue }] = await Promise.all([
+    const [{ data: monthLogs }, { data: leaves }, { data: tasksDone }, { data: tasksOverdue }, { data: assignments }, { data: recentLogs }] = await Promise.all([
       supabaseAdmin.from("time_logs").select("duration_minutes, is_billable, billable_amount")
         .eq("ca_firm_id", firmId).eq("staff_user_id", data.userId).gte("started_at", monthStart.toISOString())
         .not("ended_at", "is", null),
       supabaseAdmin.from("leave_records").select("*").eq("ca_firm_id", firmId).eq("staff_user_id", data.userId).order("leave_date", { ascending: false }).limit(50),
       supabaseAdmin.from("tasks").select("id", { count: "exact", head: true }).eq("ca_firm_id", firmId).eq("assigned_to", data.userId).eq("status", "COMPLETED"),
       supabaseAdmin.from("tasks").select("id", { count: "exact", head: true }).eq("ca_firm_id", firmId).eq("assigned_to", data.userId).not("status", "in", "(COMPLETED,CANCELLED)").lt("due_date", new Date().toISOString().slice(0, 10)),
+      supabaseAdmin.from("ca_staff_assignments").select("client_id, clients(id, business_name)").eq("ca_firm_id", firmId).eq("staff_user_id", data.userId),
+      supabaseAdmin.from("time_logs")
+        .select("id, description, started_at, ended_at, duration_minutes, is_billable, billable_amount, clients(business_name), tasks(title)")
+        .eq("ca_firm_id", firmId).eq("staff_user_id", data.userId).not("ended_at", "is", null)
+        .order("started_at", { ascending: false }).limit(30),
     ]);
     const minutes = (monthLogs ?? []).reduce((s: number, l: any) => s + (l.duration_minutes ?? 0), 0);
     const billableMinutes = (monthLogs ?? []).filter((l: any) => l.is_billable).reduce((s: number, l: any) => s + (l.duration_minutes ?? 0), 0);
@@ -316,6 +321,11 @@ export const getStaff = createServerFn({ method: "POST" })
         tasks_overdue: tasksOverdue?.length ?? (tasksOverdue as any)?.count ?? 0,
       },
       leaves: leaves ?? [],
+      assigned_clients: (assignments ?? []).map((a: any) => ({
+        id: a.client_id,
+        business_name: a.clients?.business_name ?? "Unknown",
+      })),
+      recent_logs: recentLogs ?? [],
     };
   });
 
@@ -324,6 +334,7 @@ export const addStaffMember = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       email: z.string().trim().email().max(255),
+      fullName: z.string().trim().max(120).optional().nullable(),
       designation: z.string().trim().max(120).optional().nullable(),
       billingRate: z.number().min(0).max(1_000_000).default(0),
       costRate: z.number().min(0).max(1_000_000).default(0),
@@ -360,6 +371,10 @@ export const addStaffMember = createServerFn({ method: "POST" })
       { user_id: userId, role: "ca_staff", ca_firm_id: firmId },
       { onConflict: "user_id,role,ca_firm_id" as any, ignoreDuplicates: true },
     );
+
+    if (data.fullName?.trim()) {
+      await supabaseAdmin.from("profiles").upsert({ id: userId, full_name: data.fullName.trim() });
+    }
 
     // Upsert staff_profile
     const { error: spErr } = await supabaseAdmin.from("staff_profiles").upsert({

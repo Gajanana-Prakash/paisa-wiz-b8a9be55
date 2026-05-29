@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
+  Clock, UserCog,
 } from "lucide-react";
+import { TimerWidget } from "@/components/timetracking/TimerWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -82,11 +84,23 @@ function NoAccessScreen() {
   );
 }
 
-const CA_NAV = [
+const CA_NAV_OWNER = [
   { to: "/ca/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/ca/clients", icon: Users, label: "Clients" },
   { to: "/ca/tasks", icon: KanbanSquare, label: "Tasks", badgeKey: "tasksOverdue" as const },
+  { to: "/ca/timesheets", icon: Clock, label: "Timesheets" },
+  { to: "/ca/staff", icon: UserCog, label: "Staff" },
   { to: "/ca/reports", icon: FileDown, label: "Reports" },
+  { to: "/invoices", icon: FileText, label: "Invoices" },
+  { to: "/reminders", icon: Bell, label: "Reminders" },
+  { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
+] as const;
+
+const CA_NAV_STAFF = [
+  { to: "/ca/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/ca/clients", icon: Users, label: "Clients" },
+  { to: "/ca/tasks/my-tasks", icon: KanbanSquare, label: "My tasks" },
+  { to: "/ca/timesheets/my-timesheet", icon: Clock, label: "My timesheet" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
@@ -102,7 +116,7 @@ const CLIENT_NAV = [
 
 function AppShell() {
   const navigate = useNavigate();
-  const { role, firm, availableClients, activeClientId, setActiveClientId, activeClient } = useTenant();
+  const { role, userId, firm, availableClients, activeClientId, setActiveClientId, activeClient } = useTenant();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [email, setEmail] = useState<string>("");
@@ -133,7 +147,7 @@ function AppShell() {
   const signOut = async () => { await supabase.auth.signOut(); navigate({ to: "/" }); };
   const initials = email ? email.slice(0, 2).toUpperCase() : "GS";
 
-  const nav = isCA ? CA_NAV : CLIENT_NAV;
+  const nav = isCA ? (role === "ca_owner" ? CA_NAV_OWNER : CA_NAV_STAFF) : CLIENT_NAV;
   const settingsTo = isCA ? "/ca/settings" : "/client/dashboard";
   const uploadTo = isCA ? "/ca/clients" : "/client/upload";
 
@@ -245,6 +259,8 @@ function AppShell() {
 
           {activeClient && false /* keep var used */}
 
+          {isCA && <TimerWidget />}
+
           <Link to="/assistant" className="hidden sm:inline-flex">
             <Button variant="outline" size="sm" className="gap-2 rounded-full">
               <Sparkles className="size-4 text-primary" /> Ask AI
@@ -274,6 +290,11 @@ function AppShell() {
                 <div className="text-sm font-medium truncate">{email || "—"}</div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {role === "ca_staff" && userId && (
+                <DropdownMenuItem asChild>
+                  <Link to="/ca/staff/$userId" params={{ userId }}><UserCog className="size-4 mr-2" /> My profile</Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild><Link to={settingsTo}><Settings className="size-4 mr-2" /> Settings</Link></DropdownMenuItem>
               <DropdownMenuItem onClick={signOut}><LogOut className="size-4 mr-2" /> Sign out</DropdownMenuItem>
             </DropdownMenuContent>

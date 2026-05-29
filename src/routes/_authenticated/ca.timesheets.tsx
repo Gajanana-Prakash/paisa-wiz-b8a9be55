@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useTenant } from "@/hooks/useTenant";
 import { useMemo, useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,16 +8,19 @@ import { Progress } from "@/components/ui/progress";
 import { Square, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { listActiveTimers, listTimeLogs, stopTimer, listStaff } from "@/lib/timetracking.functions";
+import { listFirmClientsLite } from "@/lib/tasks.functions";
 import { TimesheetTable } from "@/components/timetracking/TimesheetTable";
 import { formatElapsedFromStart, formatMinutes, startOfWeek, endOfWeek, isoDate, utilBg } from "@/components/timetracking/utils";
 
 export const Route = createFileRoute("/_authenticated/ca/timesheets")({ component: TimesheetsPage });
 
 function TimesheetsPage() {
+  const { role } = useTenant();
   const qc = useQueryClient();
   const listActive = useServerFn(listActiveTimers);
   const listLogs = useServerFn(listTimeLogs);
   const listStaffFn = useServerFn(listStaff);
+  const listClientsFn = useServerFn(listFirmClientsLite);
   const stop = useServerFn(stopTimer);
 
   const [now, setNow] = useState(Date.now());
@@ -25,6 +29,7 @@ function TimesheetsPage() {
   const [from, setFrom] = useState(() => isoDate(startOfWeek(new Date())));
   const [to, setTo] = useState(() => isoDate(endOfWeek(new Date())));
   const [staffFilter, setStaffFilter] = useState("");
+  const [clientFilter, setClientFilter] = useState("");
   const [billableOnly, setBillableOnly] = useState(false);
 
   const { data: active = [] } = useQuery({
@@ -34,8 +39,8 @@ function TimesheetsPage() {
   });
 
   const { data: logs = [] } = useQuery({
-    queryKey: ["time-logs", "firm", from, to, staffFilter, billableOnly],
-    queryFn: () => listLogs({ data: { scope: "firm", dateFrom: new Date(from).toISOString(), dateTo: new Date(to + "T23:59:59").toISOString(), staffId: staffFilter || undefined, billableOnly } }),
+    queryKey: ["time-logs", "firm", from, to, staffFilter, clientFilter, billableOnly],
+    queryFn: () => listLogs({ data: { scope: "firm", dateFrom: new Date(from).toISOString(), dateTo: new Date(to + "T23:59:59").toISOString(), staffId: staffFilter || undefined, clientId: clientFilter || undefined, billableOnly } }),
   });
 
   const { data: staff = [] } = useQuery({
@@ -43,10 +48,17 @@ function TimesheetsPage() {
     queryFn: () => listStaffFn({ data: undefined as any }),
   });
 
+  const { data: firmClients = [] } = useQuery({
+    queryKey: ["firm-clients-lite"],
+    queryFn: () => listClientsFn({ data: undefined as any }),
+  });
+
   const handleStop = async (id: string) => {
     try { await stop({ data: { id } }); qc.invalidateQueries({ queryKey: ["active-timers"] }); qc.invalidateQueries({ queryKey: ["time-logs"] }); toast.success("Stopped"); }
     catch (e: any) { toast.error(e.message); }
   };
+
+  if (role === "ca_staff") return <Navigate to="/ca/timesheets/my-timesheet" />;
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
@@ -90,6 +102,11 @@ function TimesheetsPage() {
               <select value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)} className="h-9 rounded-md border border-input bg-transparent px-3 text-sm min-w-[180px]">
                 <option value="">All staff</option>
                 {staff.map((s: any) => <option key={s.user_id} value={s.user_id}>{s.name}</option>)}
+              </select></div>
+            <div><label className="block text-xs font-medium mb-1 text-muted-foreground uppercase tracking-wide">Client</label>
+              <select value={clientFilter} onChange={(e) => setClientFilter(e.target.value)} className="h-9 rounded-md border border-input bg-transparent px-3 text-sm min-w-[180px]">
+                <option value="">All clients</option>
+                {(firmClients as any[]).map((c) => <option key={c.id} value={c.id}>{c.business_name}</option>)}
               </select></div>
             <label className="flex items-center gap-2 text-sm pb-2"><input type="checkbox" checked={billableOnly} onChange={(e) => setBillableOnly(e.target.checked)} /> Billable only</label>
           </div>

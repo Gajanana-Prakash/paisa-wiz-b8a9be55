@@ -236,7 +236,7 @@ export const loadTenantContext = createServerFn({ method: "POST" })
     const role: "ca_owner" | "ca_staff" | "client_owner" | "client_employee" | null =
       (caOwner?.role as any) ?? (caStaff?.role as any) ?? (clientRole?.role as any) ?? null;
 
-    return { role, firm, availableClients };
+    return { role, firm, availableClients, userId };
   });
 
 // ---------- UPDATE FIRM BRANDING (CA OWNER) ----------

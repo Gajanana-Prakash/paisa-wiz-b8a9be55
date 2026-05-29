@@ -8,6 +8,7 @@ export type TenantClient = { id: string; business_name: string; gstin: string | 
 type TenantState = {
   loading: boolean;
   role: TenantRole;
+  userId: string | null;
   firm: { id: string; name: string; logo_url: string | null; primary_color: string | null; subdomain_slug: string | null } | null;
   availableClients: TenantClient[];
   activeClientId: string | null;
@@ -23,6 +24,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const load = useServerFn(loadTenantContext);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<TenantRole>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [firm, setFirm] = useState<TenantState["firm"]>(null);
   const [clients, setClients] = useState<TenantClient[]>([]);
   const [activeClientId, setActiveClientIdState] = useState<string | null>(
@@ -34,6 +36,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     try {
       const r = await load({ data: undefined as any });
       setRole(r.role);
+      setUserId(r.userId ?? null);
       setFirm(r.firm);
       setClients(r.availableClients);
       setActiveClientIdState((prev) => {
@@ -79,10 +82,10 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<TenantState>(() => ({
-    loading, role, firm, availableClients: clients, activeClientId,
+    loading, role, userId, firm, availableClients: clients, activeClientId,
     activeClient: clients.find((c) => c.id === activeClientId) ?? null,
     setActiveClientId, refresh,
-  }), [loading, role, firm, clients, activeClientId, setActiveClientId, refresh]);
+  }), [loading, role, userId, firm, clients, activeClientId, setActiveClientId, refresh]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

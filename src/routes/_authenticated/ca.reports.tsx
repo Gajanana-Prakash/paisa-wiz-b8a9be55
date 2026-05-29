@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
@@ -294,6 +294,17 @@ function ExportsPage() {
     <div className="p-6 md:p-8 max-w-7xl mx-auto">
       <h1 className="font-display text-3xl font-semibold">Reports &amp; Export Center</h1>
       <p className="text-muted-foreground mt-1">GSTR-1 JSON, Excel, CSV, Tally XML — for one client or many, in one click.</p>
+
+      <Link
+        to="/ca/reports/timesheets"
+        className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-5 py-4 hover:bg-muted/30 transition"
+      >
+        <div>
+          <div className="font-medium text-sm">Time &amp; billing reports</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Client profitability, staff utilization, monthly billing — export to Excel</div>
+        </div>
+        <FileSpreadsheet className="size-5 text-primary shrink-0" />
+      </Link>
 
       <Tabs defaultValue="single" className="mt-6">
         <TabsList>
