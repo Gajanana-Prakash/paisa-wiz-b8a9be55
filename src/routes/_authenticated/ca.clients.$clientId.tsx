@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import { logActivity, type ActivityLog as ActivityLogRow } from "@/lib/activity";
 import { ClientCompliancePanel } from "@/components/compliance/ClientCompliancePanel";
 import { TasksPage } from "@/components/tasks/TasksPage";
+import { ClientCommunicationPanel } from "@/components/communications/ClientCommunicationPanel";
+import { ClientDscPanel } from "@/components/dsc/ClientDscPanel";
 
 export const Route = createFileRoute("/_authenticated/ca/clients/$clientId")({
   component: ClientWorkspace,
@@ -146,6 +148,8 @@ function ClientWorkspace() {
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="requests">Requests</TabsTrigger>
+          <TabsTrigger value="communication">Communication</TabsTrigger>
+          <TabsTrigger value="dsc">DSC</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="gst">GST Reports</TabsTrigger>
           <TabsTrigger value="activity">Activity log</TabsTrigger>
@@ -194,6 +198,14 @@ function ClientWorkspace() {
 
         <TabsContent value="documents" className="mt-5">
           <DocumentsTable invs={invs} />
+        </TabsContent>
+
+        <TabsContent value="communication" className="mt-5">
+          <ClientCommunicationPanel clientId={clientId} />
+        </TabsContent>
+
+        <TabsContent value="dsc" className="mt-5">
+          <ClientDscPanel clientId={clientId} />
         </TabsContent>
 
         <TabsContent value="requests" className="mt-5">

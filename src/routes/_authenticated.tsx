@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
-  Clock, UserCog,
+  Clock, UserCog, IndianRupee, MessagesSquare, KeyRound,
 } from "lucide-react";
 import { TimerWidget } from "@/components/timetracking/TimerWidget";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,9 @@ const CA_NAV_OWNER = [
   { to: "/ca/tasks", icon: KanbanSquare, label: "Tasks", badgeKey: "tasksOverdue" as const },
   { to: "/ca/timesheets", icon: Clock, label: "Timesheets" },
   { to: "/ca/staff", icon: UserCog, label: "Staff" },
+  { to: "/ca/billing", icon: IndianRupee, label: "Billing" },
+  { to: "/ca/communications", icon: MessagesSquare, label: "Communications" },
+  { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
   { to: "/ca/reports", icon: FileDown, label: "Reports" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
@@ -101,6 +104,7 @@ const CA_NAV_STAFF = [
   { to: "/ca/clients", icon: Users, label: "Clients" },
   { to: "/ca/tasks/my-tasks", icon: KanbanSquare, label: "My tasks" },
   { to: "/ca/timesheets/my-timesheet", icon: Clock, label: "My timesheet" },
+  { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },

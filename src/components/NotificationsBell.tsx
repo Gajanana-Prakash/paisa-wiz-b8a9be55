@@ -185,6 +185,19 @@ export function NotificationsBell() {
         setItems((prev) => [n, ...prev.filter((x) => x.id !== n.id)].slice(0, 25));
         toast.success(n.title, { description: n.detail });
       })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "client_conversations" }, (p) => {
+        const row = p.new as any;
+        if (row.channel !== "IN_APP" || row.direction !== "INBOUND") return;
+        const n: Notif = {
+          id: `msg-${row.id}`,
+          type: "uploaded",
+          title: "Client replied",
+          detail: String(row.body ?? "").slice(0, 80),
+          at: row.sent_at || new Date().toISOString(),
+        };
+        setItems((prev) => [n, ...prev].slice(0, 25));
+        toast.success(n.title, { description: n.detail });
+      })
       .subscribe();
 
     return () => { mounted = false; supabase.removeChannel(ch); };

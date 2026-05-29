@@ -11,6 +11,7 @@ import {
   Inbox, ShieldCheck, AlertTriangle, Building2, Paperclip,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ClientMessagesPanel } from "@/components/communications/ClientMessagesPanel";
 
 type Doc = {
   id: string;
@@ -229,6 +230,8 @@ export function ClientPortal() {
           </p>
         </div>
       </div>
+
+      <ClientMessagesPanel />
 
       {/* Upload card — front and center */}
       <section className="bg-card border border-border/70 rounded-3xl p-6 md:p-8 shadow-[0_8px_24px_-12px_rgba(16,24,40,0.08)]">
