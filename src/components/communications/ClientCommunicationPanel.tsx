@@ -17,6 +17,7 @@ import {
   createConversation,
   toggleConversationPin,
   addConversationAttachment,
+  type TimelineItem,
 } from "@/lib/communications.functions";
 import { LogCallDialog } from "./LogCallDialog";
 import {
@@ -26,7 +27,6 @@ import {
   initials,
   isNeutralCard,
   type CommChannel,
-  type TimelineItem,
 } from "./utils";
 
 type ComposeMode = "NOTE" | "IN_APP" | "WHATSAPP" | "EMAIL" | "CALL";
