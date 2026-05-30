@@ -53,6 +53,119 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_client_retainers: {
+        Row: {
+          amount: number
+          ca_firm_id: string
+          client_id: string
+          created_at: string
+          day_of_month: number
+          description: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          amount: number
+          ca_firm_id: string
+          client_id: string
+          created_at?: string
+          day_of_month?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          amount?: number
+          ca_firm_id?: string
+          client_id?: string
+          created_at?: string
+          day_of_month?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_retainers_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_retainers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_firm_billing_settings: {
+        Row: {
+          account_holder: string | null
+          bank_account: string | null
+          bank_ifsc: string | null
+          bank_name: string | null
+          ca_firm_id: string
+          created_at: string
+          default_gst_rate: number
+          default_payment_terms: string
+          firm_state_code: string | null
+          gstin: string | null
+          invoice_next_number: number
+          invoice_number_format: string
+          pan: string | null
+          signature_url: string | null
+          updated_at: string
+          upi_id: string | null
+        }
+        Insert: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          ca_firm_id: string
+          created_at?: string
+          default_gst_rate?: number
+          default_payment_terms?: string
+          firm_state_code?: string | null
+          gstin?: string | null
+          invoice_next_number?: number
+          invoice_number_format?: string
+          pan?: string | null
+          signature_url?: string | null
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Update: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          default_gst_rate?: number
+          default_payment_terms?: string
+          firm_state_code?: string | null
+          gstin?: string | null
+          invoice_next_number?: number
+          invoice_number_format?: string
+          pan?: string | null
+          signature_url?: string | null
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_firm_billing_settings_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: true
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_firms: {
         Row: {
           created_at: string
@@ -88,6 +201,269 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ca_invoice_items: {
+        Row: {
+          description: string
+          gst_amount: number
+          gst_rate: number
+          id: string
+          invoice_id: string
+          line_subtotal: number
+          quantity: number
+          service_id: string | null
+          sort_order: number
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          description: string
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_id: string
+          line_subtotal?: number
+          quantity?: number
+          service_id?: string | null
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Update: {
+          description?: string
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_id?: string
+          line_subtotal?: number
+          quantity?: number
+          service_id?: string | null
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoice_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "ca_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_invoices: {
+        Row: {
+          amount_paid: number
+          balance_due: number
+          ca_firm_id: string
+          cgst_amount: number
+          client_id: string
+          created_at: string
+          due_date: string
+          gst_amount: number
+          id: string
+          igst_amount: number
+          invoice_date: string
+          invoice_number: string
+          is_inter_state: boolean
+          last_reminder_at: string | null
+          notes: string | null
+          paid_at: string | null
+          payment_terms: string | null
+          period_label: string | null
+          reminder_count: number
+          sent_at: string | null
+          sgst_amount: number
+          status: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal: number
+          total_amount: number
+          updated_at: string
+          upi_link: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          balance_due?: number
+          ca_firm_id: string
+          cgst_amount?: number
+          client_id: string
+          created_at?: string
+          due_date: string
+          gst_amount?: number
+          id?: string
+          igst_amount?: number
+          invoice_date?: string
+          invoice_number: string
+          is_inter_state?: boolean
+          last_reminder_at?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          period_label?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          sgst_amount?: number
+          status?: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          upi_link?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          balance_due?: number
+          ca_firm_id?: string
+          cgst_amount?: number
+          client_id?: string
+          created_at?: string
+          due_date?: string
+          gst_amount?: number
+          id?: string
+          igst_amount?: number
+          invoice_date?: string
+          invoice_number?: string
+          is_inter_state?: boolean
+          last_reminder_at?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          period_label?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          sgst_amount?: number
+          status?: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          upi_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoices_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_payments: {
+        Row: {
+          amount: number
+          ca_firm_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          notes: string | null
+          payment_date: string
+          payment_mode: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by: string
+          reference_number: string | null
+        }
+        Insert: {
+          amount: number
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by: string
+          reference_number?: string | null
+        }
+        Update: {
+          amount?: number
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by?: string
+          reference_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_payments_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_services: {
+        Row: {
+          ca_firm_id: string
+          created_at: string
+          default_amount: number
+          description: string | null
+          gst_rate: number
+          hsn_sac_code: string
+          id: string
+          is_active: boolean
+          service_name: string
+          unit: Database["public"]["Enums"]["service_unit"]
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          gst_rate?: number
+          hsn_sac_code?: string
+          id?: string
+          is_active?: boolean
+          service_name: string
+          unit?: Database["public"]["Enums"]["service_unit"]
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          gst_rate?: number
+          hsn_sac_code?: string
+          id?: string
+          is_active?: boolean
+          service_name?: string
+          unit?: Database["public"]["Enums"]["service_unit"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_services_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_staff_assignments: {
         Row: {
@@ -1479,6 +1855,14 @@ export type Database = {
         | "ca_staff"
         | "client_owner"
         | "client_employee"
+      ca_invoice_status:
+        | "DRAFT"
+        | "SENT"
+        | "PARTIALLY_PAID"
+        | "PAID"
+        | "OVERDUE"
+        | "CANCELLED"
+      ca_payment_mode: "UPI" | "BANK_TRANSFER" | "CASH" | "CHEQUE" | "CARD"
       client_status: "pending_invite" | "active" | "archived"
       compliance_applies_to:
         | "ALL"
@@ -1557,6 +1941,7 @@ export type Database = {
         | "monthly_day"
         | "stale_upload_days"
         | "manual"
+      service_unit: "FIXED" | "PER_RETURN" | "PER_HOUR" | "PER_MONTH"
       task_priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
       task_status: "TODO" | "IN_PROGRESS" | "REVIEW" | "COMPLETED" | "CANCELLED"
       task_type:
@@ -1702,6 +2087,15 @@ export const Constants = {
         "client_owner",
         "client_employee",
       ],
+      ca_invoice_status: [
+        "DRAFT",
+        "SENT",
+        "PARTIALLY_PAID",
+        "PAID",
+        "OVERDUE",
+        "CANCELLED",
+      ],
+      ca_payment_mode: ["UPI", "BANK_TRANSFER", "CASH", "CHEQUE", "CARD"],
       client_status: ["pending_invite", "active", "archived"],
       compliance_applies_to: [
         "ALL",
@@ -1784,6 +2178,7 @@ export const Constants = {
         "stale_upload_days",
         "manual",
       ],
+      service_unit: ["FIXED", "PER_RETURN", "PER_HOUR", "PER_MONTH"],
       task_priority: ["LOW", "MEDIUM", "HIGH", "URGENT"],
       task_status: ["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED", "CANCELLED"],
       task_type: [
