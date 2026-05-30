@@ -53,6 +53,119 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_client_retainers: {
+        Row: {
+          amount: number
+          ca_firm_id: string
+          client_id: string
+          created_at: string
+          day_of_month: number
+          description: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          amount: number
+          ca_firm_id: string
+          client_id: string
+          created_at?: string
+          day_of_month?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          amount?: number
+          ca_firm_id?: string
+          client_id?: string
+          created_at?: string
+          day_of_month?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_retainers_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_retainers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_firm_billing_settings: {
+        Row: {
+          account_holder: string | null
+          bank_account: string | null
+          bank_ifsc: string | null
+          bank_name: string | null
+          ca_firm_id: string
+          created_at: string
+          default_gst_rate: number
+          default_payment_terms: string
+          firm_state_code: string | null
+          gstin: string | null
+          invoice_next_number: number
+          invoice_number_format: string
+          pan: string | null
+          signature_url: string | null
+          updated_at: string
+          upi_id: string | null
+        }
+        Insert: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          ca_firm_id: string
+          created_at?: string
+          default_gst_rate?: number
+          default_payment_terms?: string
+          firm_state_code?: string | null
+          gstin?: string | null
+          invoice_next_number?: number
+          invoice_number_format?: string
+          pan?: string | null
+          signature_url?: string | null
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Update: {
+          account_holder?: string | null
+          bank_account?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          default_gst_rate?: number
+          default_payment_terms?: string
+          firm_state_code?: string | null
+          gstin?: string | null
+          invoice_next_number?: number
+          invoice_number_format?: string
+          pan?: string | null
+          signature_url?: string | null
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_firm_billing_settings_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: true
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_firms: {
         Row: {
           created_at: string
@@ -88,6 +201,269 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ca_invoice_items: {
+        Row: {
+          description: string
+          gst_amount: number
+          gst_rate: number
+          id: string
+          invoice_id: string
+          line_subtotal: number
+          quantity: number
+          service_id: string | null
+          sort_order: number
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          description: string
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_id: string
+          line_subtotal?: number
+          quantity?: number
+          service_id?: string | null
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Update: {
+          description?: string
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_id?: string
+          line_subtotal?: number
+          quantity?: number
+          service_id?: string | null
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoice_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "ca_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_invoices: {
+        Row: {
+          amount_paid: number
+          balance_due: number
+          ca_firm_id: string
+          cgst_amount: number
+          client_id: string
+          created_at: string
+          due_date: string
+          gst_amount: number
+          id: string
+          igst_amount: number
+          invoice_date: string
+          invoice_number: string
+          is_inter_state: boolean
+          last_reminder_at: string | null
+          notes: string | null
+          paid_at: string | null
+          payment_terms: string | null
+          period_label: string | null
+          reminder_count: number
+          sent_at: string | null
+          sgst_amount: number
+          status: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal: number
+          total_amount: number
+          updated_at: string
+          upi_link: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          balance_due?: number
+          ca_firm_id: string
+          cgst_amount?: number
+          client_id: string
+          created_at?: string
+          due_date: string
+          gst_amount?: number
+          id?: string
+          igst_amount?: number
+          invoice_date?: string
+          invoice_number: string
+          is_inter_state?: boolean
+          last_reminder_at?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          period_label?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          sgst_amount?: number
+          status?: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          upi_link?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          balance_due?: number
+          ca_firm_id?: string
+          cgst_amount?: number
+          client_id?: string
+          created_at?: string
+          due_date?: string
+          gst_amount?: number
+          id?: string
+          igst_amount?: number
+          invoice_date?: string
+          invoice_number?: string
+          is_inter_state?: boolean
+          last_reminder_at?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          period_label?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          sgst_amount?: number
+          status?: Database["public"]["Enums"]["ca_invoice_status"]
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+          upi_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoices_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_payments: {
+        Row: {
+          amount: number
+          ca_firm_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          notes: string | null
+          payment_date: string
+          payment_mode: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by: string
+          reference_number: string | null
+        }
+        Insert: {
+          amount: number
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by: string
+          reference_number?: string | null
+        }
+        Update: {
+          amount?: number
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: Database["public"]["Enums"]["ca_payment_mode"]
+          recorded_by?: string
+          reference_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_payments_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_services: {
+        Row: {
+          ca_firm_id: string
+          created_at: string
+          default_amount: number
+          description: string | null
+          gst_rate: number
+          hsn_sac_code: string
+          id: string
+          is_active: boolean
+          service_name: string
+          unit: Database["public"]["Enums"]["service_unit"]
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          gst_rate?: number
+          hsn_sac_code?: string
+          id?: string
+          is_active?: boolean
+          service_name: string
+          unit?: Database["public"]["Enums"]["service_unit"]
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string
+          default_amount?: number
+          description?: string | null
+          gst_rate?: number
+          hsn_sac_code?: string
+          id?: string
+          is_active?: boolean
+          service_name?: string
+          unit?: Database["public"]["Enums"]["service_unit"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_services_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_staff_assignments: {
         Row: {
@@ -226,6 +602,138 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_onboarding: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          completed_at: string | null
+          completion_percentage: number
+          created_at: string
+          engagement_letter_signed: boolean
+          engagement_letter_signed_at: string | null
+          id: string
+          notes: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["onboarding_status"]
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          engagement_letter_signed?: boolean
+          engagement_letter_signed_at?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          engagement_letter_signed?: boolean
+          engagement_letter_signed_at?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_onboarding_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_onboarding_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_category: Database["public"]["Enums"]["onboarding_doc_category"]
+          id: string
+          invoice_id: string | null
+          is_mandatory: boolean
+          item_name: string
+          onboarding_id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sort_order: number
+          status: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          invoice_id?: string | null
+          is_mandatory?: boolean
+          item_name: string
+          onboarding_id: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          invoice_id?: string | null
+          is_mandatory?: boolean
+          item_name?: string
+          onboarding_id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_onboarding_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_onboarding_items_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_onboarding_items_template_item_id_fkey"
+            columns: ["template_item_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_template_items"
             referencedColumns: ["id"]
           },
         ]
@@ -493,6 +1001,104 @@ export type Database = {
         }
         Relationships: []
       }
+      engagement_letter_templates: {
+        Row: {
+          ca_firm_id: string
+          content_html: string
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          content_html: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          content_html?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      engagement_letters: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          content_html: string
+          created_at: string
+          id: string
+          sent_at: string | null
+          sign_token: string | null
+          signature_otp_expires_at: string | null
+          signature_otp_hash: string | null
+          signed_at: string | null
+          signed_document_url: string | null
+          signer_ip: string | null
+          signer_name: string | null
+          status: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id: string | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          content_html: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          status?: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          content_html?: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          status?: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_letters_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_letter_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -699,6 +1305,83 @@ export type Database = {
           reason?: string | null
           staff_user_id?: string
           status?: Database["public"]["Enums"]["leave_status"]
+        }
+        Relationships: []
+      }
+      onboarding_template_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_category: Database["public"]["Enums"]["onboarding_doc_category"]
+          id: string
+          is_mandatory: boolean
+          item_name: string
+          sort_order: number
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          is_mandatory?: boolean
+          item_name: string
+          sort_order?: number
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          is_mandatory?: boolean
+          item_name?: string
+          sort_order?: number
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_templates: {
+        Row: {
+          ca_firm_id: string | null
+          created_at: string
+          description: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"] | null
+          id: string
+          is_default: boolean
+          is_system: boolean
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          template_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1160,6 +1843,10 @@ export type Database = {
         Args: { _ca_firm_id: string; _user_id: string }
         Returns: boolean
       }
+      recompute_onboarding_progress: {
+        Args: { _onboarding_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -1168,6 +1855,14 @@ export type Database = {
         | "ca_staff"
         | "client_owner"
         | "client_employee"
+      ca_invoice_status:
+        | "DRAFT"
+        | "SENT"
+        | "PARTIALLY_PAID"
+        | "PAID"
+        | "OVERDUE"
+        | "CANCELLED"
+      ca_payment_mode: "UPI" | "BANK_TRANSFER" | "CASH" | "CHEQUE" | "CARD"
       client_status: "pending_invite" | "active" | "archived"
       compliance_applies_to:
         | "ALL"
@@ -1203,6 +1898,7 @@ export type Database = {
         | "bank_statement"
         | "asset_purchase"
         | "other"
+      engagement_letter_status: "DRAFT" | "SENT" | "SIGNED" | "EXPIRED"
       entity_type:
         | "PROPRIETOR"
         | "PARTNERSHIP"
@@ -1220,6 +1916,24 @@ export type Database = {
         | "approved"
       leave_status: "PENDING" | "APPROVED" | "REJECTED"
       leave_type: "CASUAL" | "SICK" | "EARNED" | "HALF_DAY" | "COMP_OFF"
+      onboarding_doc_category:
+        | "IDENTITY"
+        | "GST"
+        | "TAX"
+        | "BANKING"
+        | "CORPORATE"
+        | "OTHER"
+      onboarding_item_status:
+        | "PENDING"
+        | "UPLOADED"
+        | "REVIEWED"
+        | "APPROVED"
+        | "REJECTED"
+      onboarding_status:
+        | "NOT_STARTED"
+        | "IN_PROGRESS"
+        | "PENDING_REVIEW"
+        | "COMPLETED"
       reminder_channel: "in_app" | "email" | "whatsapp"
       reminder_status: "scheduled" | "sent" | "skipped" | "failed"
       reminder_trigger:
@@ -1227,6 +1941,7 @@ export type Database = {
         | "monthly_day"
         | "stale_upload_days"
         | "manual"
+      service_unit: "FIXED" | "PER_RETURN" | "PER_HOUR" | "PER_MONTH"
       task_priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
       task_status: "TODO" | "IN_PROGRESS" | "REVIEW" | "COMPLETED" | "CANCELLED"
       task_type:
@@ -1372,6 +2087,15 @@ export const Constants = {
         "client_owner",
         "client_employee",
       ],
+      ca_invoice_status: [
+        "DRAFT",
+        "SENT",
+        "PARTIALLY_PAID",
+        "PAID",
+        "OVERDUE",
+        "CANCELLED",
+      ],
+      ca_payment_mode: ["UPI", "BANK_TRANSFER", "CASH", "CHEQUE", "CARD"],
       client_status: ["pending_invite", "active", "archived"],
       compliance_applies_to: [
         "ALL",
@@ -1405,6 +2129,7 @@ export const Constants = {
         "asset_purchase",
         "other",
       ],
+      engagement_letter_status: ["DRAFT", "SENT", "SIGNED", "EXPIRED"],
       entity_type: [
         "PROPRIETOR",
         "PARTNERSHIP",
@@ -1424,6 +2149,27 @@ export const Constants = {
       ],
       leave_status: ["PENDING", "APPROVED", "REJECTED"],
       leave_type: ["CASUAL", "SICK", "EARNED", "HALF_DAY", "COMP_OFF"],
+      onboarding_doc_category: [
+        "IDENTITY",
+        "GST",
+        "TAX",
+        "BANKING",
+        "CORPORATE",
+        "OTHER",
+      ],
+      onboarding_item_status: [
+        "PENDING",
+        "UPLOADED",
+        "REVIEWED",
+        "APPROVED",
+        "REJECTED",
+      ],
+      onboarding_status: [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "PENDING_REVIEW",
+        "COMPLETED",
+      ],
       reminder_channel: ["in_app", "email", "whatsapp"],
       reminder_status: ["scheduled", "sent", "skipped", "failed"],
       reminder_trigger: [
@@ -1432,6 +2178,7 @@ export const Constants = {
         "stale_upload_days",
         "manual",
       ],
+      service_unit: ["FIXED", "PER_RETURN", "PER_HOUR", "PER_MONTH"],
       task_priority: ["LOW", "MEDIUM", "HIGH", "URGENT"],
       task_status: ["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED", "CANCELLED"],
       task_type: [

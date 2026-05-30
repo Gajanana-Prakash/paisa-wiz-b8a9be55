@@ -1,93 +1,97 @@
-# Staff & Time Tracking
+# Client Onboarding Checklist & KYC Manager
 
-Adds firm-wide time tracking, staff management, and leave workflow to GSTify, plus billable-hours reports.
+Structured digital onboarding to replace WhatsApp back-and-forth: KYC checklist per entity type, CA review/approve flow, and OTP-signed engagement letters.
 
 ## 1. Database (single migration)
 
 New enums:
-- `leave_type`: CASUAL, SICK, EARNED, HALF_DAY, COMP_OFF
-- `leave_status`: PENDING, APPROVED, REJECTED
+- `entity_type_onboarding` — `PROPRIETOR | PARTNERSHIP | LLP | PRIVATE_LTD | PUBLIC_LTD | TRUST | ALL` (reuse existing `entity_type` if compatible; otherwise extend)
+- `onboarding_status` — `NOT_STARTED | IN_PROGRESS | PENDING_REVIEW | COMPLETED`
+- `onboarding_item_status` — `PENDING | UPLOADED | REVIEWED | APPROVED | REJECTED`
+- `onboarding_doc_category` — `IDENTITY | GST | TAX | BANKING | CORPORATE | OTHER`
+- `engagement_letter_status` — `DRAFT | SENT | SIGNED | EXPIRED`
 
 New tables (all `public`, RLS on, scoped by `ca_firm_id`):
-
-- **staff_profiles** — `id`, `ca_firm_id`, `user_id` (unique per firm), `designation`, `billing_rate_per_hour numeric`, `cost_rate_per_hour numeric`, `weekly_target_hours int default 40`, `leave_balance int default 12`, `joining_date date`, `is_active bool default true`, timestamps. One row per staff in firm.
-- **time_logs** — `id`, `ca_firm_id`, `staff_user_id`, `client_id` (nullable), `task_id` (nullable), `description`, `started_at timestamptz`, `ended_at timestamptz` (nullable = running), `duration_minutes int`, `is_billable bool default true`, `billing_rate_per_hour numeric`, `billable_amount numeric`, `created_at`. Partial unique index on `(staff_user_id)` where `ended_at is null` to enforce one running timer per user.
-- **leave_records** — `id`, `ca_firm_id`, `staff_user_id`, `leave_date date`, `leave_type`, `reason`, `approved_by` (nullable), `status default PENDING`, `created_at`.
+- **onboarding_templates** — `id`, `ca_firm_id`, `template_name`, `entity_type`, `description`, `is_default`, `is_system` (seeded defaults visible to all firms with `ca_firm_id IS NULL`), timestamps.
+- **onboarding_template_items** — `id`, `template_id`, `item_name`, `description`, `is_mandatory`, `document_category`, `sort_order`.
+- **client_onboarding** — `id`, `ca_firm_id`, `client_id` (unique), `template_id`, `status`, `completion_percentage`, `sent_at`, `completed_at`, `engagement_letter_signed`, `engagement_letter_signed_at`, `notes`, timestamps.
+- **client_onboarding_items** — `id`, `onboarding_id`, `template_item_id` (nullable for custom adds), `item_name`, `description`, `is_mandatory`, `document_category`, `sort_order`, `status`, `invoice_id` (FK → existing `invoices` table used as doc vault), `rejection_reason`, `reviewed_by`, `reviewed_at`, timestamps.
+- **engagement_letter_templates** — `id`, `ca_firm_id`, `name`, `content_html`, `is_default`, timestamps.
+- **engagement_letters** — `id`, `ca_firm_id`, `client_id`, `template_id`, `content_html`, `status`, `sent_at`, `signed_at`, `signature_otp_hash`, `signature_otp_expires_at`, `signer_name`, `signer_ip`, `signed_document_url`, `valid_until`, `sign_token` (random URL token), timestamps.
 
 RLS:
-- All tables: SELECT for `is_ca_firm_member`; INSERT/UPDATE constrained to firm member; staff can only insert/update their own time_logs and leave_records; CA Owner can edit anything; only CA Owner can update leave status (approve/reject) and edit other staff's logs.
-- GRANTs to `authenticated` + `service_role`.
+- All firm-scoped tables: SELECT for `is_ca_firm_member` OR `can_access_client` (client-facing rows); INSERT/UPDATE constrained accordingly; CA Owner only for template/system writes and delete.
+- `onboarding_templates` system rows (`ca_firm_id IS NULL`, `is_system=true`): SELECT for any authenticated user; no UPDATE/DELETE.
+- `engagement_letters` sign verification done server-side via `supabaseAdmin` + token (public endpoint).
+- Standard GRANTs to `authenticated` + `service_role`.
 
-Note: `tenant_id` in spec maps to existing `ca_firm_id`. `ca_users` maps to `user_roles` rows where role ∈ (ca_owner, ca_staff).
+Map "tenant_id" → `ca_firm_id`, "document_vault" → existing `invoices` table+`invoices` storage bucket (path `{ca_firm_id}/{client_id}/onboarding/...`).
 
-## 2. Server functions (`src/lib/timetracking.functions.ts` + `.server.ts`)
+## 2. Seed data
 
-All protected with `requireSupabaseAuth`:
-- `startTimer({ clientId?, taskId?, description?, isBillable })` — guards against existing running timer.
-- `stopTimer({ timeLogId? })` — defaults to caller's running timer; computes duration + billable_amount.
-- `listTimeLogs({ scope: 'firm'|'mine', filters: { staffId?, clientId?, dateFrom, dateTo, billableOnly? } })`.
-- `updateTimeLog({ id, patch })` — owner of log OR CA Owner.
-- `createTimeLog(input)` — manual retroactive entry.
-- `deleteTimeLog({ id })` — CA Owner only.
-- `listActiveTimers()` — firm-wide running timers (CA Owner) / own (staff).
+Insert 2 system templates (`ca_firm_id=NULL`, `is_system=true`, `is_default=true` per entity):
+- Proprietorship (8 items per spec)
+- Private Limited (Proprietorship items + 10 corporate items)
 
-Staff management:
-- `listStaff()` — staff_profiles joined with profile + week_hours aggregate.
-- `getStaff({ userId })` — profile + month_hours, tasks completed/overdue counts, leave history.
-- `inviteStaff(input)` — reuses existing CA Staff invite flow + creates `staff_profiles` row on accept; if user already exists in firm, just upsert profile.
-- `updateStaffProfile({ userId, patch })` — CA Owner only.
+## 3. Server functions (`src/lib/onboarding.functions.ts` + `.server.ts`)
 
-Leave:
-- `requestLeave({ leaveDate, leaveType, reason })`.
-- `decideLeave({ id, status })` — CA Owner only; decrement `leave_balance` on APPROVED.
-- `listLeaveRequests({ scope })`.
+All `requireSupabaseAuth` unless noted:
+- **Templates**: `listOnboardingTemplates({ entityType? })`, `getOnboardingTemplate({ id })`, `createOnboardingTemplate`, `updateOnboardingTemplate`, `deleteOnboardingTemplate`, `upsertTemplateItem`, `deleteTemplateItem`, `reorderTemplateItems`.
+- **Client onboarding**: `startClientOnboarding({ clientId, templateId, customItems? })` — snapshots template items into `client_onboarding_items`; `getClientOnboarding({ clientId })`; `addOnboardingItem`, `removeOnboardingItem`; `uploadOnboardingDocument({ itemId, filePath, fileName })` — creates invoices row, links to item, sets UPLOADED; `reviewOnboardingItem({ itemId, decision, rejectionReason? })` — CA Owner/Staff; `resendOnboardingInvite`; recomputes `completion_percentage` and `status` after each change.
+- **Engagement letters**:
+  - Templates: `listLetterTemplates`, `createLetterTemplate`, `updateLetterTemplate`, `deleteLetterTemplate`.
+  - Letters: `generateEngagementLetter({ clientId, templateId, overrides? })` — merges `{CLIENT_NAME}`, `{CA_FIRM_NAME}`, `{SERVICES_LIST}`, `{DATE}`, `{FEE_AMOUNT}`; `sendEngagementLetter({ id })` — creates sign token, status SENT; `getEngagementLetterPublic({ token })` — no auth; `requestSignatureOtp({ token, signerName, signerPhone })` — generates 6-digit OTP, stores bcrypt-ish hash (sha256 with server salt), 10-min expiry, returns dev-only code in non-prod; `verifySignatureAndSign({ token, otp, signerName })` — verifies, captures IP from request headers, generates signed PDF, uploads to `invoices` bucket, marks SIGNED, updates `client_onboarding.engagement_letter_signed`.
 
-Reports:
-- `clientProfitabilityReport({ dateFrom, dateTo })` — aggregates by client.
-- `staffUtilizationReport({ dateFrom, dateTo })` — billable% vs target.
-- `monthlyBillingSummary({ year })` — totals per month.
+Signed PDF: render `content_html` + signature block to PDF via `pdf-lib` (already used elsewhere? if not, add `jspdf` which is lightweight and browser/edge compatible). Use HTML-to-PDF lite (server-side via `jspdf` from text) — acceptable v1.
 
-Excel export handled client-side via `xlsx` (lightweight) — fed by the report fns.
+OTP delivery: out of scope for actual SMS; surface OTP in toast in non-prod and via existing in-app notification for the signer's phone (or email if available). Document this as a follow-up.
 
-## 3. Routes & UI
+## 4. Routes & UI
 
 ```text
 src/routes/_authenticated/
-  ca.timesheets.tsx             -> /ca/timesheets (Owner)
-  ca.timesheets.my-timesheet.tsx -> /ca/timesheets/my-timesheet
-  ca.staff.tsx                  -> /ca/staff (list, Owner only)
-  ca.staff.$userId.tsx          -> /ca/staff/:userId (detail)
-  ca.reports.timesheets.tsx     -> /ca/reports/timesheets
+  ca.clients.new.tsx                       -> 3-step new-client wizard
+  ca.clients.$clientId.onboarding.tsx      -> onboarding tab (already a tab pattern on client detail; add new sub-route)
+  ca.settings.onboarding-templates.tsx
+  ca.settings.engagement-letter-templates.tsx
+  client.onboarding.tsx                    -> client portal checklist
+src/routes/                                
+  sign-letter.$token.tsx                   -> public OTP signing flow
 ```
 
-Components in `src/components/timetracking/`:
-- `TimerWidget.tsx` — mounted in `_authenticated` topbar (visible to ca_owner + ca_staff). Popover with client/task pickers; live elapsed counter; pulsing green dot when running. Uses TanStack Query polling every 30s + local 1s interval for elapsed display.
-- `ActiveTimersPanel.tsx` — owner view of running timers across firm.
-- `TimesheetTable.tsx` — sortable, filterable, inline-edit. Summary footer.
-- `WeeklyTargetsSidebar.tsx` — progress bar per staff vs target, green/yellow/red.
-- `LogTimeDialog.tsx` — manual retroactive entry.
-- `StaffListTable.tsx`, `NewStaffDialog.tsx`, `StaffDetailHeader.tsx`, `StaffPerformanceCards.tsx`.
-- `LeavePanel.tsx` — staff submits; owner approves/rejects.
-- `reports/ClientProfitabilityReport.tsx`, `StaffUtilizationReport.tsx`, `MonthlyBillingReport.tsx` with "Export to Excel" buttons.
+Components in `src/components/onboarding/`:
+- `NewClientWizard.tsx` (3 steps: BasicDetails, TemplatePicker, SendInvite)
+- `OnboardingProgressHeader.tsx` — circular progress, status badge, action buttons
+- `OnboardingChecklist.tsx` — category-grouped accordion
+- `OnboardingItemRow.tsx` — status icon, view doc, approve/reject buttons
+- `RejectItemDialog.tsx`
+- `UploadOnboardingItemDialog.tsx`
+- `EngagementLetterSection.tsx`
+- `EngagementLetterEditor.tsx` — rich text via existing `textarea` upgraded with simple HTML preview (skip heavy WYSIWYG; use `Textarea` + live preview pane)
+- `OnboardingTemplateManager.tsx`, `TemplateItemEditor.tsx`
+- `LetterTemplateManager.tsx`
+- Client portal: `ClientOnboardingChecklist.tsx`, `ClientUploadButton.tsx`, `ClientLetterSignView.tsx`
 
-Add to CA sidebar (`_authenticated.tsx` CA_NAV): "Timesheets", "Staff", and Timesheet under Reports section. Add `TimerWidget` to the topbar slot.
+Integrate into existing client detail page `ca.clients.$clientId.tsx` — add "Onboarding" tab. Add nav entries to CA sidebar Settings group: "Onboarding Templates", "Letter Templates". Client portal nav gets "Onboarding".
 
-## 4. Design
+## 5. Design
 
-- Timer widget: minimal button, clock icon, muted text. Running state: `bg-emerald-500/10` chip + pulsing dot (`animate-pulse`).
-- Timesheet rows: `even:bg-muted/30`, dense padding.
-- Progress bars: thin (`h-1.5`), use existing `Progress` component with tint via wrapper.
-- Use existing `--priority-*` token pattern for utilization colors: add `--util-good`, `--util-warn`, `--util-bad` to `src/styles.css` (oklch).
+- Wizard: stepper at top (3 dots), generous spacing, large primary button.
+- Onboarding tab: circular progress ring (SVG) in `--util-good`; category sections use existing icons (User, FileText, Receipt, Wallet, Building2).
+- Status pills reuse existing badge variants with semantic tokens; add `--onboarding-pending/uploaded/approved/rejected` to `src/styles.css`.
+- Client portal: oversized upload tiles, friendly copy ("Snap a photo or drop a file"), camera capture via `<input capture="environment">` on mobile.
 
-## 5. Out of scope / follow-ups
+## 6. Out of scope / follow-ups
 
-- Daily timesheet reminders (email) — needs email infra; not wired.
-- "Auto-block staff assignment on approved leave dates" — enforced as a soft warning in `NewTaskDialog` assignee picker, not a hard DB constraint (would require complex trigger).
-- pg_cron auto-stop runaway timers — not added; UI shows warning if a timer has been running >12h.
+- Real SMS OTP delivery (needs SMS connector). OTP shown in-app + email-link fallback.
+- True WYSIWYG editor — using textarea + HTML preview. Can swap to TipTap later.
+- HTML→PDF fidelity (uses `jspdf` plain-text render with simple formatting). For pixel-perfect letters, follow-up with `@react-pdf/renderer`.
+- Engagement-letter renewal reminders on `valid_until` — could plug into existing reminders module later.
 
 ## Technical notes
 
-- Install: `xlsx` (SheetJS) for Excel export. Already have `date-fns`.
-- Migration includes GRANTs + partial unique index for one-running-timer constraint.
-- `billable_amount` computed in `stopTimer` server fn (not generated column) so manual edits stay consistent.
-- Timer state lives in `time_logs` (single source of truth); widget queries `listActiveTimers` so it survives reloads/tab changes.
+- Reuse `invoices` bucket; path `{ca_firm_id}/{client_id}/onboarding/{uuid}-{filename}`.
+- `completion_percentage` recomputed in a SECURITY DEFINER helper called from server fns (avoids trigger complexity).
+- Public signing route uses `supabaseAdmin` + token lookup; never exposes other client data.
+- IP capture from `x-forwarded-for` header in server fn.
+- Install: `jspdf` (small, edge-compatible).
