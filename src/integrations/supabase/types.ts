@@ -230,6 +230,138 @@ export type Database = {
           },
         ]
       }
+      client_onboarding: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          completed_at: string | null
+          completion_percentage: number
+          created_at: string
+          engagement_letter_signed: boolean
+          engagement_letter_signed_at: string | null
+          id: string
+          notes: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["onboarding_status"]
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          engagement_letter_signed?: boolean
+          engagement_letter_signed_at?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          engagement_letter_signed?: boolean
+          engagement_letter_signed_at?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_onboarding_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_onboarding_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_category: Database["public"]["Enums"]["onboarding_doc_category"]
+          id: string
+          invoice_id: string | null
+          is_mandatory: boolean
+          item_name: string
+          onboarding_id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sort_order: number
+          status: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          invoice_id?: string | null
+          is_mandatory?: boolean
+          item_name: string
+          onboarding_id: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          invoice_id?: string | null
+          is_mandatory?: boolean
+          item_name?: string
+          onboarding_id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["onboarding_item_status"]
+          template_item_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_onboarding_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_onboarding_items_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "client_onboarding"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_onboarding_items_template_item_id_fkey"
+            columns: ["template_item_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_template_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           business_name: string
@@ -493,6 +625,104 @@ export type Database = {
         }
         Relationships: []
       }
+      engagement_letter_templates: {
+        Row: {
+          ca_firm_id: string
+          content_html: string
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          content_html: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          content_html?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      engagement_letters: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          content_html: string
+          created_at: string
+          id: string
+          sent_at: string | null
+          sign_token: string | null
+          signature_otp_expires_at: string | null
+          signature_otp_hash: string | null
+          signed_at: string | null
+          signed_document_url: string | null
+          signer_ip: string | null
+          signer_name: string | null
+          status: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id: string | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          content_html: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          status?: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          content_html?: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          status?: Database["public"]["Enums"]["engagement_letter_status"]
+          template_id?: string | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_letters_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_letter_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -699,6 +929,83 @@ export type Database = {
           reason?: string | null
           staff_user_id?: string
           status?: Database["public"]["Enums"]["leave_status"]
+        }
+        Relationships: []
+      }
+      onboarding_template_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_category: Database["public"]["Enums"]["onboarding_doc_category"]
+          id: string
+          is_mandatory: boolean
+          item_name: string
+          sort_order: number
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          is_mandatory?: boolean
+          item_name: string
+          sort_order?: number
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_category?: Database["public"]["Enums"]["onboarding_doc_category"]
+          id?: string
+          is_mandatory?: boolean
+          item_name?: string
+          sort_order?: number
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_templates: {
+        Row: {
+          ca_firm_id: string | null
+          created_at: string
+          description: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"] | null
+          id: string
+          is_default: boolean
+          is_system: boolean
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"] | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          template_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1160,6 +1467,10 @@ export type Database = {
         Args: { _ca_firm_id: string; _user_id: string }
         Returns: boolean
       }
+      recompute_onboarding_progress: {
+        Args: { _onboarding_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -1203,6 +1514,7 @@ export type Database = {
         | "bank_statement"
         | "asset_purchase"
         | "other"
+      engagement_letter_status: "DRAFT" | "SENT" | "SIGNED" | "EXPIRED"
       entity_type:
         | "PROPRIETOR"
         | "PARTNERSHIP"
@@ -1220,6 +1532,24 @@ export type Database = {
         | "approved"
       leave_status: "PENDING" | "APPROVED" | "REJECTED"
       leave_type: "CASUAL" | "SICK" | "EARNED" | "HALF_DAY" | "COMP_OFF"
+      onboarding_doc_category:
+        | "IDENTITY"
+        | "GST"
+        | "TAX"
+        | "BANKING"
+        | "CORPORATE"
+        | "OTHER"
+      onboarding_item_status:
+        | "PENDING"
+        | "UPLOADED"
+        | "REVIEWED"
+        | "APPROVED"
+        | "REJECTED"
+      onboarding_status:
+        | "NOT_STARTED"
+        | "IN_PROGRESS"
+        | "PENDING_REVIEW"
+        | "COMPLETED"
       reminder_channel: "in_app" | "email" | "whatsapp"
       reminder_status: "scheduled" | "sent" | "skipped" | "failed"
       reminder_trigger:
@@ -1405,6 +1735,7 @@ export const Constants = {
         "asset_purchase",
         "other",
       ],
+      engagement_letter_status: ["DRAFT", "SENT", "SIGNED", "EXPIRED"],
       entity_type: [
         "PROPRIETOR",
         "PARTNERSHIP",
@@ -1424,6 +1755,27 @@ export const Constants = {
       ],
       leave_status: ["PENDING", "APPROVED", "REJECTED"],
       leave_type: ["CASUAL", "SICK", "EARNED", "HALF_DAY", "COMP_OFF"],
+      onboarding_doc_category: [
+        "IDENTITY",
+        "GST",
+        "TAX",
+        "BANKING",
+        "CORPORATE",
+        "OTHER",
+      ],
+      onboarding_item_status: [
+        "PENDING",
+        "UPLOADED",
+        "REVIEWED",
+        "APPROVED",
+        "REJECTED",
+      ],
+      onboarding_status: [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "PENDING_REVIEW",
+        "COMPLETED",
+      ],
       reminder_channel: ["in_app", "email", "whatsapp"],
       reminder_status: ["scheduled", "sent", "skipped", "failed"],
       reminder_trigger: [
