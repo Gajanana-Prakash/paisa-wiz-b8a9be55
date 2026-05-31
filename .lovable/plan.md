@@ -1,97 +1,106 @@
-# Client Onboarding Checklist & KYC Manager
 
-Structured digital onboarding to replace WhatsApp back-and-forth: KYC checklist per entity type, CA review/approve flow, and OTP-signed engagement letters.
+# Permanent Document Vault
+
+Google-Drive-style permanent storage layered on the existing `invoices` storage bucket and `invoices` table pattern. New dedicated tables for vault metadata, versioning, and access logging.
 
 ## 1. Database (single migration)
 
 New enums:
-- `entity_type_onboarding` — `PROPRIETOR | PARTNERSHIP | LLP | PRIVATE_LTD | PUBLIC_LTD | TRUST | ALL` (reuse existing `entity_type` if compatible; otherwise extend)
-- `onboarding_status` — `NOT_STARTED | IN_PROGRESS | PENDING_REVIEW | COMPLETED`
-- `onboarding_item_status` — `PENDING | UPLOADED | REVIEWED | APPROVED | REJECTED`
-- `onboarding_doc_category` — `IDENTITY | GST | TAX | BANKING | CORPORATE | OTHER`
-- `engagement_letter_status` — `DRAFT | SENT | SIGNED | EXPIRED`
+- `vault_file_type` — `PDF | IMAGE | EXCEL | WORD | OTHER`
+- `vault_doc_category` — `KYC | GST | INCOME_TAX | AUDIT | BANKING | CORPORATE | INVOICES | NOTICES | AGREEMENTS | OTHER`
+- `vault_source` — `MANUAL_UPLOAD | CLIENT_UPLOAD | ONBOARDING | AI_EXTRACTED | GENERATED`
+- `vault_access_level` — `CA_ONLY | CA_AND_CLIENT | CLIENT_ONLY`
+- `vault_access_action` — `VIEWED | DOWNLOADED | SHARED | DELETED_REQUEST`
 
-New tables (all `public`, RLS on, scoped by `ca_firm_id`):
-- **onboarding_templates** — `id`, `ca_firm_id`, `template_name`, `entity_type`, `description`, `is_default`, `is_system` (seeded defaults visible to all firms with `ca_firm_id IS NULL`), timestamps.
-- **onboarding_template_items** — `id`, `template_id`, `item_name`, `description`, `is_mandatory`, `document_category`, `sort_order`.
-- **client_onboarding** — `id`, `ca_firm_id`, `client_id` (unique), `template_id`, `status`, `completion_percentage`, `sent_at`, `completed_at`, `engagement_letter_signed`, `engagement_letter_signed_at`, `notes`, timestamps.
-- **client_onboarding_items** — `id`, `onboarding_id`, `template_item_id` (nullable for custom adds), `item_name`, `description`, `is_mandatory`, `document_category`, `sort_order`, `status`, `invoice_id` (FK → existing `invoices` table used as doc vault), `rejection_reason`, `reviewed_by`, `reviewed_at`, timestamps.
-- **engagement_letter_templates** — `id`, `ca_firm_id`, `name`, `content_html`, `is_default`, timestamps.
-- **engagement_letters** — `id`, `ca_firm_id`, `client_id`, `template_id`, `content_html`, `status`, `sent_at`, `signed_at`, `signature_otp_hash`, `signature_otp_expires_at`, `signer_name`, `signer_ip`, `signed_document_url`, `valid_until`, `sign_token` (random URL token), timestamps.
+New tables (public, RLS, scoped by `ca_firm_id`):
+- **document_vault** — `id`, `ca_firm_id`, `client_id`, `uploaded_by`, `file_path` (storage path in `invoices` bucket), `file_name`, `display_name`, `file_type`, `file_size_bytes`, `document_category`, `document_subcategory`, `financial_year`, `period`, `description`, `tags text[]`, `is_kyc_document`, `source`, `linked_filing_id` (FK → `compliance_deadlines`, nullable), `linked_notice_id` (nullable, no FK — notices table not yet built), `linked_invoice_id` (FK → `invoices`, nullable), `version_number int default 1`, `parent_document_id` (self FK), `is_latest_version bool default true`, `access_level`, timestamps. Indexes on `(ca_firm_id, client_id)`, `(client_id, document_category)`, `(client_id, financial_year)`, GIN on `tags`, and a `tsvector` GIN index on `display_name || subcategory || description || tags` for full-text search.
+- **document_access_log** — `id`, `ca_firm_id`, `document_id` FK→document_vault, `accessed_by`, `action`, `accessed_at`, `ip_address`. Append-only.
 
 RLS:
-- All firm-scoped tables: SELECT for `is_ca_firm_member` OR `can_access_client` (client-facing rows); INSERT/UPDATE constrained accordingly; CA Owner only for template/system writes and delete.
-- `onboarding_templates` system rows (`ca_firm_id IS NULL`, `is_system=true`): SELECT for any authenticated user; no UPDATE/DELETE.
-- `engagement_letters` sign verification done server-side via `supabaseAdmin` + token (public endpoint).
-- Standard GRANTs to `authenticated` + `service_role`.
+- `document_vault`: SELECT via `can_access_client`; for client portal users, additionally require `access_level IN ('CA_AND_CLIENT','CLIENT_ONLY')`. INSERT requires `can_access_client + uploaded_by = auth.uid()`. UPDATE/DELETE restricted to `is_ca_firm_member`.
+- `document_access_log`: SELECT for `is_ca_firm_member`; INSERT for `can_access_client + accessed_by = auth.uid()`; no UPDATE/DELETE.
+- GRANTs to `authenticated` + `service_role`.
 
-Map "tenant_id" → `ca_firm_id`, "document_vault" → existing `invoices` table+`invoices` storage bucket (path `{ca_firm_id}/{client_id}/onboarding/...`).
+Storage: reuse `invoices` bucket. Path: `{ca_firm_id}/{client_id}/vault/{uuid}-{filename}`. Bucket already private with appropriate object policies (`can_access_client` via prefix). Verify and add a storage policy if needed scoped to this prefix.
 
-## 2. Seed data
+## 2. Server functions (`src/lib/vault.functions.ts` + `.server.ts`)
 
-Insert 2 system templates (`ca_firm_id=NULL`, `is_system=true`, `is_default=true` per entity):
-- Proprietorship (8 items per spec)
-- Private Limited (Proprietorship items + 10 corporate items)
+All with `requireSupabaseAuth`:
+- `listVaultDocuments({ clientId, category?, financialYear?, fileType?, uploadedBy?, fromDate?, toDate?, search?, includeAllVersions? })` — returns latest versions by default
+- `getVaultFolderTree({ clientId })` — returns counts per category and FY sub-buckets for GST/Income Tax
+- `getVaultDocument({ id })` — logs VIEWED
+- `getVaultSignedUrl({ id, disposition? })` — creates signed URL (5 min), logs VIEWED/DOWNLOADED
+- `uploadVaultDocument({ clientId, filePath, fileName, displayName, category, subcategory, financialYear?, period?, description?, tags?, accessLevel, source? })` — single-file metadata insert after client uploads to storage
+- `bulkUploadVaultDocuments({ clientId, files[] })` — bulk insert
+- `updateVaultDocument({ id, ... })` — rename, edit metadata, change category/access
+- `replaceVaultDocument({ id, newFilePath, newFileName })` — creates new row with `version_number = parent.version_number+1`, `parent_document_id = id`, flips parent `is_latest_version=false`
+- `getVaultVersions({ documentId })` — returns version chain
+- `bulkMoveVaultDocuments({ ids[], category })`
+- `bulkSetAccessLevel({ ids[], accessLevel })`
+- `deleteVaultDocument({ id })` — CA-only; removes storage object; KYC docs require `confirm: true`
+- `getVaultStorageUsage({ caFirmId })` — sum bytes by client + total
+- `searchVaultGlobal({ query })` — firm-wide search across all clients
+- `getRecentVaultUploads({ caFirmId, limit })`
+- `listClientVaultDocuments({ category? })` — client-portal version; filters access_level
+- `downloadVaultCategoryZip({ clientId, category })` — streams a ZIP via `jszip`; logs DOWNLOADED per file
 
-## 3. Server functions (`src/lib/onboarding.functions.ts` + `.server.ts`)
-
-All `requireSupabaseAuth` unless noted:
-- **Templates**: `listOnboardingTemplates({ entityType? })`, `getOnboardingTemplate({ id })`, `createOnboardingTemplate`, `updateOnboardingTemplate`, `deleteOnboardingTemplate`, `upsertTemplateItem`, `deleteTemplateItem`, `reorderTemplateItems`.
-- **Client onboarding**: `startClientOnboarding({ clientId, templateId, customItems? })` — snapshots template items into `client_onboarding_items`; `getClientOnboarding({ clientId })`; `addOnboardingItem`, `removeOnboardingItem`; `uploadOnboardingDocument({ itemId, filePath, fileName })` — creates invoices row, links to item, sets UPLOADED; `reviewOnboardingItem({ itemId, decision, rejectionReason? })` — CA Owner/Staff; `resendOnboardingInvite`; recomputes `completion_percentage` and `status` after each change.
-- **Engagement letters**:
-  - Templates: `listLetterTemplates`, `createLetterTemplate`, `updateLetterTemplate`, `deleteLetterTemplate`.
-  - Letters: `generateEngagementLetter({ clientId, templateId, overrides? })` — merges `{CLIENT_NAME}`, `{CA_FIRM_NAME}`, `{SERVICES_LIST}`, `{DATE}`, `{FEE_AMOUNT}`; `sendEngagementLetter({ id })` — creates sign token, status SENT; `getEngagementLetterPublic({ token })` — no auth; `requestSignatureOtp({ token, signerName, signerPhone })` — generates 6-digit OTP, stores bcrypt-ish hash (sha256 with server salt), 10-min expiry, returns dev-only code in non-prod; `verifySignatureAndSign({ token, otp, signerName })` — verifies, captures IP from request headers, generates signed PDF, uploads to `invoices` bucket, marks SIGNED, updates `client_onboarding.engagement_letter_signed`.
-
-Signed PDF: render `content_html` + signature block to PDF via `pdf-lib` (already used elsewhere? if not, add `jspdf` which is lightweight and browser/edge compatible). Use HTML-to-PDF lite (server-side via `jspdf` from text) — acceptable v1.
-
-OTP delivery: out of scope for actual SMS; surface OTP in toast in non-prod and via existing in-app notification for the signer's phone (or email if available). Document this as a follow-up.
-
-## 4. Routes & UI
+## 3. Routes & UI
 
 ```text
 src/routes/_authenticated/
-  ca.clients.new.tsx                       -> 3-step new-client wizard
-  ca.clients.$clientId.onboarding.tsx      -> onboarding tab (already a tab pattern on client detail; add new sub-route)
-  ca.settings.onboarding-templates.tsx
-  ca.settings.engagement-letter-templates.tsx
-  client.onboarding.tsx                    -> client portal checklist
-src/routes/                                
-  sign-letter.$token.tsx                   -> public OTP signing flow
+  ca.clients.$clientId.documents.tsx       -> Client vault main view
+  ca.vault.tsx                              -> Firm-wide overview
+  client.documents.tsx                      -> Client portal vault
 ```
 
-Components in `src/components/onboarding/`:
-- `NewClientWizard.tsx` (3 steps: BasicDetails, TemplatePicker, SendInvite)
-- `OnboardingProgressHeader.tsx` — circular progress, status badge, action buttons
-- `OnboardingChecklist.tsx` — category-grouped accordion
-- `OnboardingItemRow.tsx` — status icon, view doc, approve/reject buttons
-- `RejectItemDialog.tsx`
-- `UploadOnboardingItemDialog.tsx`
-- `EngagementLetterSection.tsx`
-- `EngagementLetterEditor.tsx` — rich text via existing `textarea` upgraded with simple HTML preview (skip heavy WYSIWYG; use `Textarea` + live preview pane)
-- `OnboardingTemplateManager.tsx`, `TemplateItemEditor.tsx`
-- `LetterTemplateManager.tsx`
-- Client portal: `ClientOnboardingChecklist.tsx`, `ClientUploadButton.tsx`, `ClientLetterSignView.tsx`
+Add "Documents" tab to existing `ca.clients.$clientId.tsx` and a sidebar entry "Document Vault" to CA + client portal navs.
 
-Integrate into existing client detail page `ca.clients.$clientId.tsx` — add "Onboarding" tab. Add nav entries to CA sidebar Settings group: "Onboarding Templates", "Letter Templates". Client portal nav gets "Onboarding".
+Components in `src/components/vault/`:
+- `VaultFolderTree.tsx` — collapsible category tree with FY sub-folders for GST/IT, document counts, "All Documents" root
+- `VaultToolbar.tsx` — search input, upload button, filter dropdowns, view toggle, bulk action bar
+- `VaultGridView.tsx` / `VaultListView.tsx` — view modes with row selection (checkbox in list view)
+- `VaultDocumentCard.tsx` — thumbnail (file-type icon, image preview via signed URL), hover actions
+- `VaultUploadDialog.tsx` — react-dropzone drag-and-drop, multi-file metadata form (per-file accordion), category/subcategory dropdowns mapped per category, FY picker
+- `VaultViewerDialog.tsx` — full-screen viewer: PDF via `<iframe src=signedUrl>` (browser-native PDF render, no PDF.js dep) + images render as `<img>` + Office files show "Download to view"; right-side metadata panel; version history list with one-click switch
+- `VaultBulkActionsBar.tsx`
+- `VaultStorageCard.tsx` — usage progress bar
+- `VaultStorageByClientChart.tsx` — recharts bar chart
+- `VaultGlobalSearchDialog.tsx` — Cmd/Ctrl+K trigger, command palette across firm
+- Client portal: `ClientVaultBrowser.tsx`, `ClientVaultCategoryDownloadButton.tsx`
 
-## 5. Design
+Subcategory dropdown source: small static map in `src/components/vault/categories.ts` (KYC: PAN, Aadhaar, GST Cert, Incorporation, …; GST: GSTR-1, GSTR-3B, GSTR-9; etc.). Free-text fallback allowed.
 
-- Wizard: stepper at top (3 dots), generous spacing, large primary button.
-- Onboarding tab: circular progress ring (SVG) in `--util-good`; category sections use existing icons (User, FileText, Receipt, Wallet, Building2).
-- Status pills reuse existing badge variants with semantic tokens; add `--onboarding-pending/uploaded/approved/rejected` to `src/styles.css`.
-- Client portal: oversized upload tiles, friendly copy ("Snap a photo or drop a file"), camera capture via `<input capture="environment">` on mobile.
+Keyboard shortcut Cmd/Ctrl+K wired in CA layout (and client layout) to open `VaultGlobalSearchDialog`. If a global shortcut hook already exists, extend; otherwise add a small `useHotkey` in `src/hooks/`.
+
+## 4. Design
+
+- Drive-like split layout: left tree (240px, collapsible on mobile), right content scrolls independently.
+- File-type colored icons via existing `lucide-react` (FileText red for PDF, FileSpreadsheet green for Excel, FileType for Word, Image for images).
+- Grid cards: square thumbnail area + 2 lines metadata; hover reveals action chips.
+- Storage progress bar on `/ca/vault` uses `--util-warning` past 80%, `--destructive` past 95%.
+- Add CSS tokens `--vault-folder-active`, `--vault-card-hover` in `src/styles.css`.
+- Bulk-select bar slides up from bottom when selection > 0.
+
+## 5. Dependencies
+
+- `jszip` for ZIP download
+- `react-dropzone` (verify if already installed; if so reuse, else add)
 
 ## 6. Out of scope / follow-ups
 
-- Real SMS OTP delivery (needs SMS connector). OTP shown in-app + email-link fallback.
-- True WYSIWYG editor — using textarea + HTML preview. Can swap to TipTap later.
-- HTML→PDF fidelity (uses `jspdf` plain-text render with simple formatting). For pixel-perfect letters, follow-up with `@react-pdf/renderer`.
-- Engagement-letter renewal reminders on `valid_until` — could plug into existing reminders module later.
+- True thumbnail generation for PDFs/Office docs (use static icons + first-page preview only for images).
+- Hard storage quota enforcement (display only; quotas tied to plan tier come later with billing module).
+- E-signed links with expiry tracking (signed URLs are 5-min one-shot only).
+- Notices linkage is wired as a nullable UUID column but no FK — notices module not yet built.
+- OCR / AI auto-tagging — `source = AI_EXTRACTED` is reserved for the future invoice OCR pipeline.
 
 ## Technical notes
 
-- Reuse `invoices` bucket; path `{ca_firm_id}/{client_id}/onboarding/{uuid}-{filename}`.
-- `completion_percentage` recomputed in a SECURITY DEFINER helper called from server fns (avoids trigger complexity).
-- Public signing route uses `supabaseAdmin` + token lookup; never exposes other client data.
-- IP capture from `x-forwarded-for` header in server fn.
-- Install: `jspdf` (small, edge-compatible).
+- Reuse `invoices` storage bucket (already configured private + per-firm pathing). No new bucket needed; saves migration churn.
+- `is_latest_version` flips in a single transaction inside `replaceVaultDocument` server fn (no DB trigger needed).
+- Global search uses Postgres `to_tsvector('simple', display_name || ' ' || coalesce(subcategory,'') || ' ' || coalesce(description,'') || ' ' || array_to_string(tags,' '))` with a generated column + GIN index for speed.
+- Client portal RLS adds `access_level <> 'CA_ONLY'` check via a wrapper SECURITY DEFINER function `public.can_client_see_doc(_doc_id, _user_id)` to avoid policy complexity.
+- Access log writes use `supabaseAdmin` inside server fns to keep RLS simple and ensure logs are always captured.
+- All client portal write ops blocked by RLS (no INSERT for client users on `document_vault`).
+
+Approve to proceed with the migration first, then server fns + UI in a follow-up batch.
