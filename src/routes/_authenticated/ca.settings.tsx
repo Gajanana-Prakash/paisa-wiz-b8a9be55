@@ -241,6 +241,25 @@ function SettingsPage() {
       </section>
 
       <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">Agreement templates</h2>
+        <p className="text-xs text-muted-foreground mt-1">Engagement letters, service agreements, NDAs, and custom templates with merge variables.</p>
+        <Link to="/ca/settings/agreement-templates" className="inline-block mt-4">
+          <Button variant="outline" size="sm">Manage templates</Button>
+        </Link>
+      </section>
+
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">Referrals &amp; growth</h2>
+        <p className="text-xs text-muted-foreground mt-1">Referral code, leaderboard, and client portal badge.</p>
+        <Link to="/ca/settings/referral" className="inline-block mt-4">
+          <Button variant="outline" size="sm">Referral settings</Button>
+        </Link>
+        <Link to="/ca/grow" className="inline-block mt-4 ml-2">
+          <Button size="sm">Growth center</Button>
+        </Link>
+      </section>
+
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
         <h2 className="font-display text-lg font-semibold">Billing &amp; invoices</h2>
         <p className="text-xs text-muted-foreground mt-1">PAN, GSTIN, bank details, UPI, and invoice numbering for client fee invoices.</p>
         <Link to="/ca/settings/billing" className="inline-block mt-4">

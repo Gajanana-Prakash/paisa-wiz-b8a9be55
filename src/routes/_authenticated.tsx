@@ -1,10 +1,10 @@
-import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
-  Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive,
+  Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive, FileSignature, BarChart3, Gift,
 } from "lucide-react";
 import { TimerWidget } from "@/components/timetracking/TimerWidget";
 import { VaultGlobalSearch } from "@/components/vault/VaultGlobalSearch";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { ClientNotificationsBell } from "@/components/client-portal/ClientNotificationsBell";
 import { TenantProvider, useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { finalizeCAOnboarding, acceptInvite } from "@/lib/tenant.functions";
@@ -51,7 +52,18 @@ function TenantGate() {
             meta.firm_name ||
             (meta.full_name ? `${meta.full_name}'s Firm` : null) ||
             (data.user?.email ? `${data.user.email.split("@")[0]}'s Firm` : "My CA Firm");
-          try { await finalize({ data: { firmName, phone: meta.phone } }); }
+          const referralCode =
+            typeof window !== "undefined"
+              ? localStorage.getItem("gstify_referral_code") ?? undefined
+              : undefined;
+          try {
+            await finalize({
+              data: { firmName, phone: meta.phone, referralCode: referralCode || undefined },
+            });
+            if (referralCode && typeof window !== "undefined") {
+              localStorage.removeItem("gstify_referral_code");
+            }
+          }
           catch (e: any) { toast.error(e.message); }
         }
         await refresh();
@@ -92,6 +104,9 @@ const CA_NAV_OWNER = [
   { to: "/ca/timesheets", icon: Clock, label: "Timesheets" },
   { to: "/ca/staff", icon: UserCog, label: "Staff" },
   { to: "/ca/billing", icon: IndianRupee, label: "Billing" },
+  { to: "/ca/analytics", icon: BarChart3, label: "Analytics" },
+  { to: "/ca/grow", icon: Gift, label: "Grow" },
+  { to: "/ca/agreements", icon: FileSignature, label: "Agreements" },
   { to: "/ca/communications", icon: MessagesSquare, label: "Communications" },
   { to: "/ca/vault", icon: FolderArchive, label: "Document Vault" },
   { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
@@ -113,16 +128,16 @@ const CA_NAV_STAFF = [
 ] as const;
 
 const CLIENT_NAV = [
-  { to: "/client/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/client/dashboard/home", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/client/documents", icon: FolderArchive, label: "My Documents" },
-  { to: "/client/upload", icon: Upload, label: "Upload Invoices" },
-  { to: "/client/requests", icon: Bell, label: "Requests" },
-  { to: "/invoices", icon: FileText, label: "Invoices" },
+  { to: "/client/upload", icon: Upload, label: "Upload" },
+  { to: "/client/agreements", icon: FileSignature, label: "Agreements" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
 ] as const;
 
 function AppShell() {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { role, userId, firm, availableClients, activeClientId, setActiveClientId, activeClient } = useTenant();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -135,6 +150,7 @@ function AppShell() {
   }, []);
 
   const isCA = role === "ca_owner" || role === "ca_staff";
+  const isClientPortalRoute = !isCA && pathname.startsWith("/client/dashboard");
 
   useEffect(() => {
     if (!isCA) return;
@@ -155,7 +171,7 @@ function AppShell() {
   const initials = email ? email.slice(0, 2).toUpperCase() : "GS";
 
   const nav = isCA ? (role === "ca_owner" ? CA_NAV_OWNER : CA_NAV_STAFF) : CLIENT_NAV;
-  const settingsTo = isCA ? "/ca/settings" : "/client/dashboard";
+  const settingsTo = isCA ? "/ca/settings" : "/client/dashboard/profile";
   const uploadTo = isCA ? "/ca/clients" : "/client/upload";
 
   const badges: Record<string, number> = { tasksOverdue };
@@ -217,13 +233,15 @@ function AppShell() {
 
   return (
     <div className="min-h-screen flex bg-[oklch(0.97_0.01_95)]">
-      {/* Desktop sidebar */}
-      <aside className={`hidden md:block shrink-0 transition-all duration-300 ${collapsed ? "w-[72px]" : "w-64"}`}>
-        {SidebarInner}
-      </aside>
+      {/* Desktop sidebar — hidden on client portal (has its own nav) */}
+      {!isClientPortalRoute && (
+        <aside className={`hidden md:block shrink-0 transition-all duration-300 ${collapsed ? "w-[72px]" : "w-64"}`}>
+          {SidebarInner}
+        </aside>
+      )}
 
       {/* Mobile drawer */}
-      {mobileOpen && (
+      {!isClientPortalRoute && mobileOpen && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
           <aside className="fixed inset-y-0 left-0 w-64 z-50 md:hidden animate-slide-in-right">{SidebarInner}</aside>
@@ -233,17 +251,29 @@ function AppShell() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top navbar */}
         <header className="sticky top-0 z-30 h-16 px-4 md:px-6 flex items-center gap-3 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
-            <Menu className="size-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => setCollapsed((v) => !v)}>
-            <Menu className="size-5" />
-          </Button>
+          {!isClientPortalRoute && (
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
+              <Menu className="size-5" />
+            </Button>
+          )}
+          {!isClientPortalRoute && (
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => setCollapsed((v) => !v)}>
+              <Menu className="size-5" />
+            </Button>
+          )}
 
-          <div className="hidden md:flex items-center flex-1 max-w-md relative">
-            <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
-            <Input placeholder="Search invoices, vendors, GSTIN…" className="pl-9 h-9 bg-muted/50 border-transparent focus-visible:bg-background" />
-          </div>
+          {isClientPortalRoute && firm && (
+            <Link to="/client/dashboard/home" className="font-display font-semibold text-lg truncate">
+              {firm.name}
+            </Link>
+          )}
+
+          {isCA && (
+            <div className="hidden md:flex items-center flex-1 max-w-md relative">
+              <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
+              <Input placeholder="Search invoices, vendors, GSTIN…" className="pl-9 h-9 bg-muted/50 border-transparent focus-visible:bg-background" />
+            </div>
+          )}
 
           <div className="flex-1 md:flex-none" />
 
@@ -287,7 +317,7 @@ function AppShell() {
           </Link>
 
 
-          <NotificationsBell />
+          {isCA ? <NotificationsBell /> : <ClientNotificationsBell />}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

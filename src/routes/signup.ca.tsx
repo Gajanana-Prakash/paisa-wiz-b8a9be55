@@ -1,15 +1,27 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/signup/ca")({ component: SignupCA });
+export const Route = createFileRoute("/signup/ca")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    ref: typeof s.ref === "string" ? s.ref : "",
+  }),
+  component: SignupCA,
+});
 
 function SignupCA() {
   const navigate = useNavigate();
+  const { ref } = Route.useSearch();
+
+  useEffect(() => {
+    if (ref && typeof window !== "undefined") {
+      localStorage.setItem("gstify_referral_code", ref.trim().toUpperCase());
+    }
+  }, [ref]);
   const [firmName, setFirmName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

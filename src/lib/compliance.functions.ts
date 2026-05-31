@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { regenerateDeadlines } from "@/lib/compliance.server";
+import { notifyClientPortal } from "./client-notifications.server";
 
 function toISODate(d: Date): string {
   const y = d.getFullYear();
@@ -209,12 +210,37 @@ export const updateDeadline = createServerFn({ method: "POST" })
         : data.patch.status
           ? null
           : undefined;
+    const { data: before } = await supabaseAdmin
+      .from("compliance_deadlines")
+      .select("client_id, period_label, status, compliance_types(name)")
+      .eq("id", data.id)
+      .eq("ca_firm_id", firmId)
+      .single();
+
     const { error } = await supabaseAdmin
       .from("compliance_deadlines")
       .update({ ...data.patch, ...(completed_at !== undefined ? { completed_at } : {}) })
       .eq("id", data.id)
       .eq("ca_firm_id", firmId);
     if (error) throw new Error(error.message);
+
+    if (
+      data.patch.status === "COMPLETED" &&
+      before &&
+      before.status !== "COMPLETED" &&
+      before.client_id
+    ) {
+      const filingName = (before as { compliance_types?: { name?: string } }).compliance_types?.name ?? "Filing";
+      await notifyClientPortal({
+        caFirmId: firmId,
+        clientId: before.client_id,
+        type: "filing",
+        title: `${filingName} filed`,
+        body: `${filingName} for ${before.period_label} has been filed by your CA.`,
+        link: "/client/dashboard/filings",
+      });
+    }
+
     return { ok: true };
   });
 

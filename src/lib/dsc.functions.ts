@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertFirmAccess, isCAOwner } from "./timetracking.server";
+import { notifyClientPortal } from "./client-notifications.server";
 import { computeDscStatus, daysUntil } from "./dsc.server";
 
 const DscClass = z.enum(["CLASS_2", "CLASS_3"]);
@@ -323,43 +324,39 @@ export const processDscAutomations = createServerFn({ method: "POST" })
       }
 
       const label = `${(r as any).clients?.business_name ?? "Firm"} — ${r.holder_name}`;
-      if (days === 60) {
+      const notifyDsc = async (title: string, type: string) => {
         for (const uid of ownerIds) {
           await supabaseAdmin.from("ca_notifications").insert({
             ca_firm_id: firmId,
             user_id: uid,
-            type: "dsc_expiry",
-            title: "DSC expiring in 60 days",
+            type,
+            title,
             body: label,
             link: "/ca/dsc-vault",
           });
         }
+        if (r.client_id) {
+          await notifyClientPortal({
+            caFirmId: firmId,
+            clientId: r.client_id,
+            type: "dsc_expiry",
+            title,
+            body: `Your digital signature for ${r.holder_name} — contact your CA to renew.`,
+            link: "/client/dashboard/home",
+          });
+        }
+      };
+
+      if (days === 60) {
+        await notifyDsc("DSC expiring in 60 days", "dsc_expiry");
         notifications.push(`60-day: ${label}`);
       }
       if (days === 30) {
-        for (const uid of ownerIds) {
-          await supabaseAdmin.from("ca_notifications").insert({
-            ca_firm_id: firmId,
-            user_id: uid,
-            type: "dsc_expiry",
-            title: "DSC expiring in 30 days",
-            body: label,
-            link: "/ca/dsc-vault",
-          });
-        }
+        await notifyDsc("DSC expiring in 30 days", "dsc_expiry");
         notifications.push(`30-day: ${label}`);
       }
       if (days === 7) {
-        for (const uid of ownerIds) {
-          await supabaseAdmin.from("ca_notifications").insert({
-            ca_firm_id: firmId,
-            user_id: uid,
-            type: "dsc_expiry_urgent",
-            title: "URGENT: DSC expires in 7 days",
-            body: label,
-            link: "/ca/dsc-vault",
-          });
-        }
+        await notifyDsc("URGENT: DSC expires in 7 days", "dsc_expiry_urgent");
         notifications.push(`7-day: ${label}`);
       }
       if (days === 0 && r.status !== "EXPIRED") {

@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupIndexRouteImport } from './routes/signup.index'
 import { Route as SignupCaRouteImport } from './routes/signup.ca'
+import { Route as SignTokenRouteImport } from './routes/sign.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AcceptInviteTokenRouteImport } from './routes/accept-invite.$token'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
@@ -29,31 +31,49 @@ import { Route as AuthenticatedClientUploadRouteImport } from './routes/_authent
 import { Route as AuthenticatedClientRequestsRouteImport } from './routes/_authenticated/client.requests'
 import { Route as AuthenticatedClientDocumentsRouteImport } from './routes/_authenticated/client.documents'
 import { Route as AuthenticatedClientDashboardRouteImport } from './routes/_authenticated/client.dashboard'
+import { Route as AuthenticatedClientAgreementsRouteImport } from './routes/_authenticated/client.agreements'
 import { Route as AuthenticatedCaVaultRouteImport } from './routes/_authenticated/ca.vault'
 import { Route as AuthenticatedCaTimesheetsRouteImport } from './routes/_authenticated/ca.timesheets'
 import { Route as AuthenticatedCaTasksRouteImport } from './routes/_authenticated/ca.tasks'
 import { Route as AuthenticatedCaStaffRouteImport } from './routes/_authenticated/ca.staff'
 import { Route as AuthenticatedCaSettingsRouteImport } from './routes/_authenticated/ca.settings'
 import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authenticated/ca.reports'
+import { Route as AuthenticatedCaGrowRouteImport } from './routes/_authenticated/ca.grow'
 import { Route as AuthenticatedCaDscVaultRouteImport } from './routes/_authenticated/ca.dsc-vault'
 import { Route as AuthenticatedCaDashboardRouteImport } from './routes/_authenticated/ca.dashboard'
 import { Route as AuthenticatedCaComplianceCalendarRouteImport } from './routes/_authenticated/ca.compliance-calendar'
 import { Route as AuthenticatedCaCommunicationsRouteImport } from './routes/_authenticated/ca.communications'
 import { Route as AuthenticatedCaClientsRouteImport } from './routes/_authenticated/ca.clients'
 import { Route as AuthenticatedCaBillingRouteImport } from './routes/_authenticated/ca.billing'
+import { Route as AuthenticatedCaAnalyticsRouteImport } from './routes/_authenticated/ca.analytics'
+import { Route as AuthenticatedCaAgreementsRouteImport } from './routes/_authenticated/ca.agreements'
+import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
+import { Route as AuthenticatedClientDashboardIndexRouteImport } from './routes/_authenticated/client.dashboard.index'
+import { Route as AuthenticatedClientDashboardTasksRouteImport } from './routes/_authenticated/client.dashboard.tasks'
+import { Route as AuthenticatedClientDashboardQueriesRouteImport } from './routes/_authenticated/client.dashboard.queries'
+import { Route as AuthenticatedClientDashboardProfileRouteImport } from './routes/_authenticated/client.dashboard.profile'
+import { Route as AuthenticatedClientDashboardInvoicesRouteImport } from './routes/_authenticated/client.dashboard.invoices'
+import { Route as AuthenticatedClientDashboardHomeRouteImport } from './routes/_authenticated/client.dashboard.home'
+import { Route as AuthenticatedClientDashboardFilingsRouteImport } from './routes/_authenticated/client.dashboard.filings'
+import { Route as AuthenticatedClientDashboardComplianceRouteImport } from './routes/_authenticated/client.dashboard.compliance'
 import { Route as AuthenticatedCaTimesheetsMyTimesheetRouteImport } from './routes/_authenticated/ca.timesheets.my-timesheet'
 import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authenticated/ca.tasks.my-tasks'
 import { Route as AuthenticatedCaStaffUserIdRouteImport } from './routes/_authenticated/ca.staff.$userId'
+import { Route as AuthenticatedCaSettingsReferralRouteImport } from './routes/_authenticated/ca.settings.referral'
 import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_authenticated/ca.settings.billing'
+import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
 import { Route as AuthenticatedCaReportsTimesheetsRouteImport } from './routes/_authenticated/ca.reports.timesheets'
 import { Route as AuthenticatedCaClientsClientIdRouteImport } from './routes/_authenticated/ca.clients.$clientId'
 import { Route as AuthenticatedCaBillingServicesRouteImport } from './routes/_authenticated/ca.billing.services'
 import { Route as AuthenticatedCaBillingReportsRouteImport } from './routes/_authenticated/ca.billing.reports'
 import { Route as AuthenticatedCaBillingNewRouteImport } from './routes/_authenticated/ca.billing.new'
 import { Route as AuthenticatedCaBillingInvoiceIdRouteImport } from './routes/_authenticated/ca.billing.$invoiceId'
+import { Route as AuthenticatedCaAgreementsNewRouteImport } from './routes/_authenticated/ca.agreements.new'
+import { Route as AuthenticatedCaAgreementsAgreementIdRouteImport } from './routes/_authenticated/ca.agreements.$agreementId'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
 import { Route as AuthenticatedCaBillingInvoiceIdEditRouteImport } from './routes/_authenticated/ca.billing.$invoiceId.edit'
+import { Route as AuthenticatedCaAgreementsAgreementIdEditRouteImport } from './routes/_authenticated/ca.agreements.$agreementId.edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -63,6 +83,11 @@ const SignupRoute = SignupRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -83,6 +108,11 @@ const SignupCaRoute = SignupCaRouteImport.update({
   id: '/ca',
   path: '/ca',
   getParentRoute: () => SignupRoute,
+} as any)
+const SignTokenRoute = SignTokenRouteImport.update({
+  id: '/sign/$token',
+  path: '/sign/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
@@ -159,6 +189,12 @@ const AuthenticatedClientDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedClientRoute,
   } as any)
+const AuthenticatedClientAgreementsRoute =
+  AuthenticatedClientAgreementsRouteImport.update({
+    id: '/agreements',
+    path: '/agreements',
+    getParentRoute: () => AuthenticatedClientRoute,
+  } as any)
 const AuthenticatedCaVaultRoute = AuthenticatedCaVaultRouteImport.update({
   id: '/vault',
   path: '/vault',
@@ -188,6 +224,11 @@ const AuthenticatedCaSettingsRoute = AuthenticatedCaSettingsRouteImport.update({
 const AuthenticatedCaReportsRoute = AuthenticatedCaReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AuthenticatedCaRoute,
+} as any)
+const AuthenticatedCaGrowRoute = AuthenticatedCaGrowRouteImport.update({
+  id: '/grow',
+  path: '/grow',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
 const AuthenticatedCaDscVaultRoute = AuthenticatedCaDscVaultRouteImport.update({
@@ -223,6 +264,72 @@ const AuthenticatedCaBillingRoute = AuthenticatedCaBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
+const AuthenticatedCaAnalyticsRoute =
+  AuthenticatedCaAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
+const AuthenticatedCaAgreementsRoute =
+  AuthenticatedCaAgreementsRouteImport.update({
+    id: '/agreements',
+    path: '/agreements',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
+const AuthenticatedAdminReferralsRoute =
+  AuthenticatedAdminReferralsRouteImport.update({
+    id: '/admin/referrals',
+    path: '/admin/referrals',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedClientDashboardIndexRoute =
+  AuthenticatedClientDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardTasksRoute =
+  AuthenticatedClientDashboardTasksRouteImport.update({
+    id: '/tasks',
+    path: '/tasks',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardQueriesRoute =
+  AuthenticatedClientDashboardQueriesRouteImport.update({
+    id: '/queries',
+    path: '/queries',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardProfileRoute =
+  AuthenticatedClientDashboardProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardInvoicesRoute =
+  AuthenticatedClientDashboardInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardHomeRoute =
+  AuthenticatedClientDashboardHomeRouteImport.update({
+    id: '/home',
+    path: '/home',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardFilingsRoute =
+  AuthenticatedClientDashboardFilingsRouteImport.update({
+    id: '/filings',
+    path: '/filings',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
+const AuthenticatedClientDashboardComplianceRoute =
+  AuthenticatedClientDashboardComplianceRouteImport.update({
+    id: '/compliance',
+    path: '/compliance',
+    getParentRoute: () => AuthenticatedClientDashboardRoute,
+  } as any)
 const AuthenticatedCaTimesheetsMyTimesheetRoute =
   AuthenticatedCaTimesheetsMyTimesheetRouteImport.update({
     id: '/my-timesheet',
@@ -241,10 +348,22 @@ const AuthenticatedCaStaffUserIdRoute =
     path: '/$userId',
     getParentRoute: () => AuthenticatedCaStaffRoute,
   } as any)
+const AuthenticatedCaSettingsReferralRoute =
+  AuthenticatedCaSettingsReferralRouteImport.update({
+    id: '/referral',
+    path: '/referral',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsBillingRoute =
   AuthenticatedCaSettingsBillingRouteImport.update({
     id: '/billing',
     path: '/billing',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
+const AuthenticatedCaSettingsAgreementTemplatesRoute =
+  AuthenticatedCaSettingsAgreementTemplatesRouteImport.update({
+    id: '/agreement-templates',
+    path: '/agreement-templates',
     getParentRoute: () => AuthenticatedCaSettingsRoute,
   } as any)
 const AuthenticatedCaReportsTimesheetsRoute =
@@ -283,6 +402,18 @@ const AuthenticatedCaBillingInvoiceIdRoute =
     path: '/$invoiceId',
     getParentRoute: () => AuthenticatedCaBillingRoute,
   } as any)
+const AuthenticatedCaAgreementsNewRoute =
+  AuthenticatedCaAgreementsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedCaAgreementsRoute,
+  } as any)
+const AuthenticatedCaAgreementsAgreementIdRoute =
+  AuthenticatedCaAgreementsAgreementIdRouteImport.update({
+    id: '/$agreementId',
+    path: '/$agreementId',
+    getParentRoute: () => AuthenticatedCaAgreementsRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdDocumentsRoute =
   AuthenticatedCaClientsClientIdDocumentsRouteImport.update({
     id: '/documents',
@@ -301,9 +432,16 @@ const AuthenticatedCaBillingInvoiceIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthenticatedCaBillingInvoiceIdRoute,
   } as any)
+const AuthenticatedCaAgreementsAgreementIdEditRoute =
+  AuthenticatedCaAgreementsAgreementIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedCaAgreementsAgreementIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRouteWithChildren
   '/assistant': typeof AuthenticatedAssistantRoute
@@ -314,42 +452,62 @@ export interface FileRoutesByFullPath {
   '/reminders': typeof AuthenticatedRemindersRoute
   '/accept-invite/$token': typeof AcceptInviteTokenRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/sign/$token': typeof SignTokenRoute
   '/signup/ca': typeof SignupCaRoute
   '/signup/': typeof SignupIndexRoute
+  '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/ca/agreements': typeof AuthenticatedCaAgreementsRouteWithChildren
+  '/ca/analytics': typeof AuthenticatedCaAnalyticsRoute
   '/ca/billing': typeof AuthenticatedCaBillingRouteWithChildren
   '/ca/clients': typeof AuthenticatedCaClientsRouteWithChildren
   '/ca/communications': typeof AuthenticatedCaCommunicationsRoute
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
   '/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
   '/ca/vault': typeof AuthenticatedCaVaultRoute
-  '/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/client/agreements': typeof AuthenticatedClientAgreementsRoute
+  '/client/dashboard': typeof AuthenticatedClientDashboardRouteWithChildren
   '/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca/': typeof AuthenticatedCaIndexRoute
   '/client/': typeof AuthenticatedClientIndexRoute
+  '/ca/agreements/$agreementId': typeof AuthenticatedCaAgreementsAgreementIdRouteWithChildren
+  '/ca/agreements/new': typeof AuthenticatedCaAgreementsNewRoute
   '/ca/billing/$invoiceId': typeof AuthenticatedCaBillingInvoiceIdRouteWithChildren
   '/ca/billing/new': typeof AuthenticatedCaBillingNewRoute
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
+  '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
+  '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
+  '/client/dashboard/compliance': typeof AuthenticatedClientDashboardComplianceRoute
+  '/client/dashboard/filings': typeof AuthenticatedClientDashboardFilingsRoute
+  '/client/dashboard/home': typeof AuthenticatedClientDashboardHomeRoute
+  '/client/dashboard/invoices': typeof AuthenticatedClientDashboardInvoicesRoute
+  '/client/dashboard/profile': typeof AuthenticatedClientDashboardProfileRoute
+  '/client/dashboard/queries': typeof AuthenticatedClientDashboardQueriesRoute
+  '/client/dashboard/tasks': typeof AuthenticatedClientDashboardTasksRoute
+  '/client/dashboard/': typeof AuthenticatedClientDashboardIndexRoute
+  '/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -357,36 +515,54 @@ export interface FileRoutesByTo {
   '/reminders': typeof AuthenticatedRemindersRoute
   '/accept-invite/$token': typeof AcceptInviteTokenRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/sign/$token': typeof SignTokenRoute
   '/signup/ca': typeof SignupCaRoute
   '/signup': typeof SignupIndexRoute
+  '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/ca/agreements': typeof AuthenticatedCaAgreementsRouteWithChildren
+  '/ca/analytics': typeof AuthenticatedCaAnalyticsRoute
   '/ca/billing': typeof AuthenticatedCaBillingRouteWithChildren
   '/ca/clients': typeof AuthenticatedCaClientsRouteWithChildren
   '/ca/communications': typeof AuthenticatedCaCommunicationsRoute
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
   '/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
   '/ca/vault': typeof AuthenticatedCaVaultRoute
-  '/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/client/agreements': typeof AuthenticatedClientAgreementsRoute
   '/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca': typeof AuthenticatedCaIndexRoute
   '/client': typeof AuthenticatedClientIndexRoute
+  '/ca/agreements/$agreementId': typeof AuthenticatedCaAgreementsAgreementIdRouteWithChildren
+  '/ca/agreements/new': typeof AuthenticatedCaAgreementsNewRoute
   '/ca/billing/$invoiceId': typeof AuthenticatedCaBillingInvoiceIdRouteWithChildren
   '/ca/billing/new': typeof AuthenticatedCaBillingNewRoute
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
+  '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
+  '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
+  '/client/dashboard/compliance': typeof AuthenticatedClientDashboardComplianceRoute
+  '/client/dashboard/filings': typeof AuthenticatedClientDashboardFilingsRoute
+  '/client/dashboard/home': typeof AuthenticatedClientDashboardHomeRoute
+  '/client/dashboard/invoices': typeof AuthenticatedClientDashboardInvoicesRoute
+  '/client/dashboard/profile': typeof AuthenticatedClientDashboardProfileRoute
+  '/client/dashboard/queries': typeof AuthenticatedClientDashboardQueriesRoute
+  '/client/dashboard/tasks': typeof AuthenticatedClientDashboardTasksRoute
+  '/client/dashboard': typeof AuthenticatedClientDashboardIndexRoute
+  '/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
@@ -395,6 +571,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRouteWithChildren
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
@@ -405,36 +582,55 @@ export interface FileRoutesById {
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/accept-invite/$token': typeof AcceptInviteTokenRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/sign/$token': typeof SignTokenRoute
   '/signup/ca': typeof SignupCaRoute
   '/signup/': typeof SignupIndexRoute
+  '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/_authenticated/ca/agreements': typeof AuthenticatedCaAgreementsRouteWithChildren
+  '/_authenticated/ca/analytics': typeof AuthenticatedCaAnalyticsRoute
   '/_authenticated/ca/billing': typeof AuthenticatedCaBillingRouteWithChildren
   '/_authenticated/ca/clients': typeof AuthenticatedCaClientsRouteWithChildren
   '/_authenticated/ca/communications': typeof AuthenticatedCaCommunicationsRoute
   '/_authenticated/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/_authenticated/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/_authenticated/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/_authenticated/ca/grow': typeof AuthenticatedCaGrowRoute
   '/_authenticated/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/_authenticated/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
   '/_authenticated/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/_authenticated/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/_authenticated/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
   '/_authenticated/ca/vault': typeof AuthenticatedCaVaultRoute
-  '/_authenticated/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/_authenticated/client/agreements': typeof AuthenticatedClientAgreementsRoute
+  '/_authenticated/client/dashboard': typeof AuthenticatedClientDashboardRouteWithChildren
   '/_authenticated/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/_authenticated/client/requests': typeof AuthenticatedClientRequestsRoute
   '/_authenticated/client/upload': typeof AuthenticatedClientUploadRoute
   '/_authenticated/ca/': typeof AuthenticatedCaIndexRoute
   '/_authenticated/client/': typeof AuthenticatedClientIndexRoute
+  '/_authenticated/ca/agreements/$agreementId': typeof AuthenticatedCaAgreementsAgreementIdRouteWithChildren
+  '/_authenticated/ca/agreements/new': typeof AuthenticatedCaAgreementsNewRoute
   '/_authenticated/ca/billing/$invoiceId': typeof AuthenticatedCaBillingInvoiceIdRouteWithChildren
   '/_authenticated/ca/billing/new': typeof AuthenticatedCaBillingNewRoute
   '/_authenticated/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/_authenticated/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/_authenticated/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
   '/_authenticated/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
+  '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/_authenticated/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
+  '/_authenticated/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/_authenticated/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/_authenticated/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/_authenticated/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
+  '/_authenticated/client/dashboard/compliance': typeof AuthenticatedClientDashboardComplianceRoute
+  '/_authenticated/client/dashboard/filings': typeof AuthenticatedClientDashboardFilingsRoute
+  '/_authenticated/client/dashboard/home': typeof AuthenticatedClientDashboardHomeRoute
+  '/_authenticated/client/dashboard/invoices': typeof AuthenticatedClientDashboardInvoicesRoute
+  '/_authenticated/client/dashboard/profile': typeof AuthenticatedClientDashboardProfileRoute
+  '/_authenticated/client/dashboard/queries': typeof AuthenticatedClientDashboardQueriesRoute
+  '/_authenticated/client/dashboard/tasks': typeof AuthenticatedClientDashboardTasksRoute
+  '/_authenticated/client/dashboard/': typeof AuthenticatedClientDashboardIndexRoute
+  '/_authenticated/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/_authenticated/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
@@ -443,6 +639,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/join'
     | '/login'
     | '/signup'
     | '/assistant'
@@ -453,42 +650,62 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/accept-invite/$token'
     | '/invite/$token'
+    | '/sign/$token'
     | '/signup/ca'
     | '/signup/'
+    | '/admin/referrals'
+    | '/ca/agreements'
+    | '/ca/analytics'
     | '/ca/billing'
     | '/ca/clients'
     | '/ca/communications'
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/grow'
     | '/ca/reports'
     | '/ca/settings'
     | '/ca/staff'
     | '/ca/tasks'
     | '/ca/timesheets'
     | '/ca/vault'
+    | '/client/agreements'
     | '/client/dashboard'
     | '/client/documents'
     | '/client/requests'
     | '/client/upload'
     | '/ca/'
     | '/client/'
+    | '/ca/agreements/$agreementId'
+    | '/ca/agreements/new'
     | '/ca/billing/$invoiceId'
     | '/ca/billing/new'
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
     | '/ca/reports/timesheets'
+    | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
+    | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
     | '/ca/timesheets/my-timesheet'
+    | '/client/dashboard/compliance'
+    | '/client/dashboard/filings'
+    | '/client/dashboard/home'
+    | '/client/dashboard/invoices'
+    | '/client/dashboard/profile'
+    | '/client/dashboard/queries'
+    | '/client/dashboard/tasks'
+    | '/client/dashboard/'
+    | '/ca/agreements/$agreementId/edit'
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/join'
     | '/login'
     | '/assistant'
     | '/dashboard'
@@ -496,36 +713,54 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/accept-invite/$token'
     | '/invite/$token'
+    | '/sign/$token'
     | '/signup/ca'
     | '/signup'
+    | '/admin/referrals'
+    | '/ca/agreements'
+    | '/ca/analytics'
     | '/ca/billing'
     | '/ca/clients'
     | '/ca/communications'
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/grow'
     | '/ca/reports'
     | '/ca/settings'
     | '/ca/staff'
     | '/ca/tasks'
     | '/ca/timesheets'
     | '/ca/vault'
-    | '/client/dashboard'
+    | '/client/agreements'
     | '/client/documents'
     | '/client/requests'
     | '/client/upload'
     | '/ca'
     | '/client'
+    | '/ca/agreements/$agreementId'
+    | '/ca/agreements/new'
     | '/ca/billing/$invoiceId'
     | '/ca/billing/new'
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
     | '/ca/reports/timesheets'
+    | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
+    | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
     | '/ca/timesheets/my-timesheet'
+    | '/client/dashboard/compliance'
+    | '/client/dashboard/filings'
+    | '/client/dashboard/home'
+    | '/client/dashboard/invoices'
+    | '/client/dashboard/profile'
+    | '/client/dashboard/queries'
+    | '/client/dashboard/tasks'
+    | '/client/dashboard'
+    | '/ca/agreements/$agreementId/edit'
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
@@ -533,6 +768,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/join'
     | '/login'
     | '/signup'
     | '/_authenticated/assistant'
@@ -543,36 +779,55 @@ export interface FileRouteTypes {
     | '/_authenticated/reminders'
     | '/accept-invite/$token'
     | '/invite/$token'
+    | '/sign/$token'
     | '/signup/ca'
     | '/signup/'
+    | '/_authenticated/admin/referrals'
+    | '/_authenticated/ca/agreements'
+    | '/_authenticated/ca/analytics'
     | '/_authenticated/ca/billing'
     | '/_authenticated/ca/clients'
     | '/_authenticated/ca/communications'
     | '/_authenticated/ca/compliance-calendar'
     | '/_authenticated/ca/dashboard'
     | '/_authenticated/ca/dsc-vault'
+    | '/_authenticated/ca/grow'
     | '/_authenticated/ca/reports'
     | '/_authenticated/ca/settings'
     | '/_authenticated/ca/staff'
     | '/_authenticated/ca/tasks'
     | '/_authenticated/ca/timesheets'
     | '/_authenticated/ca/vault'
+    | '/_authenticated/client/agreements'
     | '/_authenticated/client/dashboard'
     | '/_authenticated/client/documents'
     | '/_authenticated/client/requests'
     | '/_authenticated/client/upload'
     | '/_authenticated/ca/'
     | '/_authenticated/client/'
+    | '/_authenticated/ca/agreements/$agreementId'
+    | '/_authenticated/ca/agreements/new'
     | '/_authenticated/ca/billing/$invoiceId'
     | '/_authenticated/ca/billing/new'
     | '/_authenticated/ca/billing/reports'
     | '/_authenticated/ca/billing/services'
     | '/_authenticated/ca/clients/$clientId'
     | '/_authenticated/ca/reports/timesheets'
+    | '/_authenticated/ca/settings/agreement-templates'
     | '/_authenticated/ca/settings/billing'
+    | '/_authenticated/ca/settings/referral'
     | '/_authenticated/ca/staff/$userId'
     | '/_authenticated/ca/tasks/my-tasks'
     | '/_authenticated/ca/timesheets/my-timesheet'
+    | '/_authenticated/client/dashboard/compliance'
+    | '/_authenticated/client/dashboard/filings'
+    | '/_authenticated/client/dashboard/home'
+    | '/_authenticated/client/dashboard/invoices'
+    | '/_authenticated/client/dashboard/profile'
+    | '/_authenticated/client/dashboard/queries'
+    | '/_authenticated/client/dashboard/tasks'
+    | '/_authenticated/client/dashboard/'
+    | '/_authenticated/ca/agreements/$agreementId/edit'
     | '/_authenticated/ca/billing/$invoiceId/edit'
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
@@ -581,10 +836,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRouteWithChildren
   AcceptInviteTokenRoute: typeof AcceptInviteTokenRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  SignTokenRoute: typeof SignTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -601,6 +858,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -630,6 +894,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup/ca'
       preLoaderRoute: typeof SignupCaRouteImport
       parentRoute: typeof SignupRoute
+    }
+    '/sign/$token': {
+      id: '/sign/$token'
+      path: '/sign/$token'
+      fullPath: '/sign/$token'
+      preLoaderRoute: typeof SignTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
       id: '/invite/$token'
@@ -729,6 +1000,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientDashboardRouteImport
       parentRoute: typeof AuthenticatedClientRoute
     }
+    '/_authenticated/client/agreements': {
+      id: '/_authenticated/client/agreements'
+      path: '/agreements'
+      fullPath: '/client/agreements'
+      preLoaderRoute: typeof AuthenticatedClientAgreementsRouteImport
+      parentRoute: typeof AuthenticatedClientRoute
+    }
     '/_authenticated/ca/vault': {
       id: '/_authenticated/ca/vault'
       path: '/vault'
@@ -769,6 +1047,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/ca/reports'
       preLoaderRoute: typeof AuthenticatedCaReportsRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
+    '/_authenticated/ca/grow': {
+      id: '/_authenticated/ca/grow'
+      path: '/grow'
+      fullPath: '/ca/grow'
+      preLoaderRoute: typeof AuthenticatedCaGrowRouteImport
       parentRoute: typeof AuthenticatedCaRoute
     }
     '/_authenticated/ca/dsc-vault': {
@@ -813,6 +1098,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaBillingRouteImport
       parentRoute: typeof AuthenticatedCaRoute
     }
+    '/_authenticated/ca/analytics': {
+      id: '/_authenticated/ca/analytics'
+      path: '/analytics'
+      fullPath: '/ca/analytics'
+      preLoaderRoute: typeof AuthenticatedCaAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
+    '/_authenticated/ca/agreements': {
+      id: '/_authenticated/ca/agreements'
+      path: '/agreements'
+      fullPath: '/ca/agreements'
+      preLoaderRoute: typeof AuthenticatedCaAgreementsRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
+    '/_authenticated/admin/referrals': {
+      id: '/_authenticated/admin/referrals'
+      path: '/admin/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AuthenticatedAdminReferralsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/client/dashboard/': {
+      id: '/_authenticated/client/dashboard/'
+      path: '/'
+      fullPath: '/client/dashboard/'
+      preLoaderRoute: typeof AuthenticatedClientDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/tasks': {
+      id: '/_authenticated/client/dashboard/tasks'
+      path: '/tasks'
+      fullPath: '/client/dashboard/tasks'
+      preLoaderRoute: typeof AuthenticatedClientDashboardTasksRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/queries': {
+      id: '/_authenticated/client/dashboard/queries'
+      path: '/queries'
+      fullPath: '/client/dashboard/queries'
+      preLoaderRoute: typeof AuthenticatedClientDashboardQueriesRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/profile': {
+      id: '/_authenticated/client/dashboard/profile'
+      path: '/profile'
+      fullPath: '/client/dashboard/profile'
+      preLoaderRoute: typeof AuthenticatedClientDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/invoices': {
+      id: '/_authenticated/client/dashboard/invoices'
+      path: '/invoices'
+      fullPath: '/client/dashboard/invoices'
+      preLoaderRoute: typeof AuthenticatedClientDashboardInvoicesRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/home': {
+      id: '/_authenticated/client/dashboard/home'
+      path: '/home'
+      fullPath: '/client/dashboard/home'
+      preLoaderRoute: typeof AuthenticatedClientDashboardHomeRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/filings': {
+      id: '/_authenticated/client/dashboard/filings'
+      path: '/filings'
+      fullPath: '/client/dashboard/filings'
+      preLoaderRoute: typeof AuthenticatedClientDashboardFilingsRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
+    '/_authenticated/client/dashboard/compliance': {
+      id: '/_authenticated/client/dashboard/compliance'
+      path: '/compliance'
+      fullPath: '/client/dashboard/compliance'
+      preLoaderRoute: typeof AuthenticatedClientDashboardComplianceRouteImport
+      parentRoute: typeof AuthenticatedClientDashboardRoute
+    }
     '/_authenticated/ca/timesheets/my-timesheet': {
       id: '/_authenticated/ca/timesheets/my-timesheet'
       path: '/my-timesheet'
@@ -834,11 +1196,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaStaffUserIdRouteImport
       parentRoute: typeof AuthenticatedCaStaffRoute
     }
+    '/_authenticated/ca/settings/referral': {
+      id: '/_authenticated/ca/settings/referral'
+      path: '/referral'
+      fullPath: '/ca/settings/referral'
+      preLoaderRoute: typeof AuthenticatedCaSettingsReferralRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/billing': {
       id: '/_authenticated/ca/settings/billing'
       path: '/billing'
       fullPath: '/ca/settings/billing'
       preLoaderRoute: typeof AuthenticatedCaSettingsBillingRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
+    '/_authenticated/ca/settings/agreement-templates': {
+      id: '/_authenticated/ca/settings/agreement-templates'
+      path: '/agreement-templates'
+      fullPath: '/ca/settings/agreement-templates'
+      preLoaderRoute: typeof AuthenticatedCaSettingsAgreementTemplatesRouteImport
       parentRoute: typeof AuthenticatedCaSettingsRoute
     }
     '/_authenticated/ca/reports/timesheets': {
@@ -883,6 +1259,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaBillingInvoiceIdRouteImport
       parentRoute: typeof AuthenticatedCaBillingRoute
     }
+    '/_authenticated/ca/agreements/new': {
+      id: '/_authenticated/ca/agreements/new'
+      path: '/new'
+      fullPath: '/ca/agreements/new'
+      preLoaderRoute: typeof AuthenticatedCaAgreementsNewRouteImport
+      parentRoute: typeof AuthenticatedCaAgreementsRoute
+    }
+    '/_authenticated/ca/agreements/$agreementId': {
+      id: '/_authenticated/ca/agreements/$agreementId'
+      path: '/$agreementId'
+      fullPath: '/ca/agreements/$agreementId'
+      preLoaderRoute: typeof AuthenticatedCaAgreementsAgreementIdRouteImport
+      parentRoute: typeof AuthenticatedCaAgreementsRoute
+    }
     '/_authenticated/ca/clients/$clientId/documents': {
       id: '/_authenticated/ca/clients/$clientId/documents'
       path: '/documents'
@@ -904,8 +1294,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaBillingInvoiceIdEditRouteImport
       parentRoute: typeof AuthenticatedCaBillingInvoiceIdRoute
     }
+    '/_authenticated/ca/agreements/$agreementId/edit': {
+      id: '/_authenticated/ca/agreements/$agreementId/edit'
+      path: '/edit'
+      fullPath: '/ca/agreements/$agreementId/edit'
+      preLoaderRoute: typeof AuthenticatedCaAgreementsAgreementIdEditRouteImport
+      parentRoute: typeof AuthenticatedCaAgreementsAgreementIdRoute
+    }
   }
 }
+
+interface AuthenticatedCaAgreementsAgreementIdRouteChildren {
+  AuthenticatedCaAgreementsAgreementIdEditRoute: typeof AuthenticatedCaAgreementsAgreementIdEditRoute
+}
+
+const AuthenticatedCaAgreementsAgreementIdRouteChildren: AuthenticatedCaAgreementsAgreementIdRouteChildren =
+  {
+    AuthenticatedCaAgreementsAgreementIdEditRoute:
+      AuthenticatedCaAgreementsAgreementIdEditRoute,
+  }
+
+const AuthenticatedCaAgreementsAgreementIdRouteWithChildren =
+  AuthenticatedCaAgreementsAgreementIdRoute._addFileChildren(
+    AuthenticatedCaAgreementsAgreementIdRouteChildren,
+  )
+
+interface AuthenticatedCaAgreementsRouteChildren {
+  AuthenticatedCaAgreementsAgreementIdRoute: typeof AuthenticatedCaAgreementsAgreementIdRouteWithChildren
+  AuthenticatedCaAgreementsNewRoute: typeof AuthenticatedCaAgreementsNewRoute
+}
+
+const AuthenticatedCaAgreementsRouteChildren: AuthenticatedCaAgreementsRouteChildren =
+  {
+    AuthenticatedCaAgreementsAgreementIdRoute:
+      AuthenticatedCaAgreementsAgreementIdRouteWithChildren,
+    AuthenticatedCaAgreementsNewRoute: AuthenticatedCaAgreementsNewRoute,
+  }
+
+const AuthenticatedCaAgreementsRouteWithChildren =
+  AuthenticatedCaAgreementsRoute._addFileChildren(
+    AuthenticatedCaAgreementsRouteChildren,
+  )
 
 interface AuthenticatedCaBillingInvoiceIdRouteChildren {
   AuthenticatedCaBillingInvoiceIdEditRoute: typeof AuthenticatedCaBillingInvoiceIdEditRoute
@@ -992,12 +1421,17 @@ const AuthenticatedCaReportsRouteWithChildren =
   )
 
 interface AuthenticatedCaSettingsRouteChildren {
+  AuthenticatedCaSettingsAgreementTemplatesRoute: typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   AuthenticatedCaSettingsBillingRoute: typeof AuthenticatedCaSettingsBillingRoute
+  AuthenticatedCaSettingsReferralRoute: typeof AuthenticatedCaSettingsReferralRoute
 }
 
 const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren =
   {
+    AuthenticatedCaSettingsAgreementTemplatesRoute:
+      AuthenticatedCaSettingsAgreementTemplatesRoute,
     AuthenticatedCaSettingsBillingRoute: AuthenticatedCaSettingsBillingRoute,
+    AuthenticatedCaSettingsReferralRoute: AuthenticatedCaSettingsReferralRoute,
   }
 
 const AuthenticatedCaSettingsRouteWithChildren =
@@ -1043,12 +1477,15 @@ const AuthenticatedCaTimesheetsRouteWithChildren =
   )
 
 interface AuthenticatedCaRouteChildren {
+  AuthenticatedCaAgreementsRoute: typeof AuthenticatedCaAgreementsRouteWithChildren
+  AuthenticatedCaAnalyticsRoute: typeof AuthenticatedCaAnalyticsRoute
   AuthenticatedCaBillingRoute: typeof AuthenticatedCaBillingRouteWithChildren
   AuthenticatedCaClientsRoute: typeof AuthenticatedCaClientsRouteWithChildren
   AuthenticatedCaCommunicationsRoute: typeof AuthenticatedCaCommunicationsRoute
   AuthenticatedCaComplianceCalendarRoute: typeof AuthenticatedCaComplianceCalendarRoute
   AuthenticatedCaDashboardRoute: typeof AuthenticatedCaDashboardRoute
   AuthenticatedCaDscVaultRoute: typeof AuthenticatedCaDscVaultRoute
+  AuthenticatedCaGrowRoute: typeof AuthenticatedCaGrowRoute
   AuthenticatedCaReportsRoute: typeof AuthenticatedCaReportsRouteWithChildren
   AuthenticatedCaSettingsRoute: typeof AuthenticatedCaSettingsRouteWithChildren
   AuthenticatedCaStaffRoute: typeof AuthenticatedCaStaffRouteWithChildren
@@ -1059,6 +1496,8 @@ interface AuthenticatedCaRouteChildren {
 }
 
 const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
+  AuthenticatedCaAgreementsRoute: AuthenticatedCaAgreementsRouteWithChildren,
+  AuthenticatedCaAnalyticsRoute: AuthenticatedCaAnalyticsRoute,
   AuthenticatedCaBillingRoute: AuthenticatedCaBillingRouteWithChildren,
   AuthenticatedCaClientsRoute: AuthenticatedCaClientsRouteWithChildren,
   AuthenticatedCaCommunicationsRoute: AuthenticatedCaCommunicationsRoute,
@@ -1066,6 +1505,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
     AuthenticatedCaComplianceCalendarRoute,
   AuthenticatedCaDashboardRoute: AuthenticatedCaDashboardRoute,
   AuthenticatedCaDscVaultRoute: AuthenticatedCaDscVaultRoute,
+  AuthenticatedCaGrowRoute: AuthenticatedCaGrowRoute,
   AuthenticatedCaReportsRoute: AuthenticatedCaReportsRouteWithChildren,
   AuthenticatedCaSettingsRoute: AuthenticatedCaSettingsRouteWithChildren,
   AuthenticatedCaStaffRoute: AuthenticatedCaStaffRouteWithChildren,
@@ -1079,8 +1519,45 @@ const AuthenticatedCaRouteWithChildren = AuthenticatedCaRoute._addFileChildren(
   AuthenticatedCaRouteChildren,
 )
 
+interface AuthenticatedClientDashboardRouteChildren {
+  AuthenticatedClientDashboardComplianceRoute: typeof AuthenticatedClientDashboardComplianceRoute
+  AuthenticatedClientDashboardFilingsRoute: typeof AuthenticatedClientDashboardFilingsRoute
+  AuthenticatedClientDashboardHomeRoute: typeof AuthenticatedClientDashboardHomeRoute
+  AuthenticatedClientDashboardInvoicesRoute: typeof AuthenticatedClientDashboardInvoicesRoute
+  AuthenticatedClientDashboardProfileRoute: typeof AuthenticatedClientDashboardProfileRoute
+  AuthenticatedClientDashboardQueriesRoute: typeof AuthenticatedClientDashboardQueriesRoute
+  AuthenticatedClientDashboardTasksRoute: typeof AuthenticatedClientDashboardTasksRoute
+  AuthenticatedClientDashboardIndexRoute: typeof AuthenticatedClientDashboardIndexRoute
+}
+
+const AuthenticatedClientDashboardRouteChildren: AuthenticatedClientDashboardRouteChildren =
+  {
+    AuthenticatedClientDashboardComplianceRoute:
+      AuthenticatedClientDashboardComplianceRoute,
+    AuthenticatedClientDashboardFilingsRoute:
+      AuthenticatedClientDashboardFilingsRoute,
+    AuthenticatedClientDashboardHomeRoute:
+      AuthenticatedClientDashboardHomeRoute,
+    AuthenticatedClientDashboardInvoicesRoute:
+      AuthenticatedClientDashboardInvoicesRoute,
+    AuthenticatedClientDashboardProfileRoute:
+      AuthenticatedClientDashboardProfileRoute,
+    AuthenticatedClientDashboardQueriesRoute:
+      AuthenticatedClientDashboardQueriesRoute,
+    AuthenticatedClientDashboardTasksRoute:
+      AuthenticatedClientDashboardTasksRoute,
+    AuthenticatedClientDashboardIndexRoute:
+      AuthenticatedClientDashboardIndexRoute,
+  }
+
+const AuthenticatedClientDashboardRouteWithChildren =
+  AuthenticatedClientDashboardRoute._addFileChildren(
+    AuthenticatedClientDashboardRouteChildren,
+  )
+
 interface AuthenticatedClientRouteChildren {
-  AuthenticatedClientDashboardRoute: typeof AuthenticatedClientDashboardRoute
+  AuthenticatedClientAgreementsRoute: typeof AuthenticatedClientAgreementsRoute
+  AuthenticatedClientDashboardRoute: typeof AuthenticatedClientDashboardRouteWithChildren
   AuthenticatedClientDocumentsRoute: typeof AuthenticatedClientDocumentsRoute
   AuthenticatedClientRequestsRoute: typeof AuthenticatedClientRequestsRoute
   AuthenticatedClientUploadRoute: typeof AuthenticatedClientUploadRoute
@@ -1088,7 +1565,9 @@ interface AuthenticatedClientRouteChildren {
 }
 
 const AuthenticatedClientRouteChildren: AuthenticatedClientRouteChildren = {
-  AuthenticatedClientDashboardRoute: AuthenticatedClientDashboardRoute,
+  AuthenticatedClientAgreementsRoute: AuthenticatedClientAgreementsRoute,
+  AuthenticatedClientDashboardRoute:
+    AuthenticatedClientDashboardRouteWithChildren,
   AuthenticatedClientDocumentsRoute: AuthenticatedClientDocumentsRoute,
   AuthenticatedClientRequestsRoute: AuthenticatedClientRequestsRoute,
   AuthenticatedClientUploadRoute: AuthenticatedClientUploadRoute,
@@ -1105,6 +1584,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
+  AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1114,6 +1594,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
+  AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -1136,10 +1617,12 @@ const SignupRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRouteWithChildren,
   AcceptInviteTokenRoute: AcceptInviteTokenRoute,
   InviteTokenRoute: InviteTokenRoute,
+  SignTokenRoute: SignTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

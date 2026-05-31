@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { ensureDefaultComplianceProfile, regenerateDeadlines } from "@/lib/compliance.server";
+import { ensureReferralCodes, processReferralSignup } from "@/lib/referrals.server";
 
 
 // ---------- CA OWNER ONBOARDING ----------
@@ -13,6 +14,7 @@ export const finalizeCAOnboarding = createServerFn({ method: "POST" })
     z.object({
       firmName: z.string().trim().min(2).max(120),
       phone: z.string().trim().max(20).optional(),
+      referralCode: z.string().trim().max(40).optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -39,6 +41,18 @@ export const finalizeCAOnboarding = createServerFn({ method: "POST" })
       .from("user_roles")
       .insert({ user_id: userId, role: "ca_owner", ca_firm_id: firm.id });
     if (rErr) throw new Error(rErr.message);
+
+    await ensureReferralCodes(firm.id, data.firmName);
+
+    if (data.referralCode) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+      await processReferralSignup({
+        referralCode: data.referralCode,
+        newFirmId: firm.id,
+        newFirmOwnerUserId: userId,
+        referredEmail: authUser?.user?.email ?? null,
+      });
+    }
 
     return { ok: true, caFirmId: firm.id, role: "ca_owner" as const };
   });
@@ -201,7 +215,7 @@ export const loadTenantContext = createServerFn({ method: "POST" })
 
     let firm: { id: string; name: string; logo_url: string | null; primary_color: string | null; subdomain_slug: string | null } | null = null;
     let availableClients: Array<{ id: string; business_name: string; gstin: string | null; status: string }> = [];
-    const firmCols = "id, name, logo_url, primary_color, subdomain_slug";
+    const firmCols = "id, name, logo_url, primary_color, subdomain_slug, show_powered_by_gstify";
 
     if (caOwner?.ca_firm_id) {
       const { data: f } = await supabaseAdmin.from("ca_firms").select(firmCols).eq("id", caOwner.ca_firm_id).single();
@@ -249,6 +263,7 @@ export const updateFirmBranding = createServerFn({ method: "POST" })
       logoUrl: z.string().trim().max(2000).nullable().optional(),
       primaryColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
       subdomainSlug: z.string().trim().toLowerCase().regex(/^[a-z0-9-]{2,40}$/).nullable().optional(),
+      showPoweredByGstify: z.boolean().optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -267,6 +282,7 @@ export const updateFirmBranding = createServerFn({ method: "POST" })
     if (data.logoUrl !== undefined) patch.logo_url = data.logoUrl;
     if (data.primaryColor !== undefined) patch.primary_color = data.primaryColor;
     if (data.subdomainSlug !== undefined) patch.subdomain_slug = data.subdomainSlug;
+    if (data.showPoweredByGstify !== undefined) patch.show_powered_by_gstify = data.showPoweredByGstify;
 
     const { error } = await supabaseAdmin.from("ca_firms").update(patch as any).eq("id", firm.ca_firm_id);
     if (error) throw new Error(error.message);

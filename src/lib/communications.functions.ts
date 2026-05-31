@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertFirmAccess } from "./timetracking.server";
+import { notifyClientPortal } from "./client-notifications.server";
 
 const ChannelEnum = z.enum(["IN_APP", "EMAIL", "WHATSAPP", "PHONE_CALL", "MEETING", "NOTE"]);
 const DirectionEnum = z.enum(["INBOUND", "OUTBOUND", "INTERNAL_NOTE"]);
@@ -174,6 +175,18 @@ export const createConversation = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+
+    if (data.channel === "IN_APP" && data.direction === "OUTBOUND") {
+      await notifyClientPortal({
+        caFirmId: firmId,
+        clientId: data.clientId,
+        type: "message",
+        title: data.subject ?? "New message from your CA",
+        body: data.body.slice(0, 200),
+        link: "/client/dashboard/queries",
+      });
+    }
+
     return { id: row!.id };
   });
 

@@ -24,9 +24,11 @@ import { ClientCompliancePanel } from "@/components/compliance/ClientComplianceP
 import { TasksPage } from "@/components/tasks/TasksPage";
 import { ClientCommunicationPanel } from "@/components/communications/ClientCommunicationPanel";
 import { ClientDscPanel } from "@/components/dsc/ClientDscPanel";
+import { ClientAgreementsPanel } from "@/components/agreements/ClientAgreementsPanel";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getVaultFolderTree } from "@/lib/vault.functions";
+import { createDocumentRequest } from "@/lib/document-requests.functions";
 import { formatBytes } from "@/components/vault/utils";
 import { VAULT_CATEGORIES } from "@/components/vault/categories";
 
@@ -153,6 +155,7 @@ function ClientWorkspace() {
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="requests">Requests</TabsTrigger>
+          <TabsTrigger value="agreements">Agreements</TabsTrigger>
           <TabsTrigger value="communication">Communication</TabsTrigger>
           <TabsTrigger value="dsc">DSC</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
@@ -203,6 +206,10 @@ function ClientWorkspace() {
 
         <TabsContent value="documents" className="mt-5">
           <ClientVaultSummary clientId={clientId} invCount={invs.length} />
+        </TabsContent>
+
+        <TabsContent value="agreements" className="mt-5">
+          <ClientAgreementsPanel clientId={clientId} />
         </TabsContent>
 
         <TabsContent value="communication" className="mt-5">
@@ -529,6 +536,7 @@ function RequestComposer({
   const [dueDate, setDueDate] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [sentLink, setSentLink] = useState<string | null>(null);
+  const createReq = useServerFn(createDocumentRequest);
 
   const reset = () => {
     setDocType("purchase_bills");
@@ -541,32 +549,28 @@ function RequestComposer({
   const submit = async () => {
     setSubmitting(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Not signed in");
-      // need ca_firm_id from client row
       const { data: c } = await supabase.from("clients").select("ca_firm_id").eq("id", client.id).single();
       if (!c) throw new Error("Client not found");
-      const { data: inserted, error } = await supabase.from("document_requests").insert({
-        ca_firm_id: c.ca_firm_id,
-        client_id: client.id,
-        created_by: u.user.id,
-        doc_type: docType as any,
-        period_label: period || null,
-        note: note || null,
-        due_date: dueDate || null,
-      }).select("id").single();
-      if (error) throw error;
+      const result = await createReq({
+        data: {
+          clientId: client.id,
+          docType,
+          periodLabel: period || null,
+          note: note || null,
+          dueDate: dueDate || null,
+        },
+      });
       await logActivity({
         ca_firm_id: c.ca_firm_id,
         client_id: client.id,
         action: "document_request_sent",
         entity_type: "document_request",
-        entity_id: inserted?.id ?? null,
+        entity_id: result?.id ?? null,
         metadata: { doc_type: docType, period: period || null, due_date: dueDate || null },
       });
-      const link = `${window.location.origin}/dashboard`;
+      const link = `${window.location.origin}/client/requests`;
       setSentLink(link);
-      toast.success("Request sent");
+      toast.success("Request sent — client notified");
     } catch (e: any) {
       toast.error(e.message);
     } finally {

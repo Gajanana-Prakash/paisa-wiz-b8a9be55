@@ -1167,6 +1167,38 @@ export type Database = {
         }
         Relationships: []
       }
+      engagement_letter_signing: {
+        Row: {
+          letter_id: string
+          sign_token: string | null
+          signature_otp_expires_at: string | null
+          signature_otp_hash: string | null
+          signer_ip: string | null
+        }
+        Insert: {
+          letter_id: string
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signer_ip?: string | null
+        }
+        Update: {
+          letter_id?: string
+          sign_token?: string | null
+          signature_otp_expires_at?: string | null
+          signature_otp_hash?: string | null
+          signer_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_letter_signing_letter_id_fkey"
+            columns: ["letter_id"]
+            isOneToOne: true
+            referencedRelation: "engagement_letters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engagement_letters: {
         Row: {
           ca_firm_id: string
@@ -1175,12 +1207,8 @@ export type Database = {
           created_at: string
           id: string
           sent_at: string | null
-          sign_token: string | null
-          signature_otp_expires_at: string | null
-          signature_otp_hash: string | null
           signed_at: string | null
           signed_document_url: string | null
-          signer_ip: string | null
           signer_name: string | null
           status: Database["public"]["Enums"]["engagement_letter_status"]
           template_id: string | null
@@ -1194,12 +1222,8 @@ export type Database = {
           created_at?: string
           id?: string
           sent_at?: string | null
-          sign_token?: string | null
-          signature_otp_expires_at?: string | null
-          signature_otp_hash?: string | null
           signed_at?: string | null
           signed_document_url?: string | null
-          signer_ip?: string | null
           signer_name?: string | null
           status?: Database["public"]["Enums"]["engagement_letter_status"]
           template_id?: string | null
@@ -1213,12 +1237,8 @@ export type Database = {
           created_at?: string
           id?: string
           sent_at?: string | null
-          sign_token?: string | null
-          signature_otp_expires_at?: string | null
-          signature_otp_hash?: string | null
           signed_at?: string | null
           signed_document_url?: string | null
-          signer_ip?: string | null
           signer_name?: string | null
           status?: Database["public"]["Enums"]["engagement_letter_status"]
           template_id?: string | null

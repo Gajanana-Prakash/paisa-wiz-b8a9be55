@@ -9,7 +9,14 @@ type TenantState = {
   loading: boolean;
   role: TenantRole;
   userId: string | null;
-  firm: { id: string; name: string; logo_url: string | null; primary_color: string | null; subdomain_slug: string | null } | null;
+  firm: {
+    id: string;
+    name: string;
+    logo_url: string | null;
+    primary_color: string | null;
+    subdomain_slug: string | null;
+    show_powered_by_gstify?: boolean | null;
+  } | null;
   availableClients: TenantClient[];
   activeClientId: string | null;
   activeClient: TenantClient | null;

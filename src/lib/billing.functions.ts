@@ -10,6 +10,7 @@ import {
   getOrCreateBillingSettings,
   recalcInvoiceBalances,
 } from "./billing.server";
+import { notifyClientPortal } from "./client-notifications.server";
 
 const ServiceUnit = z.enum(["FIXED", "PER_RETURN", "PER_HOUR", "PER_MONTH"]);
 const InvoiceStatus = z.enum(["DRAFT", "SENT", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED"]);
@@ -328,6 +329,23 @@ export const saveCaInvoice = createServerFn({ method: "POST" })
     const { error: iErr } = await supabaseAdmin.from("ca_invoice_items").insert(itemRows);
     if (iErr) throw new Error(iErr.message);
     await recalcInvoiceBalances(invoiceId!);
+    if (data.sendAfterSave) {
+      const { data: inv } = await supabaseAdmin
+        .from("ca_invoices")
+        .select("invoice_number, balance_due, total_amount, client_id")
+        .eq("id", invoiceId!)
+        .single();
+      if (inv) {
+        await notifyClientPortal({
+          caFirmId: firmId,
+          clientId: inv.client_id,
+          type: "invoice",
+          title: `Invoice ${inv.invoice_number}`,
+          body: `Amount due: ₹${Number(inv.balance_due || inv.total_amount).toLocaleString("en-IN")}`,
+          link: "/client/dashboard/invoices",
+        });
+      }
+    }
     return { id: invoiceId };
   });
 
@@ -338,7 +356,7 @@ export const sendCaInvoice = createServerFn({ method: "POST" })
     const firmId = await assertFirmAccess(context.userId);
     const { data: inv } = await supabaseAdmin
       .from("ca_invoices")
-      .select("status")
+      .select("status, invoice_number, balance_due, total_amount, client_id")
       .eq("id", data.id)
       .eq("ca_firm_id", firmId)
       .maybeSingle();
@@ -349,6 +367,16 @@ export const sendCaInvoice = createServerFn({ method: "POST" })
       .update({ status: "SENT", sent_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    await notifyClientPortal({
+      caFirmId: firmId,
+      clientId: inv.client_id,
+      type: "invoice",
+      title: `Invoice ${inv.invoice_number}`,
+      body: `Amount due: ₹${Number(inv.balance_due || inv.total_amount).toLocaleString("en-IN")}`,
+      link: "/client/dashboard/invoices",
+    });
+
     return { ok: true };
   });
 
