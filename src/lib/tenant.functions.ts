@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { ensureDefaultComplianceProfile, regenerateDeadlines } from "@/lib/compliance.server";
 import { ensureReferralCodes, processReferralSignup } from "@/lib/referrals.server";
+import { ensureSubscription } from "@/lib/subscriptions.server";
 
 
 // ---------- CA OWNER ONBOARDING ----------
@@ -43,6 +44,7 @@ export const finalizeCAOnboarding = createServerFn({ method: "POST" })
     if (rErr) throw new Error(rErr.message);
 
     await ensureReferralCodes(firm.id, data.firmName);
+    await ensureSubscription(firm.id);
 
     if (data.referralCode) {
       const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
@@ -193,6 +195,15 @@ export const acceptInvite = createServerFn({ method: "POST" })
       .update({ accepted_at: new Date().toISOString(), accepted_by: userId })
       .eq("id", inv.id);
 
+    await supabaseAdmin.from("client_users").upsert(
+      {
+        user_id: userId,
+        client_id: inv.client_id,
+        preferred_language: "EN",
+      },
+      { onConflict: "user_id,client_id" },
+    );
+
     return { ok: true, clientId: inv.client_id, caFirmId: inv.ca_firm_id };
   });
 
@@ -215,7 +226,8 @@ export const loadTenantContext = createServerFn({ method: "POST" })
 
     let firm: { id: string; name: string; logo_url: string | null; primary_color: string | null; subdomain_slug: string | null } | null = null;
     let availableClients: Array<{ id: string; business_name: string; gstin: string | null; status: string }> = [];
-    const firmCols = "id, name, logo_url, primary_color, subdomain_slug, show_powered_by_gstify";
+    const firmCols =
+      "id, name, logo_url, primary_color, subdomain_slug, show_powered_by_gstify, ca_onboarding_wizard_done";
 
     if (caOwner?.ca_firm_id) {
       const { data: f } = await supabaseAdmin.from("ca_firms").select(firmCols).eq("id", caOwner.ca_firm_id).single();

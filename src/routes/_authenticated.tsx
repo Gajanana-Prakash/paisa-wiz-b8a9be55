@@ -5,7 +5,10 @@ import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
   Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive, FileSignature, BarChart3, Gift,
+  CircleHelp, BookOpen,
 } from "lucide-react";
+import { HelpWidget } from "@/components/support/HelpWidget";
+import { CAWelcomeOnboarding } from "@/components/support/CAWelcomeOnboarding";
 import { TimerWidget } from "@/components/timetracking/TimerWidget";
 import { VaultGlobalSearch } from "@/components/vault/VaultGlobalSearch";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { ClientNotificationsBell } from "@/components/client-portal/ClientNotificationsBell";
+import { LanguageToggle } from "@/components/client-portal/LanguageToggle";
 import { TenantProvider, useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { finalizeCAOnboarding, acceptInvite } from "@/lib/tenant.functions";
@@ -104,8 +108,10 @@ const CA_NAV_OWNER = [
   { to: "/ca/timesheets", icon: Clock, label: "Timesheets" },
   { to: "/ca/staff", icon: UserCog, label: "Staff" },
   { to: "/ca/billing", icon: IndianRupee, label: "Billing" },
+  { to: "/ca/gst-library", icon: BookOpen, label: "GST Library" },
   { to: "/ca/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/ca/grow", icon: Gift, label: "Grow" },
+  { to: "/ca/help", icon: CircleHelp, label: "Help" },
   { to: "/ca/agreements", icon: FileSignature, label: "Agreements" },
   { to: "/ca/communications", icon: MessagesSquare, label: "Communications" },
   { to: "/ca/vault", icon: FolderArchive, label: "Document Vault" },
@@ -122,8 +128,10 @@ const CA_NAV_STAFF = [
   { to: "/ca/tasks/my-tasks", icon: KanbanSquare, label: "My tasks" },
   { to: "/ca/timesheets/my-timesheet", icon: Clock, label: "My timesheet" },
   { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
+  { to: "/ca/gst-library", icon: BookOpen, label: "GST Library" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
+  { to: "/ca/help", icon: CircleHelp, label: "Help" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
 ] as const;
 
@@ -150,7 +158,8 @@ function AppShell() {
   }, []);
 
   const isCA = role === "ca_owner" || role === "ca_staff";
-  const isClientPortalRoute = !isCA && pathname.startsWith("/client/dashboard");
+  const isClientRoute = !isCA && pathname.startsWith("/client");
+  const isClientPortalRoute = isClientRoute && pathname.startsWith("/client/dashboard");
 
   useEffect(() => {
     if (!isCA) return;
@@ -317,6 +326,8 @@ function AppShell() {
           </Link>
 
 
+          {isClientRoute && !isClientPortalRoute && <LanguageToggle className="shrink-0" />}
+
           {isCA ? <NotificationsBell /> : <ClientNotificationsBell />}
 
           <DropdownMenu>
@@ -347,6 +358,8 @@ function AppShell() {
 
         <main className="flex-1 overflow-auto"><Outlet /></main>
       </div>
+      {isCA && !isClientPortalRoute && <HelpWidget />}
+      {isCA && role === "ca_owner" && <CAWelcomeOnboarding />}
       <VaultGlobalSearch />
     </div>
   );

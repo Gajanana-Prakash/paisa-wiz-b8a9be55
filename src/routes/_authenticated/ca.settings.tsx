@@ -260,10 +260,29 @@ function SettingsPage() {
       </section>
 
       <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">Help &amp; support</h2>
+        <p className="text-xs text-muted-foreground mt-1">WhatsApp support, tutorials, FAQs, and onboarding calls.</p>
+        <Link to="/ca/help" className="inline-block mt-4">
+          <Button variant="outline" size="sm">Help &amp; Support</Button>
+        </Link>
+      </section>
+
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">GSTify subscription</h2>
+        <p className="text-xs text-muted-foreground mt-1">Your plan, usage, and GST invoices for GSTify fees.</p>
+        <Link to="/ca/settings/billing-subscription" className="inline-block mt-4">
+          <Button variant="outline" size="sm">Billing &amp; subscription</Button>
+        </Link>
+        <Link to="/pricing" className="inline-block mt-4 ml-2">
+          <Button size="sm" variant="ghost">View pricing</Button>
+        </Link>
+      </section>
+
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
         <h2 className="font-display text-lg font-semibold">Billing &amp; invoices</h2>
         <p className="text-xs text-muted-foreground mt-1">PAN, GSTIN, bank details, UPI, and invoice numbering for client fee invoices.</p>
         <Link to="/ca/settings/billing" className="inline-block mt-4">
-          <Button variant="outline" size="sm">Billing settings</Button>
+          <Button variant="outline" size="sm">Client invoice settings</Button>
         </Link>
       </section>
 

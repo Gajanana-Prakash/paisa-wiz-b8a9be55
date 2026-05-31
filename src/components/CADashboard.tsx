@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
+import { DeadlineSupportBanner } from "@/components/support/DeadlineSupportBanner";
+import { getSupportContext } from "@/lib/support.functions";
 import { inviteClient } from "@/lib/tenant.functions";
 import { getComplianceSummary } from "@/lib/compliance.functions";
 import { Button } from "@/components/ui/button";
@@ -62,6 +65,12 @@ export function CADashboard() {
   const [overdueCount, setOverdueCount] = useState(0);
   const [dueThisWeek, setDueThisWeek] = useState(0);
   const summaryFn = useServerFn(getComplianceSummary);
+  const loadSupport = useServerFn(getSupportContext);
+  const { data: supportCtx } = useQuery({
+    queryKey: ["support-context-dashboard"],
+    queryFn: () => loadSupport({ data: undefined as any }),
+    enabled: !!firm?.id,
+  });
 
   const load = async () => {
     if (!firm?.id) return;
@@ -134,6 +143,12 @@ export function CADashboard() {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-8 max-w-[1400px] mx-auto space-y-6">
+      {firm && (
+        <DeadlineSupportBanner
+          firmName={firm.name}
+          tier={supportCtx?.tier ?? "FREE"}
+        />
+      )}
       {overdueCount > 0 && (
         <Link to="/ca/compliance-calendar" className="block">
           <div className="rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive px-5 py-4 flex items-center justify-between gap-3 hover:bg-destructive/15 transition">

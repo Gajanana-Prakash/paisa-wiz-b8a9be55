@@ -16,6 +16,7 @@ type TenantState = {
     primary_color: string | null;
     subdomain_slug: string | null;
     show_powered_by_gstify?: boolean | null;
+    ca_onboarding_wizard_done?: boolean | null;
   } | null;
   availableClients: TenantClient[];
   activeClientId: string | null;

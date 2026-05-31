@@ -11,6 +11,8 @@ import {
   recalcInvoiceBalances,
 } from "./billing.server";
 import { notifyClientPortal } from "./client-notifications.server";
+import { getClientOwnerLanguage } from "./client-language.functions";
+import { invoiceNotificationWhatsApp } from "./whatsapp-client-messages";
 
 const ServiceUnit = z.enum(["FIXED", "PER_RETURN", "PER_HOUR", "PER_MONTH"]);
 const InvoiceStatus = z.enum(["DRAFT", "SENT", "PARTIALLY_PAID", "PAID", "OVERDUE", "CANCELLED"]);
@@ -550,7 +552,7 @@ export const processBillingAutomations = createServerFn({ method: "POST" })
 
     const { data: open } = await supabaseAdmin
       .from("ca_invoices")
-      .select("id, status, due_date, balance_due, amount_paid, invoice_number, reminder_count, clients(business_name, contact_phone, contact_email)")
+      .select("id, client_id, status, due_date, balance_due, amount_paid, invoice_number, reminder_count, clients(business_name, contact_phone, contact_email)")
       .eq("ca_firm_id", firmId)
       .in("status", ["SENT", "PARTIALLY_PAID", "OVERDUE"]);
 
@@ -580,7 +582,15 @@ export const processBillingAutomations = createServerFn({ method: "POST" })
 
       const client = (inv as any).clients;
       const amt = balance.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
-      const msg = `Reminder: Invoice ${inv.invoice_number} for ${client?.business_name ?? "your account"} — balance due ${amt}. Please arrange payment at your earliest.`;
+      const lang = await getClientOwnerLanguage(inv.client_id as string);
+      const payLink = `${typeof process !== "undefined" && process.env.VITE_APP_URL ? process.env.VITE_APP_URL : "https://gstify.in"}/client/dashboard/invoices`;
+      const msg = invoiceNotificationWhatsApp({
+        lang,
+        clientName: client?.contact_name ?? client?.business_name ?? "there",
+        firmName: "your CA",
+        amount: amt,
+        paymentLink: payLink,
+      });
 
       if (inv.due_date === tomorrowStr) {
         reminders.push({

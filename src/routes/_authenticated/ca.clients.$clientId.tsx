@@ -29,6 +29,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getVaultFolderTree } from "@/lib/vault.functions";
 import { createDocumentRequest } from "@/lib/document-requests.functions";
+import { getClientPreferredLanguageForCa } from "@/lib/client-language.functions";
+import { documentRequestWhatsApp } from "@/lib/whatsapp-client-messages";
+import { useTenant } from "@/hooks/useTenant";
+import { whatsappLink } from "@/components/billing/utils";
 import { formatBytes } from "@/components/vault/utils";
 import { VAULT_CATEGORIES } from "@/components/vault/categories";
 
@@ -537,6 +541,9 @@ function RequestComposer({
   const [submitting, setSubmitting] = useState(false);
   const [sentLink, setSentLink] = useState<string | null>(null);
   const createReq = useServerFn(createDocumentRequest);
+  const loadLang = useServerFn(getClientPreferredLanguageForCa);
+  const { firm } = useTenant();
+  const [waMessage, setWaMessage] = useState("");
 
   const reset = () => {
     setDocType("purchase_bills");
@@ -570,6 +577,18 @@ function RequestComposer({
       });
       const link = `${window.location.origin}/client/requests`;
       setSentLink(link);
+      const { language } = await loadLang({ data: { clientId: client.id } });
+      setWaMessage(
+        documentRequestWhatsApp({
+          lang: language,
+          clientName: client.contact_name || client.business_name,
+          firmName: firm?.name ?? "Your CA",
+          periodLabel: period || null,
+          docLabel: DOC_TYPE_LABELS[docType] ?? docType,
+          link,
+          dueDate: dueDate || null,
+        }),
+      );
       toast.success("Request sent — client notified");
     } catch (e: any) {
       toast.error(e.message);
@@ -580,14 +599,7 @@ function RequestComposer({
 
   const close = () => { onOpenChange(false); setTimeout(reset, 200); };
 
-  const waText = sentLink
-    ? encodeURIComponent(
-        `Hi ${client.contact_name || client.business_name}, please upload ${DOC_TYPE_LABELS[docType]}${period ? ` for ${period}` : ""} on GSTify: ${sentLink}`,
-      )
-    : "";
-  const waUrl = client.contact_phone
-    ? `https://wa.me/${client.contact_phone.replace(/\D/g, "")}?text=${waText}`
-    : `https://wa.me/?text=${waText}`;
+  const waUrl = waMessage ? whatsappLink(client.contact_phone, waMessage) : "";
   const mailUrl = sentLink
     ? `mailto:${client.contact_email || ""}?subject=${encodeURIComponent(`Document request: ${DOC_TYPE_LABELS[docType]}`)}&body=${encodeURIComponent(`Please upload ${DOC_TYPE_LABELS[docType]}${period ? ` for ${period}` : ""} here: ${sentLink}${note ? `\n\nNote: ${note}` : ""}`)}`
     : "";

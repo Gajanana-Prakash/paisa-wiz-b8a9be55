@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ClientMessagesPanel } from "@/components/communications/ClientMessagesPanel";
+import { useLanguage } from "@/hooks/useLanguage";
 import {
   listClientQueries,
   createClientQuery,
@@ -31,6 +32,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export function ClientQueriesPage() {
+  const { t } = useLanguage();
   const qc = useQueryClient();
   const listFn = useServerFn(listClientQueries);
   const createFn = useServerFn(createClientQuery);
@@ -120,8 +122,8 @@ export function ClientQueriesPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Messages & queries</h1>
-        <p className="text-muted-foreground mt-1">Chat with your CA or raise a support query</p>
+        <h1 className="font-display text-2xl font-semibold">{t("queries_title")}</h1>
+        <p className="text-muted-foreground mt-1 leading-relaxed">{t("queries_sub")}</p>
       </div>
 
       <ClientMessagesPanel />

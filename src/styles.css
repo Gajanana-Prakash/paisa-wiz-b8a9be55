@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* GSTify — Emerald Prestige design system */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 
 @theme inline {
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -164,5 +164,11 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
+  }
+
+  .client-portal-hi body,
+  .client-portal-hi .client-portal-root {
+    font-family: "Noto Sans Devanagari", var(--font-sans);
+    line-height: 1.8;
   }
 }

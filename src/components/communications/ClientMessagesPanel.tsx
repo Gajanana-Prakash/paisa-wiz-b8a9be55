@@ -12,8 +12,10 @@ import {
   markClientMessagesRead,
 } from "@/lib/communications.functions";
 import { formatCommTime } from "./utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function ClientMessagesPanel() {
+  const { t } = useLanguage();
   const qc = useQueryClient();
   const load = useServerFn(listClientInAppMessages);
   const reply = useServerFn(clientReplyMessage);
@@ -43,7 +45,7 @@ export function ClientMessagesPanel() {
       await reply({ data: { body: text.trim() } });
       setText("");
       refetch();
-      toast.success("Reply sent");
+      toast.success(t("reply_sent"));
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -56,7 +58,7 @@ export function ClientMessagesPanel() {
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MessageSquare className="size-5 text-primary" />
-          <h2 className="font-display font-semibold">Messages from your CA</h2>
+          <h2 className="font-display font-semibold">{t("messages_panel_title")}</h2>
         </div>
         {(data?.unread ?? 0) > 0 && (
           <Badge className="bg-primary">{data!.unread} new</Badge>
@@ -69,7 +71,7 @@ export function ClientMessagesPanel() {
         )}
         {!isLoading && !data?.messages?.length && (
           <p className="text-sm text-center text-muted-foreground py-8">
-            No messages yet. Your CA will reach out here when they need something from you.
+            {t("messages_empty")}
           </p>
         )}
         {(data?.messages ?? []).map((m: any) => (
@@ -95,7 +97,7 @@ export function ClientMessagesPanel() {
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Reply to your CA…"
+            placeholder={t("reply_to_ca")}
             rows={2}
             className="resize-none flex-1"
           />

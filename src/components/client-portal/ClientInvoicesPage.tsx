@@ -11,8 +11,10 @@ import {
 import { getClientInvoicesPortal } from "@/lib/client-portal.functions";
 import { formatInr } from "@/components/billing/utils";
 import { PaymentModal } from "./PaymentModal";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function ClientInvoicesPage() {
+  const { t } = useLanguage();
   const load = useServerFn(getClientInvoicesPortal);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -34,8 +36,8 @@ export function ClientInvoicesPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Invoices & payments</h1>
-        <p className="text-muted-foreground mt-1">View bills and pay your CA online</p>
+        <h1 className="font-display text-2xl font-semibold">{t("invoices")}</h1>
+        <p className="text-muted-foreground mt-1 leading-relaxed">{t("invoices_sub")}</p>
       </div>
 
       <section className="space-y-4">

@@ -24,7 +24,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-primary-foreground/80">
           <a href="#features" className="hover:text-primary-foreground transition">Features</a>
           <a href="#workflow" className="hover:text-primary-foreground transition">How it works</a>
-          <a href="#pricing" className="hover:text-primary-foreground transition">Pricing</a>
+          <Link to="/pricing" className="hover:text-primary-foreground transition">Pricing</Link>
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/login"><Button variant="ghost" className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">Sign in</Button></Link>
@@ -310,8 +310,16 @@ function Pricing() {
           </Link>
         </div>
 
+        <div className="mt-8 text-center">
+          <Link to="/pricing">
+            <Button variant="outline" size="lg" className="rounded-full">
+              See all plans &amp; calculator <ArrowRight className="ml-2 size-4" />
+            </Button>
+          </Link>
+        </div>
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Prices in INR, billed monthly. GST extra as applicable. Annual billing available — contact us for 2 months free.
+          Per-client pricing from ₹99/client. GST invoice provided.{" "}
+          <Link to="/pricing" className="underline hover:text-foreground">Full pricing →</Link>
         </p>
       </div>
     </section>

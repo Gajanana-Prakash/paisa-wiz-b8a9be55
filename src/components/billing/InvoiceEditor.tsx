@@ -17,11 +17,13 @@ import {
 import { listFirmClientsLite } from "@/lib/tasks.functions";
 import { formatInr, addDays } from "./utils";
 import { computeInvoiceTotals } from "@/lib/billing.calc";
+import { HsnRateLookup } from "@/components/gst-library/HsnRateLookup";
 
 type LineRow = {
   key: string;
   serviceId: string;
   description: string;
+  hsnSac: string;
   quantity: number;
   unitPrice: number;
   gstRate: number;
@@ -32,6 +34,7 @@ function emptyLine(gstRate = 18): LineRow {
     key: Math.random().toString(36).slice(2),
     serviceId: "",
     description: "",
+    hsnSac: "",
     quantity: 1,
     unitPrice: 0,
     gstRate,
@@ -68,6 +71,7 @@ export function InvoiceEditor({
           key: it.id,
           serviceId: it.service_id ?? "",
           description: it.description,
+          hsnSac: it.hsn_sac_code ?? "",
           quantity: Number(it.quantity),
           unitPrice: Number(it.unit_price),
           gstRate: Number(it.gst_rate),
@@ -133,6 +137,7 @@ export function InvoiceEditor({
               ...l,
               serviceId,
               description: svc ? svc.service_name : l.description,
+              hsnSac: svc?.hsn_sac_code ?? l.hsnSac,
               unitPrice: svc ? Number(svc.default_amount) : l.unitPrice,
               gstRate: svc ? Number(svc.gst_rate) : l.gstRate,
             }
@@ -234,6 +239,7 @@ export function InvoiceEditor({
             <thead className="text-xs text-muted-foreground uppercase">
               <tr>
                 <th className="text-left py-2">Service</th>
+                <th className="text-left py-2 w-24">HSN/SAC</th>
                 <th className="text-left py-2">Description</th>
                 <th className="text-right py-2 w-20">Qty</th>
                 <th className="text-right py-2 w-28">Rate</th>
@@ -255,6 +261,21 @@ export function InvoiceEditor({
                         <option key={s.id} value={s.id}>{s.service_name}</option>
                       ))}
                     </select>
+                  </td>
+                  <td className="py-2 pr-2 align-top">
+                    <Input
+                      value={l.hsnSac}
+                      onChange={(e) => setLines((p) => p.map((x) => x.key === l.key ? { ...x, hsnSac: e.target.value } : x))}
+                      className="h-8 font-mono text-xs"
+                      placeholder="998231"
+                    />
+                    <HsnRateLookup
+                      code={l.hsnSac}
+                      compact
+                      onApplyRate={(rate) =>
+                        setLines((p) => p.map((x) => (x.key === l.key ? { ...x, gstRate: rate } : x)))
+                      }
+                    />
                   </td>
                   <td className="py-2 pr-2">
                     <Input value={l.description} onChange={(e) => setLines((p) => p.map((x) => x.key === l.key ? { ...x, description: e.target.value } : x))} className="h-8" />
