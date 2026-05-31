@@ -27,7 +27,9 @@ import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCaIndexRouteImport } from './routes/_authenticated/ca.index'
 import { Route as AuthenticatedClientUploadRouteImport } from './routes/_authenticated/client.upload'
 import { Route as AuthenticatedClientRequestsRouteImport } from './routes/_authenticated/client.requests'
+import { Route as AuthenticatedClientDocumentsRouteImport } from './routes/_authenticated/client.documents'
 import { Route as AuthenticatedClientDashboardRouteImport } from './routes/_authenticated/client.dashboard'
+import { Route as AuthenticatedCaVaultRouteImport } from './routes/_authenticated/ca.vault'
 import { Route as AuthenticatedCaTimesheetsRouteImport } from './routes/_authenticated/ca.timesheets'
 import { Route as AuthenticatedCaTasksRouteImport } from './routes/_authenticated/ca.tasks'
 import { Route as AuthenticatedCaStaffRouteImport } from './routes/_authenticated/ca.staff'
@@ -49,6 +51,7 @@ import { Route as AuthenticatedCaBillingServicesRouteImport } from './routes/_au
 import { Route as AuthenticatedCaBillingReportsRouteImport } from './routes/_authenticated/ca.billing.reports'
 import { Route as AuthenticatedCaBillingNewRouteImport } from './routes/_authenticated/ca.billing.new'
 import { Route as AuthenticatedCaBillingInvoiceIdRouteImport } from './routes/_authenticated/ca.billing.$invoiceId'
+import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
 import { Route as AuthenticatedCaBillingInvoiceIdEditRouteImport } from './routes/_authenticated/ca.billing.$invoiceId.edit'
 
@@ -144,12 +147,23 @@ const AuthenticatedClientRequestsRoute =
     path: '/requests',
     getParentRoute: () => AuthenticatedClientRoute,
   } as any)
+const AuthenticatedClientDocumentsRoute =
+  AuthenticatedClientDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedClientRoute,
+  } as any)
 const AuthenticatedClientDashboardRoute =
   AuthenticatedClientDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedClientRoute,
   } as any)
+const AuthenticatedCaVaultRoute = AuthenticatedCaVaultRouteImport.update({
+  id: '/vault',
+  path: '/vault',
+  getParentRoute: () => AuthenticatedCaRoute,
+} as any)
 const AuthenticatedCaTimesheetsRoute =
   AuthenticatedCaTimesheetsRouteImport.update({
     id: '/timesheets',
@@ -269,6 +283,12 @@ const AuthenticatedCaBillingInvoiceIdRoute =
     path: '/$invoiceId',
     getParentRoute: () => AuthenticatedCaBillingRoute,
   } as any)
+const AuthenticatedCaClientsClientIdDocumentsRoute =
+  AuthenticatedCaClientsClientIdDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdComplianceRoute =
   AuthenticatedCaClientsClientIdComplianceRouteImport.update({
     id: '/compliance',
@@ -307,7 +327,9 @@ export interface FileRoutesByFullPath {
   '/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
+  '/ca/vault': typeof AuthenticatedCaVaultRoute
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca/': typeof AuthenticatedCaIndexRoute
@@ -324,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
+  '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -347,7 +370,9 @@ export interface FileRoutesByTo {
   '/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
+  '/ca/vault': typeof AuthenticatedCaVaultRoute
   '/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/client/requests': typeof AuthenticatedClientRequestsRoute
   '/client/upload': typeof AuthenticatedClientUploadRoute
   '/ca': typeof AuthenticatedCaIndexRoute
@@ -364,6 +389,7 @@ export interface FileRoutesByTo {
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
+  '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -392,7 +418,9 @@ export interface FileRoutesById {
   '/_authenticated/ca/staff': typeof AuthenticatedCaStaffRouteWithChildren
   '/_authenticated/ca/tasks': typeof AuthenticatedCaTasksRouteWithChildren
   '/_authenticated/ca/timesheets': typeof AuthenticatedCaTimesheetsRouteWithChildren
+  '/_authenticated/ca/vault': typeof AuthenticatedCaVaultRoute
   '/_authenticated/client/dashboard': typeof AuthenticatedClientDashboardRoute
+  '/_authenticated/client/documents': typeof AuthenticatedClientDocumentsRoute
   '/_authenticated/client/requests': typeof AuthenticatedClientRequestsRoute
   '/_authenticated/client/upload': typeof AuthenticatedClientUploadRoute
   '/_authenticated/ca/': typeof AuthenticatedCaIndexRoute
@@ -409,6 +437,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
   '/_authenticated/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
+  '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -437,7 +466,9 @@ export interface FileRouteTypes {
     | '/ca/staff'
     | '/ca/tasks'
     | '/ca/timesheets'
+    | '/ca/vault'
     | '/client/dashboard'
+    | '/client/documents'
     | '/client/requests'
     | '/client/upload'
     | '/ca/'
@@ -454,6 +485,7 @@ export interface FileRouteTypes {
     | '/ca/timesheets/my-timesheet'
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
+    | '/ca/clients/$clientId/documents'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -477,7 +509,9 @@ export interface FileRouteTypes {
     | '/ca/staff'
     | '/ca/tasks'
     | '/ca/timesheets'
+    | '/ca/vault'
     | '/client/dashboard'
+    | '/client/documents'
     | '/client/requests'
     | '/client/upload'
     | '/ca'
@@ -494,6 +528,7 @@ export interface FileRouteTypes {
     | '/ca/timesheets/my-timesheet'
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
+    | '/ca/clients/$clientId/documents'
   id:
     | '__root__'
     | '/'
@@ -521,7 +556,9 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/staff'
     | '/_authenticated/ca/tasks'
     | '/_authenticated/ca/timesheets'
+    | '/_authenticated/ca/vault'
     | '/_authenticated/client/dashboard'
+    | '/_authenticated/client/documents'
     | '/_authenticated/client/requests'
     | '/_authenticated/client/upload'
     | '/_authenticated/ca/'
@@ -538,6 +575,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/timesheets/my-timesheet'
     | '/_authenticated/ca/billing/$invoiceId/edit'
     | '/_authenticated/ca/clients/$clientId/compliance'
+    | '/_authenticated/ca/clients/$clientId/documents'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -677,12 +715,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientRequestsRouteImport
       parentRoute: typeof AuthenticatedClientRoute
     }
+    '/_authenticated/client/documents': {
+      id: '/_authenticated/client/documents'
+      path: '/documents'
+      fullPath: '/client/documents'
+      preLoaderRoute: typeof AuthenticatedClientDocumentsRouteImport
+      parentRoute: typeof AuthenticatedClientRoute
+    }
     '/_authenticated/client/dashboard': {
       id: '/_authenticated/client/dashboard'
       path: '/dashboard'
       fullPath: '/client/dashboard'
       preLoaderRoute: typeof AuthenticatedClientDashboardRouteImport
       parentRoute: typeof AuthenticatedClientRoute
+    }
+    '/_authenticated/ca/vault': {
+      id: '/_authenticated/ca/vault'
+      path: '/vault'
+      fullPath: '/ca/vault'
+      preLoaderRoute: typeof AuthenticatedCaVaultRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
     }
     '/_authenticated/ca/timesheets': {
       id: '/_authenticated/ca/timesheets'
@@ -831,6 +883,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaBillingInvoiceIdRouteImport
       parentRoute: typeof AuthenticatedCaBillingRoute
     }
+    '/_authenticated/ca/clients/$clientId/documents': {
+      id: '/_authenticated/ca/clients/$clientId/documents'
+      path: '/documents'
+      fullPath: '/ca/clients/$clientId/documents'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdDocumentsRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
+    }
     '/_authenticated/ca/clients/$clientId/compliance': {
       id: '/_authenticated/ca/clients/$clientId/compliance'
       path: '/compliance'
@@ -886,12 +945,15 @@ const AuthenticatedCaBillingRouteWithChildren =
 
 interface AuthenticatedCaClientsClientIdRouteChildren {
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
+  AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
 }
 
 const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientIdRouteChildren =
   {
     AuthenticatedCaClientsClientIdComplianceRoute:
       AuthenticatedCaClientsClientIdComplianceRoute,
+    AuthenticatedCaClientsClientIdDocumentsRoute:
+      AuthenticatedCaClientsClientIdDocumentsRoute,
   }
 
 const AuthenticatedCaClientsClientIdRouteWithChildren =
@@ -992,6 +1054,7 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaStaffRoute: typeof AuthenticatedCaStaffRouteWithChildren
   AuthenticatedCaTasksRoute: typeof AuthenticatedCaTasksRouteWithChildren
   AuthenticatedCaTimesheetsRoute: typeof AuthenticatedCaTimesheetsRouteWithChildren
+  AuthenticatedCaVaultRoute: typeof AuthenticatedCaVaultRoute
   AuthenticatedCaIndexRoute: typeof AuthenticatedCaIndexRoute
 }
 
@@ -1008,6 +1071,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaStaffRoute: AuthenticatedCaStaffRouteWithChildren,
   AuthenticatedCaTasksRoute: AuthenticatedCaTasksRouteWithChildren,
   AuthenticatedCaTimesheetsRoute: AuthenticatedCaTimesheetsRouteWithChildren,
+  AuthenticatedCaVaultRoute: AuthenticatedCaVaultRoute,
   AuthenticatedCaIndexRoute: AuthenticatedCaIndexRoute,
 }
 
@@ -1017,6 +1081,7 @@ const AuthenticatedCaRouteWithChildren = AuthenticatedCaRoute._addFileChildren(
 
 interface AuthenticatedClientRouteChildren {
   AuthenticatedClientDashboardRoute: typeof AuthenticatedClientDashboardRoute
+  AuthenticatedClientDocumentsRoute: typeof AuthenticatedClientDocumentsRoute
   AuthenticatedClientRequestsRoute: typeof AuthenticatedClientRequestsRoute
   AuthenticatedClientUploadRoute: typeof AuthenticatedClientUploadRoute
   AuthenticatedClientIndexRoute: typeof AuthenticatedClientIndexRoute
@@ -1024,6 +1089,7 @@ interface AuthenticatedClientRouteChildren {
 
 const AuthenticatedClientRouteChildren: AuthenticatedClientRouteChildren = {
   AuthenticatedClientDashboardRoute: AuthenticatedClientDashboardRoute,
+  AuthenticatedClientDocumentsRoute: AuthenticatedClientDocumentsRoute,
   AuthenticatedClientRequestsRoute: AuthenticatedClientRequestsRoute,
   AuthenticatedClientUploadRoute: AuthenticatedClientUploadRoute,
   AuthenticatedClientIndexRoute: AuthenticatedClientIndexRoute,
@@ -1078,13 +1144,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
