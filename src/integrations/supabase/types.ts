@@ -924,6 +924,44 @@ export type Database = {
         }
         Relationships: []
       }
+      document_access_log: {
+        Row: {
+          accessed_at: string
+          accessed_by: string
+          action: Database["public"]["Enums"]["vault_access_action"]
+          ca_firm_id: string
+          document_id: string
+          id: string
+          ip_address: string | null
+        }
+        Insert: {
+          accessed_at?: string
+          accessed_by: string
+          action: Database["public"]["Enums"]["vault_access_action"]
+          ca_firm_id: string
+          document_id: string
+          id?: string
+          ip_address?: string | null
+        }
+        Update: {
+          accessed_at?: string
+          accessed_by?: string
+          action?: Database["public"]["Enums"]["vault_access_action"]
+          ca_firm_id?: string
+          document_id?: string
+          id?: string
+          ip_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_access_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "document_vault"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_request_uploads: {
         Row: {
           created_at: string
@@ -1000,6 +1038,104 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      document_vault: {
+        Row: {
+          access_level: Database["public"]["Enums"]["vault_access_level"]
+          ca_firm_id: string
+          client_id: string
+          created_at: string
+          description: string | null
+          display_name: string
+          document_category: Database["public"]["Enums"]["vault_doc_category"]
+          document_subcategory: string | null
+          file_name: string
+          file_path: string
+          file_size_bytes: number
+          file_type: Database["public"]["Enums"]["vault_file_type"]
+          financial_year: string | null
+          id: string
+          is_kyc_document: boolean
+          is_latest_version: boolean
+          linked_filing_id: string | null
+          linked_invoice_id: string | null
+          linked_notice_id: string | null
+          parent_document_id: string | null
+          period: string | null
+          search_tsv: unknown
+          source: Database["public"]["Enums"]["vault_source"]
+          tags: string[]
+          updated_at: string
+          uploaded_by: string
+          version_number: number
+        }
+        Insert: {
+          access_level?: Database["public"]["Enums"]["vault_access_level"]
+          ca_firm_id: string
+          client_id: string
+          created_at?: string
+          description?: string | null
+          display_name: string
+          document_category?: Database["public"]["Enums"]["vault_doc_category"]
+          document_subcategory?: string | null
+          file_name: string
+          file_path: string
+          file_size_bytes?: number
+          file_type?: Database["public"]["Enums"]["vault_file_type"]
+          financial_year?: string | null
+          id?: string
+          is_kyc_document?: boolean
+          is_latest_version?: boolean
+          linked_filing_id?: string | null
+          linked_invoice_id?: string | null
+          linked_notice_id?: string | null
+          parent_document_id?: string | null
+          period?: string | null
+          search_tsv?: unknown
+          source?: Database["public"]["Enums"]["vault_source"]
+          tags?: string[]
+          updated_at?: string
+          uploaded_by: string
+          version_number?: number
+        }
+        Update: {
+          access_level?: Database["public"]["Enums"]["vault_access_level"]
+          ca_firm_id?: string
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          document_category?: Database["public"]["Enums"]["vault_doc_category"]
+          document_subcategory?: string | null
+          file_name?: string
+          file_path?: string
+          file_size_bytes?: number
+          file_type?: Database["public"]["Enums"]["vault_file_type"]
+          financial_year?: string | null
+          id?: string
+          is_kyc_document?: boolean
+          is_latest_version?: boolean
+          linked_filing_id?: string | null
+          linked_invoice_id?: string | null
+          linked_notice_id?: string | null
+          parent_document_id?: string | null
+          period?: string | null
+          search_tsv?: unknown
+          source?: Database["public"]["Enums"]["vault_source"]
+          tags?: string[]
+          updated_at?: string
+          uploaded_by?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_vault_parent_document_id_fkey"
+            columns: ["parent_document_id"]
+            isOneToOne: false
+            referencedRelation: "document_vault"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       engagement_letter_templates: {
         Row: {
@@ -1953,6 +2089,30 @@ export type Database = {
         | "NOTICE_REPLY"
         | "DOCUMENT_COLLECTION"
         | "OTHER"
+      vault_access_action:
+        | "VIEWED"
+        | "DOWNLOADED"
+        | "SHARED"
+        | "DELETED_REQUEST"
+      vault_access_level: "CA_ONLY" | "CA_AND_CLIENT" | "CLIENT_ONLY"
+      vault_doc_category:
+        | "KYC"
+        | "GST"
+        | "INCOME_TAX"
+        | "AUDIT"
+        | "BANKING"
+        | "CORPORATE"
+        | "INVOICES"
+        | "NOTICES"
+        | "AGREEMENTS"
+        | "OTHER"
+      vault_file_type: "PDF" | "IMAGE" | "EXCEL" | "WORD" | "OTHER"
+      vault_source:
+        | "MANUAL_UPLOAD"
+        | "CLIENT_UPLOAD"
+        | "ONBOARDING"
+        | "AI_EXTRACTED"
+        | "GENERATED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2190,6 +2350,33 @@ export const Constants = {
         "NOTICE_REPLY",
         "DOCUMENT_COLLECTION",
         "OTHER",
+      ],
+      vault_access_action: [
+        "VIEWED",
+        "DOWNLOADED",
+        "SHARED",
+        "DELETED_REQUEST",
+      ],
+      vault_access_level: ["CA_ONLY", "CA_AND_CLIENT", "CLIENT_ONLY"],
+      vault_doc_category: [
+        "KYC",
+        "GST",
+        "INCOME_TAX",
+        "AUDIT",
+        "BANKING",
+        "CORPORATE",
+        "INVOICES",
+        "NOTICES",
+        "AGREEMENTS",
+        "OTHER",
+      ],
+      vault_file_type: ["PDF", "IMAGE", "EXCEL", "WORD", "OTHER"],
+      vault_source: [
+        "MANUAL_UPLOAD",
+        "CLIENT_UPLOAD",
+        "ONBOARDING",
+        "AI_EXTRACTED",
+        "GENERATED",
       ],
     },
   },
