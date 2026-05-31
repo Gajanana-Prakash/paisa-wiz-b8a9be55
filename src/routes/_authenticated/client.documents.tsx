@@ -3,14 +3,15 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTenant } from "@/hooks/useTenant";
-import { listClientVaultDocuments, getVaultSignedUrl } from "@/lib/vault.functions";
-import { VAULT_CATEGORIES, type VaultCategory } from "@/components/vault/categories";
+import { listClientVaultDocuments, getVaultSignedUrl, bulkGetVaultSignedUrls } from "@/lib/vault.functions";
+import { CLIENT_PORTAL_CATEGORIES, type VaultCategory } from "@/components/vault/categories";
 import { FileTypeIconView } from "@/components/vault/FileTypeIconView";
 import { VaultViewerDialog } from "@/components/vault/VaultViewerDialog";
+import { downloadDocumentsAsZip } from "@/components/vault/downloadZip";
 import { formatBytes } from "@/components/vault/utils";
 
 export const Route = createFileRoute("/_authenticated/client/documents")({ component: ClientPortalDocs });
@@ -19,14 +20,22 @@ function ClientPortalDocs() {
   const { activeClient } = useTenant();
   const list = useServerFn(listClientVaultDocuments);
   const sign = useServerFn(getVaultSignedUrl);
-  const [category, setCategory] = useState<VaultCategory | "">("");
+  const bulkSign = useServerFn(bulkGetVaultSignedUrls);
+  const [activeGroup, setActiveGroup] = useState<string>("");
   const [viewerId, setViewerId] = useState<string | null>(null);
+  const [zipBusy, setZipBusy] = useState(false);
 
-  const { data: docs = [], isLoading } = useQuery({
-    queryKey: ["client-vault", activeClient?.id, category],
-    queryFn: () => list({ data: { clientId: activeClient!.id, category: category || undefined } }),
+  const group = CLIENT_PORTAL_CATEGORIES.find((g) => g.label === activeGroup);
+
+  const { data: allDocs = [], isLoading } = useQuery({
+    queryKey: ["client-vault", activeClient?.id],
+    queryFn: () => list({ data: { clientId: activeClient!.id } }),
     enabled: !!activeClient,
   });
+
+  const docs = activeGroup && group
+    ? allDocs.filter((d: any) => group.categories.includes(d.document_category as VaultCategory))
+    : allDocs;
 
   const download = async (id: string) => {
     try {
@@ -35,20 +44,46 @@ function ClientPortalDocs() {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  const downloadCategoryZip = async () => {
+    if (!activeGroup || !docs.length) return;
+    setZipBusy(true);
+    try {
+      const ids = docs.map((d: any) => d.id);
+      const urls = await bulkSign({ data: { ids } });
+      await downloadDocumentsAsZip(urls, activeGroup.replace(/\s+/g, "-"));
+      toast.success(`Downloaded ${urls.length} files`);
+    } catch (e: any) {
+      toast.error(e.message ?? "Download failed");
+    } finally {
+      setZipBusy(false);
+    }
+  };
+
   if (!activeClient) return <div className="p-8 text-muted-foreground">Select a client.</div>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="font-display text-3xl font-semibold">My documents</h1>
-      <p className="text-muted-foreground mt-1">Documents your CA has shared with you.</p>
+      <h1 className="font-display text-3xl font-semibold">My Documents</h1>
+      <p className="text-muted-foreground mt-1">Documents your CA has shared with you. View and download only.</p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        <Button size="sm" variant={!category ? "default" : "outline"} onClick={() => setCategory("")}>All</Button>
-        {VAULT_CATEGORIES.map((c) => (
-          <Button key={c.value} size="sm" variant={category === c.value ? "default" : "outline"} onClick={() => setCategory(c.value as VaultCategory)}>
-            {c.label}
+      <div className="mt-6 flex flex-wrap gap-2 items-center">
+        <Button size="sm" variant={!activeGroup ? "default" : "outline"} onClick={() => setActiveGroup("")}>
+          All ({allDocs.length})
+        </Button>
+        {CLIENT_PORTAL_CATEGORIES.map((g) => {
+          const count = allDocs.filter((d: any) => g.categories.includes(d.document_category)).length;
+          return (
+            <Button key={g.label} size="sm" variant={activeGroup === g.label ? "default" : "outline"} onClick={() => setActiveGroup(g.label)}>
+              {g.label} ({count})
+            </Button>
+          );
+        })}
+        {activeGroup && docs.length > 0 && (
+          <Button size="sm" variant="secondary" onClick={downloadCategoryZip} disabled={zipBusy} className="ml-auto">
+            {zipBusy ? <Loader2 className="size-4 animate-spin mr-1" /> : <Archive className="size-4 mr-1" />}
+            Download all as ZIP
           </Button>
-        ))}
+        )}
       </div>
 
       <div className="mt-6">
@@ -64,9 +99,10 @@ function ClientPortalDocs() {
                 <div className="flex-1 min-w-0">
                   <div className="font-medium truncate">{d.display_name}</div>
                   <div className="text-xs text-muted-foreground mt-0.5 truncate">
-                    {d.document_category} · {d.financial_year ?? format(new Date(d.created_at), "dd MMM yyyy")}
+                    {d.document_subcategory || d.document_category}
+                    {d.financial_year ? ` · ${d.financial_year}` : ""}
                   </div>
-                  <div className="text-xs text-muted-foreground">{formatBytes(Number(d.file_size_bytes ?? 0))}</div>
+                  <div className="text-xs text-muted-foreground">{formatBytes(Number(d.file_size_bytes ?? 0))} · {format(new Date(d.created_at), "dd MMM yyyy")}</div>
                   <div className="mt-2 flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => setViewerId(d.id)}>View</Button>
                     <Button size="sm" variant="ghost" onClick={() => download(d.id)}><Download className="size-3.5 mr-1" />Download</Button>
@@ -78,7 +114,7 @@ function ClientPortalDocs() {
         )}
       </div>
 
-      <VaultViewerDialog documentId={viewerId} open={!!viewerId} onOpenChange={(v) => !v && setViewerId(null)} />
+      <VaultViewerDialog documentId={viewerId} open={!!viewerId} onOpenChange={(v) => !v && setViewerId(null)} canEdit={false} />
     </div>
   );
 }

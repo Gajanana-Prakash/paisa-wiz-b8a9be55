@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
-  Clock, UserCog, IndianRupee, MessagesSquare, KeyRound,
+  Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive,
 } from "lucide-react";
 import { TimerWidget } from "@/components/timetracking/TimerWidget";
+import { VaultGlobalSearch } from "@/components/vault/VaultGlobalSearch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -92,6 +93,7 @@ const CA_NAV_OWNER = [
   { to: "/ca/staff", icon: UserCog, label: "Staff" },
   { to: "/ca/billing", icon: IndianRupee, label: "Billing" },
   { to: "/ca/communications", icon: MessagesSquare, label: "Communications" },
+  { to: "/ca/vault", icon: FolderArchive, label: "Document Vault" },
   { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
   { to: "/ca/reports", icon: FileDown, label: "Reports" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
@@ -112,6 +114,7 @@ const CA_NAV_STAFF = [
 
 const CLIENT_NAV = [
   { to: "/client/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/client/documents", icon: FolderArchive, label: "My Documents" },
   { to: "/client/upload", icon: Upload, label: "Upload Invoices" },
   { to: "/client/requests", icon: Bell, label: "Requests" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
@@ -263,6 +266,13 @@ function AppShell() {
 
           {activeClient && false /* keep var used */}
 
+          {isCA && (
+            <Button variant="outline" size="sm" className="hidden sm:flex gap-2 rounded-full" onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}>
+              <Search className="size-4" /> <span className="text-muted-foreground">Search docs</span>
+              <kbd className="text-[10px] px-1 rounded bg-muted">⌘K</kbd>
+            </Button>
+          )}
+
           {isCA && <TimerWidget />}
 
           <Link to="/assistant" className="hidden sm:inline-flex">
@@ -307,6 +317,7 @@ function AppShell() {
 
         <main className="flex-1 overflow-auto"><Outlet /></main>
       </div>
+      <VaultGlobalSearch />
     </div>
   );
 }

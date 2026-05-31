@@ -14,8 +14,12 @@ export const listVaultDocuments = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({
     clientId: z.string().uuid(),
     category: Category.optional(),
+    subcategory: z.string().max(120).optional(),
     financialYear: z.string().optional(),
     fileType: FileType.optional(),
+    uploadedBy: z.string().uuid().optional(),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
     search: z.string().max(200).optional(),
     includeAllVersions: z.boolean().default(false),
   }).parse(d))
@@ -24,8 +28,12 @@ export const listVaultDocuments = createServerFn({ method: "POST" })
     let q = supabaseAdmin.from("document_vault").select("*").eq("ca_firm_id", caFirmId).eq("client_id", data.clientId);
     if (!data.includeAllVersions) q = q.eq("is_latest_version", true);
     if (data.category) q = q.eq("document_category", data.category);
+    if (data.subcategory) q = q.eq("document_subcategory", data.subcategory);
     if (data.financialYear) q = q.eq("financial_year", data.financialYear);
     if (data.fileType) q = q.eq("file_type", data.fileType);
+    if (data.uploadedBy) q = q.eq("uploaded_by", data.uploadedBy);
+    if (data.dateFrom) q = q.gte("created_at", data.dateFrom);
+    if (data.dateTo) q = q.lte("created_at", data.dateTo);
     if (!isCAMember) q = q.in("access_level", ["CA_AND_CLIENT", "CLIENT_ONLY"]);
     q = q.order("created_at", { ascending: false }).limit(1000);
     const { data: rows, error } = await q;
@@ -37,10 +45,18 @@ export const listVaultDocuments = createServerFn({ method: "POST" })
         r.display_name?.toLowerCase().includes(s) ||
         r.document_subcategory?.toLowerCase().includes(s) ||
         r.description?.toLowerCase().includes(s) ||
+        r.financial_year?.toLowerCase().includes(s) ||
+        r.period?.toLowerCase().includes(s) ||
         (r.tags ?? []).some((t: string) => t.toLowerCase().includes(s))
       );
     }
-    return list;
+    const uploaderIds = [...new Set(list.map((r: any) => r.uploaded_by as string))];
+    let uploaderNames: Record<string, string> = {};
+    if (uploaderIds.length) {
+      const { data: profs } = await supabaseAdmin.from("profiles").select("id, full_name").in("id", uploaderIds);
+      uploaderNames = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.full_name || "Unknown"]));
+    }
+    return list.map((r: any) => ({ ...r, uploader_name: uploaderNames[r.uploaded_by] ?? "Unknown" }));
   });
 
 export const getVaultFolderTree = createServerFn({ method: "POST" })
@@ -56,6 +72,7 @@ export const getVaultFolderTree = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     const counts: Record<string, number> = {};
     const byFy: Record<string, Record<string, number>> = {};
+    const bySubcategory: Record<string, Record<string, number>> = {};
     let total = 0;
     let totalBytes = 0;
     for (const r of rows ?? []) {
@@ -68,8 +85,13 @@ export const getVaultFolderTree = createServerFn({ method: "POST" })
         byFy[cat] = byFy[cat] ?? {};
         byFy[cat][fy] = (byFy[cat][fy] ?? 0) + 1;
       }
+      const sub = (r as any).document_subcategory as string | null;
+      if (sub && cat === "KYC") {
+        bySubcategory[cat] = bySubcategory[cat] ?? {};
+        bySubcategory[cat][sub] = (bySubcategory[cat][sub] ?? 0) + 1;
+      }
     }
-    return { counts, byFy, total, totalBytes };
+    return { counts, byFy, bySubcategory, total, totalBytes };
   });
 
 export const uploadVaultDocument = createServerFn({ method: "POST" })
@@ -332,13 +354,82 @@ export const searchVaultGlobal = createServerFn({ method: "POST" })
     if (!access.isCAMember || !access.caFirmId) throw new Error("CA members only");
     const q = data.query.trim();
     const { data: rows, error } = await supabaseAdmin.from("document_vault")
-      .select("id, display_name, document_category, document_subcategory, financial_year, file_type, created_at, client_id, clients(business_name)")
+      .select("id, display_name, document_category, document_subcategory, financial_year, period, file_type, created_at, client_id, clients(business_name)")
       .eq("ca_firm_id", access.caFirmId)
-      .or(`display_name.ilike.%${q}%,document_subcategory.ilike.%${q}%,description.ilike.%${q}%`)
+      .eq("is_latest_version", true)
+      .or(`display_name.ilike.%${q}%,document_subcategory.ilike.%${q}%,description.ilike.%${q}%,financial_year.ilike.%${q}%,period.ilike.%${q}%`)
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    let list = rows ?? [];
+    const tagMatch = await supabaseAdmin.from("document_vault")
+      .select("id, display_name, document_category, document_subcategory, financial_year, period, file_type, created_at, client_id, clients(business_name)")
+      .eq("ca_firm_id", access.caFirmId)
+      .eq("is_latest_version", true)
+      .contains("tags", [q])
+      .limit(20);
+    if (!tagMatch.error && tagMatch.data) {
+      const seen = new Set(list.map((r: any) => r.id));
+      for (const r of tagMatch.data) {
+        if (!seen.has((r as any).id)) list.push(r);
+      }
+    }
+    return list;
+  });
+
+export const getVaultDocument = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: doc } = await supabaseAdmin.from("document_vault").select("*").eq("id", data.id).maybeSingle();
+    if (!doc) throw new Error("Not found");
+    const d = doc as any;
+    const { isCAMember } = await assertClientAccess(context.userId, d.client_id);
+    if (!isCAMember && d.access_level === "CA_ONLY") throw new Error("Access denied");
+    const { data: prof } = await supabaseAdmin.from("profiles").select("full_name").eq("id", d.uploaded_by).maybeSingle();
+    return { ...d, uploader_name: (prof as any)?.full_name ?? "Unknown" };
+  });
+
+export const bulkGetVaultSignedUrls = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ ids: z.array(z.string().uuid()).min(1).max(100) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const access = await getUserFirmAndClientAccess(context.userId);
+    const { data: docs } = await supabaseAdmin.from("document_vault").select("*").in("id", data.ids);
+    const results: { id: string; url: string; fileName: string }[] = [];
+    for (const doc of docs ?? []) {
+      const d = doc as any;
+      try {
+        await assertClientAccess(context.userId, d.client_id);
+        if (!access.isCAMember && d.access_level === "CA_ONLY") continue;
+        const { data: signed, error } = await supabaseAdmin.storage.from("invoices").createSignedUrl(d.file_path, 300, { download: d.file_name });
+        if (error || !signed) continue;
+        results.push({ id: d.id, url: signed.signedUrl, fileName: d.file_name });
+        await supabaseAdmin.from("document_access_log").insert({
+          ca_firm_id: d.ca_firm_id,
+          document_id: d.id,
+          accessed_by: context.userId,
+          action: "DOWNLOADED",
+        });
+      } catch { /* skip inaccessible */ }
+    }
+    return results;
+  });
+
+export const getVaultUploaders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ clientId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { caFirmId } = await assertClientAccess(context.userId, data.clientId);
+    const { data: rows } = await supabaseAdmin.from("document_vault")
+      .select("uploaded_by")
+      .eq("ca_firm_id", caFirmId)
+      .eq("client_id", data.clientId)
+      .eq("is_latest_version", true);
+    const ids = [...new Set((rows ?? []).map((r: any) => r.uploaded_by as string))];
+    if (!ids.length) return [];
+    const { data: profs } = await supabaseAdmin.from("profiles").select("id, full_name").in("id", ids);
+    return (profs ?? []).map((p: any) => ({ id: p.id, name: p.full_name || "Unknown" }));
   });
 
 export const listClientVaultDocuments = createServerFn({ method: "POST" })

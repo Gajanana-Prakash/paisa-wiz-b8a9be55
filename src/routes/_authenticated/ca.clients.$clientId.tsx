@@ -16,7 +16,7 @@ import {
 import {
   ArrowLeft, FileText, AlertTriangle, CheckCircle2, Clock, Bell, FileDown,
   Activity, ClipboardList, Building2, IndianRupee, Plus, Copy, MessageCircle, Mail,
-  QrCode, Send, CalendarClock,
+  QrCode, Send, CalendarClock, FolderArchive, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { logActivity, type ActivityLog as ActivityLogRow } from "@/lib/activity";
@@ -24,6 +24,11 @@ import { ClientCompliancePanel } from "@/components/compliance/ClientComplianceP
 import { TasksPage } from "@/components/tasks/TasksPage";
 import { ClientCommunicationPanel } from "@/components/communications/ClientCommunicationPanel";
 import { ClientDscPanel } from "@/components/dsc/ClientDscPanel";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { getVaultFolderTree } from "@/lib/vault.functions";
+import { formatBytes } from "@/components/vault/utils";
+import { VAULT_CATEGORIES } from "@/components/vault/categories";
 
 export const Route = createFileRoute("/_authenticated/ca/clients/$clientId")({
   component: ClientWorkspace,
@@ -197,7 +202,7 @@ function ClientWorkspace() {
         </TabsContent>
 
         <TabsContent value="documents" className="mt-5">
-          <DocumentsTable invs={invs} />
+          <ClientVaultSummary clientId={clientId} invCount={invs.length} />
         </TabsContent>
 
         <TabsContent value="communication" className="mt-5">
@@ -286,7 +291,52 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
   );
 }
 
-function DocumentsTable({ invs }: { invs: Inv[] }) {
+function ClientVaultSummary({ clientId, invCount }: { clientId: string; invCount: number }) {
+  const treeFn = useServerFn(getVaultFolderTree);
+  const { data: folder, isLoading } = useQuery({
+    queryKey: ["vault", "tree", clientId],
+    queryFn: () => treeFn({ data: { clientId } }),
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2">
+              <FolderArchive className="size-5 text-primary" />
+              <h3 className="font-display font-semibold text-lg">Document Vault</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Permanent storage for KYC, GST filings, ITRs, audit reports, bank statements, and more.
+            </p>
+            {isLoading ? (
+              <div className="text-sm text-muted-foreground mt-3">Loading…</div>
+            ) : (
+              <div className="text-sm mt-3">
+                <span className="font-medium">{folder?.total ?? 0} documents</span>
+                <span className="text-muted-foreground"> · {formatBytes(folder?.totalBytes ?? 0)} stored</span>
+              </div>
+            )}
+          </div>
+          <Link to="/ca/clients/$clientId/documents" params={{ clientId }}>
+            <Button><ExternalLink className="size-4 mr-2" />Open Document Vault</Button>
+          </Link>
+        </div>
+        {!isLoading && folder && folder.total > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {VAULT_CATEGORIES.filter((c) => (folder.counts?.[c.value] ?? 0) > 0).map((c) => (
+              <Badge key={c.value} variant="outline">{c.label}: {folder.counts[c.value]}</Badge>
+            ))}
+          </div>
+        )}
+      </div>
+      <DocumentsTable invs={invs} invCount={invCount} />
+    </div>
+  );
+}
+
+function DocumentsTable({ invs, invCount }: { invs: Inv[]; invCount?: number }) {
   const [q, setQ] = useState("");
   const filtered = invs.filter((i) => {
     const s = q.toLowerCase();
@@ -297,7 +347,7 @@ function DocumentsTable({ invs }: { invs: Inv[] }) {
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="p-4 border-b border-border flex items-center justify-between gap-3 flex-wrap">
-        <h3 className="font-display font-semibold">Documents ({invs.length})</h3>
+        <h3 className="font-display font-semibold">Invoices ({invCount ?? invs.length})</h3>
         <Input className="max-w-xs" placeholder="Search vendor or invoice #" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       {filtered.length === 0 ? (

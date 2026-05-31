@@ -186,7 +186,7 @@ export function VaultUploadDialog({
         <DialogFooter className="mt-4">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>Cancel</Button>
           <Button onClick={submit} disabled={busy || !items.length}>
-            {busy ? <><Loader2 className="size-4 mr-2 animate-spin" />Uploading…</> : `Upload ${items.length || ""}`}
+            {busy ? <><Loader2 className="size-4 mr-2 animate-spin" />Uploading…</> : items.length ? `Upload All (${items.length})` : "Upload All"}
           </Button>
         </DialogFooter>
       </DialogContent>

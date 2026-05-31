@@ -26,6 +26,16 @@ export const SUBCATEGORIES: Record<VaultCategory, string[]> = {
   OTHER: ["Other"],
 };
 
+/** Client portal groupings — maps friendly labels to vault categories */
+export const CLIENT_PORTAL_CATEGORIES = [
+  { label: "My GST Filings", categories: ["GST"] as VaultCategory[] },
+  { label: "My Tax Returns", categories: ["INCOME_TAX"] as VaultCategory[] },
+  { label: "My Certificates", categories: ["KYC", "CORPORATE"] as VaultCategory[] },
+  { label: "Notices", categories: ["NOTICES"] as VaultCategory[] },
+] as const;
+
+export const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024; // 10 GB display cap
+
 export function detectFileType(name: string, mime?: string): "PDF" | "IMAGE" | "EXCEL" | "WORD" | "OTHER" {
   const n = name.toLowerCase();
   const m = (mime || "").toLowerCase();
