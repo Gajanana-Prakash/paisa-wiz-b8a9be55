@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "g3LsxSXp-RtkYPz-XpmHm"
+uri = "file://GSTIFY_MASTER_ISSUES.md"
+type = "text"
+title = "GSTify Master Issues & Feature Requests"
