@@ -1,0 +1,155 @@
+PROMPT 10 — ICAI & CPE COMPLIANCE TRACKER FOR CAs
+Priority: SMART ADDITION — No competitor has this, creates daily habit
+Context
+Every Indian CA must complete 120 CPE (Continuing Professional Education) hours
+in a 3-year block to maintain their ICAI membership. Add this personal professional
+tracker inside GSTify to create a deeply personal daily use reason.
+
+10.1 — New Database Tables
+ca_professional_profiles
+
+id (uuid, PK)
+user_id (uuid, FK → ca_users)
+tenant_id (uuid, FK)
+membership_number (text) — ICAI membership number (e.g. "123456")
+membership_type (enum) — ASSOCIATE | FELLOW
+cop_number (text) — Certificate of Practice number, nullable
+cop_expiry_date (date) — nullable
+current_cpe_block_start (date) — start of current 3-year block
+current_cpe_block_end (date) — end of current 3-year block
+cpe_hours_required (integer) — default 120
+cpe_hours_structured_required (integer) — default 90 (must be structured)
+cpe_hours_unstructured_max (integer) — default 30
+created_at (timestamp)
+
+cpe_activities
+
+id (uuid, PK)
+user_id (uuid, FK)
+tenant_id (uuid, FK)
+activity_date (date)
+activity_type (enum) — SEMINAR | WEBINAR | CONFERENCE | SELF_READING | WRITING |
+TEACHING | ICAI_PROGRAM | E_LEARNING | STUDY_CIRCLE
+activity_category (enum) — STRUCTURED | UNSTRUCTURED
+title (text) — name of the seminar/webinar/article
+organizer (text) — ICAI / WIRC / ICAI branch name / External organizer
+hours_claimed (decimal) — hours to count toward CPE
+certificate_url (text) — uploaded certificate, nullable
+icai_activity_id (text) — nullable (ICAI's own activity ID if registered on ICAI portal)
+verification_status (enum) — SELF_REPORTED | VERIFIED | REJECTED
+notes (text)
+created_at (timestamp)
+
+icai_upcoming_events (maintained by GSTify team)
+
+id (uuid, PK)
+title (text)
+organizer (text)
+event_type (enum) — SEMINAR | WEBINAR | CONFERENCE | STUDY_CIRCLE
+event_date (date)
+event_time (time)
+duration_hours (decimal)
+registration_url (text)
+is_free (boolean)
+fee_amount (decimal) — nullable
+cpe_hours_awarded (decimal)
+topics (text array)
+region (text) — "National" / "Western" / "Southern" / "Eastern" / "Northern"
+created_at (timestamp)
+
+
+10.2 — Pages & UI to Build
+Page: /ca/my-profile/cpe
+Accessed via "My Profile" → "CPE & ICAI" tab
+Page Title: "My CPE Progress"
+CPE Progress Hero Card (top — full width):
+Large circular progress indicator:
+
+Centre: "87 / 120 hrs"
+Ring: 72% filled in brand green
+Below ring: "Current block: Apr 2022 – Mar 2025"
+"3 years, 8 months remaining"
+
+Below progress ring, two smaller progress bars:
+
+Structured hours: "74 / 90 hours" (progress bar)
+Unstructured hours: "13 / 30 hours" (progress bar)
+
+Status badge:
+
+On track (green) if ahead of pace
+Attention needed (orange) if behind pace
+At risk (red) if significantly behind
+
+Pace indicator:
+"To complete on time, you need [X] more hours in the next [Y] months"
+"Required pace: [Z] hours/month"
+"Your pace so far: [A] hours/month"
+
+CPE Activity Log Section:
+"+ Log New Activity" button → modal:
+Fields:
+
+Activity Type (dropdown: Seminar / Webinar / Conference / Self Reading / Writing / Teaching / E-Learning / Study Circle)
+Category (auto-set based on type: Structured / Unstructured)
+
+Note shown: "ICAI classifies seminars/webinars as Structured, self-reading as Unstructured"
+
+
+Activity Title
+Organizer name
+Activity Date
+Hours Claimed (decimal — e.g. 3.5)
+ICAI Activity ID (optional — if registered on ICAI portal)
+Upload certificate (optional — PDF/image)
+
+Save → adds to cpe_activities, updates progress ring immediately
+Activity History Table:
+Columns: Date | Activity | Organizer | Type | Category | Hours | Certificate | Actions
+
+Category badge: "Structured" (green pill) / "Unstructured" (blue pill)
+Certificate: "📄 View" if uploaded, "—" if not
+Actions: Edit | Delete
+
+
+Upcoming ICAI Events Section:
+Title: "Upcoming CPE opportunities"
+Cards (horizontal scroll on mobile):
+Event card:
+WEBINAR — 3.5 CPE hours
+"GST Amendments 2025-26 — Key Changes"
+by WIRC of ICAI
+📅 15 June 2025 | 10:00 AM - 1:30 PM
+🆓 Free for ICAI members
+[Register Now →] (opens ICAI website)
+[+ Add to Calendar]
+Filter: All | Free | My Region (based on CA's state) | Webinars only
+
+ICAI Membership Alerts Section (bottom):
+Certificate of Practice Renewal:
+If cop_expiry_date is within 90 days:
+
+Orange alert card: "Your Certificate of Practice expires on [date]"
+"Renew at ICAI portal" button
+"Mark as Renewed" button (once renewed, CA enters new expiry date)
+
+Membership Fee:
+
+Reminder every year in February: "ICAI membership fee is due by 30 September"
+"Mark as Paid" button
+
+
+CPE Summary Widget (shown on CA personal dashboard)
+Small widget on CA's main dashboard sidebar:
+"My CPE | 87/120 hrs | [mini progress bar] | On track ✅"
+Click → goes to full CPE page
+
+10.3 — Design Guidelines
+
+Progress ring: most important visual element — make it large, clear, satisfying to look at
+Green when on track, orange when slightly behind, red when at risk
+"On track" message: positive, encouraging — not scary
+Activity log: quick to fill in (max 30 seconds per activity)
+Certificate upload: optional but encouraged — "Certificates help if ICAI asks for records"
+Upcoming events: show only future events, remove past ones automatically
+

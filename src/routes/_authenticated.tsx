@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
   Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive, FileSignature, BarChart3, Gift,
-  CircleHelp, BookOpen,
+  CircleHelp, BookOpen, GraduationCap,
 } from "lucide-react";
 import { HelpWidget } from "@/components/support/HelpWidget";
 import { CAWelcomeOnboarding } from "@/components/support/CAWelcomeOnboarding";
@@ -120,6 +120,7 @@ const CA_NAV_OWNER = [
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
+  { to: "/ca/my-profile/cpe", icon: GraduationCap, label: "My CPE" },
 ] as const;
 
 const CA_NAV_STAFF = [
@@ -133,6 +134,7 @@ const CA_NAV_STAFF = [
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/ca/help", icon: CircleHelp, label: "Help" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
+  { to: "/ca/my-profile/cpe", icon: GraduationCap, label: "My CPE" },
 ] as const;
 
 const CLIENT_NAV = [

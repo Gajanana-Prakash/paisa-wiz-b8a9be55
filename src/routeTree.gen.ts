@@ -67,6 +67,7 @@ import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from '
 import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_authenticated/ca.settings.billing'
 import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
 import { Route as AuthenticatedCaReportsTimesheetsRouteImport } from './routes/_authenticated/ca.reports.timesheets'
+import { Route as AuthenticatedCaMyProfileCpeRouteImport } from './routes/_authenticated/ca.my-profile.cpe'
 import { Route as AuthenticatedCaClientsClientIdRouteImport } from './routes/_authenticated/ca.clients.$clientId'
 import { Route as AuthenticatedCaBillingServicesRouteImport } from './routes/_authenticated/ca.billing.services'
 import { Route as AuthenticatedCaBillingReportsRouteImport } from './routes/_authenticated/ca.billing.reports'
@@ -398,6 +399,12 @@ const AuthenticatedCaReportsTimesheetsRoute =
     path: '/timesheets',
     getParentRoute: () => AuthenticatedCaReportsRoute,
   } as any)
+const AuthenticatedCaMyProfileCpeRoute =
+  AuthenticatedCaMyProfileCpeRouteImport.update({
+    id: '/my-profile/cpe',
+    path: '/my-profile/cpe',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdRoute =
   AuthenticatedCaClientsClientIdRouteImport.update({
     id: '/$clientId',
@@ -514,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
@@ -580,6 +588,7 @@ export interface FileRoutesByTo {
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
@@ -652,6 +661,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/_authenticated/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/_authenticated/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
+  '/_authenticated/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/_authenticated/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/_authenticated/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
@@ -724,6 +734,7 @@ export interface FileRouteTypes {
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
+    | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
+    | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
@@ -861,6 +873,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/billing/reports'
     | '/_authenticated/ca/billing/services'
     | '/_authenticated/ca/clients/$clientId'
+    | '/_authenticated/ca/my-profile/cpe'
     | '/_authenticated/ca/reports/timesheets'
     | '/_authenticated/ca/settings/agreement-templates'
     | '/_authenticated/ca/settings/billing'
@@ -1303,6 +1316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaReportsTimesheetsRouteImport
       parentRoute: typeof AuthenticatedCaReportsRoute
     }
+    '/_authenticated/ca/my-profile/cpe': {
+      id: '/_authenticated/ca/my-profile/cpe'
+      path: '/my-profile/cpe'
+      fullPath: '/ca/my-profile/cpe'
+      preLoaderRoute: typeof AuthenticatedCaMyProfileCpeRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
     '/_authenticated/ca/clients/$clientId': {
       id: '/_authenticated/ca/clients/$clientId'
       path: '/$clientId'
@@ -1577,6 +1597,7 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaTimesheetsRoute: typeof AuthenticatedCaTimesheetsRouteWithChildren
   AuthenticatedCaVaultRoute: typeof AuthenticatedCaVaultRoute
   AuthenticatedCaIndexRoute: typeof AuthenticatedCaIndexRoute
+  AuthenticatedCaMyProfileCpeRoute: typeof AuthenticatedCaMyProfileCpeRoute
 }
 
 const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
@@ -1599,6 +1620,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaTimesheetsRoute: AuthenticatedCaTimesheetsRouteWithChildren,
   AuthenticatedCaVaultRoute: AuthenticatedCaVaultRoute,
   AuthenticatedCaIndexRoute: AuthenticatedCaIndexRoute,
+  AuthenticatedCaMyProfileCpeRoute: AuthenticatedCaMyProfileCpeRoute,
 }
 
 const AuthenticatedCaRouteWithChildren = AuthenticatedCaRoute._addFileChildren(

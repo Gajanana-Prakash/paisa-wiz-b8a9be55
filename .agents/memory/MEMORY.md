@@ -1,0 +1,1 @@
+- [Node.js 20 WebSocket polyfill for Supabase SSR](ws-polyfill.md) — Supabase Realtime crashes SSR on Node.js 20 without a WebSocket polyfill; fix lives in src/lib/ws-polyfill.server.ts imported first in src/server.ts
