@@ -1,8 +1,10 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const APP_BASE = typeof process !== "undefined" && process.env.VITE_APP_URL
-  ? process.env.VITE_APP_URL
-  : "https://gstify.in";
+const _appUrl = typeof process !== "undefined" ? process.env.VITE_APP_URL : undefined;
+if (!_appUrl && typeof process !== "undefined" && process.env.NODE_ENV === "production") {
+  console.error("[GSTify] VITE_APP_URL is not set in production — referral links will point to https://gstify.in instead of the correct deployment URL. Set this env var in production.");
+}
+const APP_BASE = _appUrl ?? "https://gstify.in";
 
 export function referralJoinUrl(code: string) {
   return `${APP_BASE}/join?ref=${encodeURIComponent(code)}`;

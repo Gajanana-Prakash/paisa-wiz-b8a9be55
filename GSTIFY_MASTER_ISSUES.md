@@ -1,8 +1,9 @@
 # GSTify — Master Issues & Feature Request Document
 
 **Generated:** June 1, 2026  
+**Last Updated:** June 2, 2026 — Security fixes applied (see ✅ FIXED markers)  
 **Sources:** Security Audit (Dep Audit + SAST + HoundDog + Manual Review) · Product Management Analysis  
-**Status:** Read-only reference — no code has been modified
+**Status:** 5 issues fixed in code · 2 dependency CVEs confirmed already patched · CRIT-001 requires manual key rotation (see below)
 
 ---
 
@@ -22,7 +23,7 @@
 
 ---
 
-### CRIT-001 · Supabase Publishable Key committed to `.replit` file
+### CRIT-001 · Supabase Publishable Key committed to `.replit` file · ⚠️ REQUIRES MANUAL ACTION
 
 | Field | Detail |
 |---|---|
@@ -47,6 +48,12 @@ This JWT is the Supabase **anon** key (role: `anon`, not service_role) so it doe
 4. Audit git history to confirm no `SUPABASE_SERVICE_ROLE_KEY` was ever committed.
 
 **Effort:** 30 minutes
+
+> **Action required from you:** The agent cannot rotate Supabase API keys or write to Replit's encrypted Secrets store directly.  
+> Steps to close this:  
+> 1. Go to your [Supabase dashboard](https://supabase.com/dashboard) → **Project Settings → API** → regenerate the **anon public key**.  
+> 2. Open the **Replit Secrets panel** (padlock icon) and add/update `SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_PUBLISHABLE_KEY` with the new value.  
+> 3. Once confirmed working, the `.replit` lines 12 and 15 can be removed.
 
 ---
 
@@ -108,16 +115,16 @@ Same as HIGH-001 — replace `xlsx` with the patched version from `cdn.sheetjs.c
 
 ---
 
-### HIGH-003 · TanStack Start server-function deserialization (GHSA-9m65-766c-r333)
+### HIGH-003 · TanStack Start server-function deserialization (GHSA-9m65-766c-r333) · ✅ ALREADY PATCHED
 
 | Field | Detail |
 |---|---|
 | **Severity** | High (Moderate in advisory; elevated here due to `supabaseAdmin` usage) |
 | **Category** | Dependency Vulnerability |
 | **Source** | Dependency Audit |
-| **Package** | `@tanstack/start-server-core@1.167.22` |
+| **Package** | `@tanstack/start-server-core@1.167.30` ✅ (was 1.167.22) |
 | **Advisory** | GHSA-9m65-766c-r333 |
-| **Fix Available** | Yes — upgrade to ≥ 1.167.30 |
+| **Fix Available** | Yes — confirmed installed |
 
 **Description**  
 A type-confusion bug in `seroval ≤ 1.5.2` allows a crafted HTTP body sent to one `/_serverFn/<id>` endpoint to trigger invocation of a **different** server function as a side effect of deserializing the request payload.
@@ -141,14 +148,14 @@ This is a minor version bump with no breaking changes.
 
 ---
 
-### MED-001 · HTML template strings with unencoded interpolation — XSS risk
+### MED-001 · HTML template strings with unencoded interpolation — XSS risk · ✅ FIXED
 
 | Field | Detail |
 |---|---|
 | **Severity** | Medium |
 | **Category** | Cross-Site Scripting (XSS) |
 | **Source** | SAST MEDIUM ×5 (`html-in-template-string`) |
-| **Files** | `src/components/analytics/exportReport.ts`, `src/routes/_authenticated/ca.reports.tsx` |
+| **Files** | `src/components/analytics/exportReport.ts` ✅ fixed · `src/routes/_authenticated/ca.reports.tsx` (no HTML template strings found) |
 
 **Description**  
 Template literals construct raw HTML strings with interpolated user-controlled variables (client names, GSTIN values, firm names, amounts) that are not HTML-encoded before being written to a blob or injected into the DOM.
@@ -169,11 +176,13 @@ const html = `<td>${esc(clientName)}</td><td>${esc(gstin)}</td>`;
 ```
 Or use `he.encode()` from the `he` package.
 
+**Fix applied:** Added `escHtml()` helper to `exportReport.ts`; all client names, staff names, category labels, range labels and KPI values are now HTML-encoded before being inserted into the print template.
+
 **Effort:** 1–2 hours
 
 ---
 
-### MED-002 · Open redirect in DSC Vault (`window.location.href = m`)
+### MED-002 · Open redirect in DSC Vault (`window.location.href = m`) · ✅ FIXED
 
 | Field | Detail |
 |---|---|
@@ -200,6 +209,8 @@ if (m && ALLOWED_REDIRECT_PREFIXES.some(prefix => m.startsWith(prefix))) {
   window.location.href = m;
 }
 ```
+
+**Fix applied:** Guard added — `if (m && m.startsWith("mailto:")) window.location.href = m`. The `mailtoLink()` helper always produces `mailto:` URLs or `null`, so this guard both validates the scheme and eliminates the null-assignment path.
 
 **Effort:** 30 minutes
 
@@ -263,14 +274,14 @@ A malicious or automated user can send thousands of requests per minute, generat
 
 ---
 
-### MED-005 · GSTIN fields lack format validation
+### MED-005 · GSTIN fields lack format validation · ✅ FIXED
 
 | Field | Detail |
 |---|---|
 | **Severity** | Medium |
 | **Category** | Input Validation |
 | **Source** | Manual code review |
-| **Files** | `src/lib/billing.functions.ts`, `src/lib/tenant.functions.ts`, `src/lib/client-portal.functions.ts` |
+| **Files** | `src/lib/billing.functions.ts` ✅ · `src/lib/tenant.functions.ts` ✅ · `src/lib/client-portal.functions.ts` (no GSTIN field found) |
 
 **Description**  
 GSTIN inputs across all server functions are validated only for maximum length (`max(20)`). No regex check enforces the correct 15-character Indian GST format.
@@ -289,6 +300,8 @@ gstin: z.string()
   .regex(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/, "Invalid GSTIN format")
   .optional()
 ```
+
+**Fix applied:** Added `.refine()` with regex `/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/` to GSTIN fields in both `billing.functions.ts` and `tenant.functions.ts`. The refine uses `.toUpperCase()` internally so lowercase input passes; null/undefined/empty-string values are allowed through the optional/nullable chain without triggering the regex.
 
 **Effort:** 1 hour
 
@@ -325,7 +338,7 @@ Replace `as any` casts with:
 
 ---
 
-### LOW-001 · Hardcoded placeholder contact info shipped in production source
+### LOW-001 · Hardcoded placeholder contact info shipped in production source · ✅ FIXED
 
 | Field | Detail |
 |---|---|
@@ -346,11 +359,14 @@ if (!import.meta.env.VITE_GSTIFY_SUPPORT_WHATSAPP && import.meta.env.PROD) {
 }
 ```
 
+**Fix applied:** Added `import.meta.env.PROD` guards in `support.content.ts` that call `console.error()` at startup if either env var is missing in a production build. This makes the misconfiguration immediately visible in deployment logs rather than silently shipping placeholder content.  
+**Remaining action:** Set `VITE_GSTIFY_SUPPORT_WHATSAPP`, `VITE_GSTIFY_SUPPORT_WHATSAPP_DISPLAY`, and `VITE_GSTIFY_INTRO_VIDEO_ID` in Replit Secrets before going live.
+
 **Effort:** 15 minutes
 
 ---
 
-### LOW-002 · Hardcoded production URL fallback in referrals server
+### LOW-002 · Hardcoded production URL fallback in referrals server · ✅ FIXED
 
 | Field | Detail |
 |---|---|
@@ -368,6 +384,9 @@ Replace the silent fallback with an explicit environment check:
 const APP_BASE = process.env.VITE_APP_URL;
 if (!APP_BASE) throw new Error("VITE_APP_URL is required");
 ```
+
+**Fix applied:** Replaced the silent `|| "https://gstify.in"` fallback with an explicit check that logs `console.error()` in production when `VITE_APP_URL` is unset, making misconfiguration visible in deployment logs immediately.  
+**Remaining action:** Set `VITE_APP_URL` in Replit Secrets for the production deployment.
 
 **Effort:** 5 minutes
 

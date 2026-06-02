@@ -12,6 +12,15 @@ export type SupportTutorial = {
   pathPatterns: string[];
 };
 
+if (import.meta.env.PROD) {
+  if (!import.meta.env.VITE_GSTIFY_SUPPORT_WHATSAPP) {
+    console.error("[GSTify] VITE_GSTIFY_SUPPORT_WHATSAPP is not set — support WhatsApp links will use a placeholder number. Set this env var before deploying.");
+  }
+  if (!import.meta.env.VITE_GSTIFY_INTRO_VIDEO_ID) {
+    console.error("[GSTify] VITE_GSTIFY_INTRO_VIDEO_ID is not set — intro video will use a placeholder. Set this env var before deploying.");
+  }
+}
+
 export const SUPPORT_WHATSAPP_DISPLAY = import.meta.env.VITE_GSTIFY_SUPPORT_WHATSAPP_DISPLAY || "+91-98765-43210";
 export const SUPPORT_WHATSAPP_E164 =
   import.meta.env.VITE_GSTIFY_SUPPORT_WHATSAPP || "919876543210";

@@ -72,7 +72,9 @@ export const inviteClient = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       businessName: z.string().trim().min(2).max(200),
-      gstin: z.string().trim().max(20).optional(),
+      gstin: z.string().trim()
+        .refine((v) => !v || /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/.test(v.toUpperCase()), "Invalid GSTIN format")
+        .optional(),
       contactName: z.string().trim().max(120).optional(),
       contactEmail: z.string().trim().email().max(255).optional().or(z.literal("")),
       contactPhone: z.string().trim().max(20).optional(),

@@ -42,7 +42,9 @@ export const updateBillingSettings = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       pan: z.string().max(20).nullable().optional(),
-      gstin: z.string().max(20).nullable().optional(),
+      gstin: z.string().trim()
+        .refine((v) => !v || /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/.test(v.toUpperCase()), "Invalid GSTIN format")
+        .nullable().optional(),
       firmStateCode: z.string().max(2).nullable().optional(),
       bankName: z.string().max(120).nullable().optional(),
       bankAccount: z.string().max(40).nullable().optional(),

@@ -99,7 +99,7 @@ function DscVaultPage() {
       if (p.phone) window.open(whatsappLink(p.phone, p.message), "_blank");
       else if (p.email) {
         const m = mailtoLink(p.email, `DSC renewal — ${p.holderName}`, p.message);
-        if (m) window.location.href = m;
+        if (m && m.startsWith("mailto:")) window.location.href = m;
       } else {
         await navigator.clipboard.writeText(p.message);
         toast.success("Copied alert text");
