@@ -42,6 +42,7 @@ import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCaHelpRouteImport } from './routes/_authenticated/ca.help'
 import { Route as AuthenticatedCaGstLibraryRouteImport } from './routes/_authenticated/ca.gst-library'
 import { Route as AuthenticatedCaGrowRouteImport } from './routes/_authenticated/ca.grow'
+import { Route as AuthenticatedCaEInvoicesRouteImport } from './routes/_authenticated/ca.e-invoices'
 import { Route as AuthenticatedCaDscVaultRouteImport } from './routes/_authenticated/ca.dsc-vault'
 import { Route as AuthenticatedCaDashboardRouteImport } from './routes/_authenticated/ca.dashboard'
 import { Route as AuthenticatedCaComplianceCalendarRouteImport } from './routes/_authenticated/ca.compliance-calendar'
@@ -63,6 +64,7 @@ import { Route as AuthenticatedCaTimesheetsMyTimesheetRouteImport } from './rout
 import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authenticated/ca.tasks.my-tasks'
 import { Route as AuthenticatedCaStaffUserIdRouteImport } from './routes/_authenticated/ca.staff.$userId'
 import { Route as AuthenticatedCaSettingsReferralRouteImport } from './routes/_authenticated/ca.settings.referral'
+import { Route as AuthenticatedCaSettingsEInvoiceRouteImport } from './routes/_authenticated/ca.settings.e-invoice'
 import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from './routes/_authenticated/ca.settings.billing-subscription'
 import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_authenticated/ca.settings.billing'
 import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
@@ -75,6 +77,7 @@ import { Route as AuthenticatedCaBillingNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedCaBillingInvoiceIdRouteImport } from './routes/_authenticated/ca.billing.$invoiceId'
 import { Route as AuthenticatedCaAgreementsNewRouteImport } from './routes/_authenticated/ca.agreements.new'
 import { Route as AuthenticatedCaAgreementsAgreementIdRouteImport } from './routes/_authenticated/ca.agreements.$agreementId'
+import { Route as AuthenticatedCaClientsClientIdEInvoicesRouteImport } from './routes/_authenticated/ca.clients.$clientId.e-invoices'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
 import { Route as AuthenticatedCaBillingInvoiceIdEditRouteImport } from './routes/_authenticated/ca.billing.$invoiceId.edit'
@@ -252,6 +255,12 @@ const AuthenticatedCaGrowRoute = AuthenticatedCaGrowRouteImport.update({
   path: '/grow',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
+const AuthenticatedCaEInvoicesRoute =
+  AuthenticatedCaEInvoicesRouteImport.update({
+    id: '/e-invoices',
+    path: '/e-invoices',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
 const AuthenticatedCaDscVaultRoute = AuthenticatedCaDscVaultRouteImport.update({
   id: '/dsc-vault',
   path: '/dsc-vault',
@@ -375,6 +384,12 @@ const AuthenticatedCaSettingsReferralRoute =
     path: '/referral',
     getParentRoute: () => AuthenticatedCaSettingsRoute,
   } as any)
+const AuthenticatedCaSettingsEInvoiceRoute =
+  AuthenticatedCaSettingsEInvoiceRouteImport.update({
+    id: '/e-invoice',
+    path: '/e-invoice',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsBillingSubscriptionRoute =
   AuthenticatedCaSettingsBillingSubscriptionRouteImport.update({
     id: '/billing-subscription',
@@ -447,6 +462,12 @@ const AuthenticatedCaAgreementsAgreementIdRoute =
     path: '/$agreementId',
     getParentRoute: () => AuthenticatedCaAgreementsRoute,
   } as any)
+const AuthenticatedCaClientsClientIdEInvoicesRoute =
+  AuthenticatedCaClientsClientIdEInvoicesRouteImport.update({
+    id: '/e-invoices',
+    path: '/e-invoices',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdDocumentsRoute =
   AuthenticatedCaClientsClientIdDocumentsRouteImport.update({
     id: '/documents',
@@ -498,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
@@ -526,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -542,6 +565,7 @@ export interface FileRoutesByFullPath {
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -566,6 +590,7 @@ export interface FileRoutesByTo {
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
@@ -593,6 +618,7 @@ export interface FileRoutesByTo {
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -609,6 +635,7 @@ export interface FileRoutesByTo {
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -638,6 +665,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/_authenticated/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/_authenticated/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/_authenticated/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/_authenticated/ca/grow': typeof AuthenticatedCaGrowRoute
   '/_authenticated/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/_authenticated/ca/help': typeof AuthenticatedCaHelpRoute
@@ -666,6 +694,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/_authenticated/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/_authenticated/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/_authenticated/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/_authenticated/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/_authenticated/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/_authenticated/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -682,6 +711,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/_authenticated/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -711,6 +741,7 @@ export interface FileRouteTypes {
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/e-invoices'
     | '/ca/grow'
     | '/ca/gst-library'
     | '/ca/help'
@@ -739,6 +770,7 @@ export interface FileRouteTypes {
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
+    | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
@@ -755,6 +787,7 @@ export interface FileRouteTypes {
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
+    | '/ca/clients/$clientId/e-invoices'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -779,6 +812,7 @@ export interface FileRouteTypes {
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/e-invoices'
     | '/ca/grow'
     | '/ca/gst-library'
     | '/ca/help'
@@ -806,6 +840,7 @@ export interface FileRouteTypes {
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
+    | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
@@ -822,6 +857,7 @@ export interface FileRouteTypes {
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
+    | '/ca/clients/$clientId/e-invoices'
   id:
     | '__root__'
     | '/'
@@ -850,6 +886,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/compliance-calendar'
     | '/_authenticated/ca/dashboard'
     | '/_authenticated/ca/dsc-vault'
+    | '/_authenticated/ca/e-invoices'
     | '/_authenticated/ca/grow'
     | '/_authenticated/ca/gst-library'
     | '/_authenticated/ca/help'
@@ -878,6 +915,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/settings/agreement-templates'
     | '/_authenticated/ca/settings/billing'
     | '/_authenticated/ca/settings/billing-subscription'
+    | '/_authenticated/ca/settings/e-invoice'
     | '/_authenticated/ca/settings/referral'
     | '/_authenticated/ca/staff/$userId'
     | '/_authenticated/ca/tasks/my-tasks'
@@ -894,6 +932,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/billing/$invoiceId/edit'
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
+    | '/_authenticated/ca/clients/$clientId/e-invoices'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1141,6 +1180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaGrowRouteImport
       parentRoute: typeof AuthenticatedCaRoute
     }
+    '/_authenticated/ca/e-invoices': {
+      id: '/_authenticated/ca/e-invoices'
+      path: '/e-invoices'
+      fullPath: '/ca/e-invoices'
+      preLoaderRoute: typeof AuthenticatedCaEInvoicesRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
     '/_authenticated/ca/dsc-vault': {
       id: '/_authenticated/ca/dsc-vault'
       path: '/dsc-vault'
@@ -1288,6 +1334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaSettingsReferralRouteImport
       parentRoute: typeof AuthenticatedCaSettingsRoute
     }
+    '/_authenticated/ca/settings/e-invoice': {
+      id: '/_authenticated/ca/settings/e-invoice'
+      path: '/e-invoice'
+      fullPath: '/ca/settings/e-invoice'
+      preLoaderRoute: typeof AuthenticatedCaSettingsEInvoiceRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/billing-subscription': {
       id: '/_authenticated/ca/settings/billing-subscription'
       path: '/billing-subscription'
@@ -1371,6 +1424,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ca/agreements/$agreementId'
       preLoaderRoute: typeof AuthenticatedCaAgreementsAgreementIdRouteImport
       parentRoute: typeof AuthenticatedCaAgreementsRoute
+    }
+    '/_authenticated/ca/clients/$clientId/e-invoices': {
+      id: '/_authenticated/ca/clients/$clientId/e-invoices'
+      path: '/e-invoices'
+      fullPath: '/ca/clients/$clientId/e-invoices'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
     }
     '/_authenticated/ca/clients/$clientId/documents': {
       id: '/_authenticated/ca/clients/$clientId/documents'
@@ -1474,6 +1534,7 @@ const AuthenticatedCaBillingRouteWithChildren =
 interface AuthenticatedCaClientsClientIdRouteChildren {
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
   AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  AuthenticatedCaClientsClientIdEInvoicesRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 
 const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientIdRouteChildren =
@@ -1482,6 +1543,8 @@ const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientI
       AuthenticatedCaClientsClientIdComplianceRoute,
     AuthenticatedCaClientsClientIdDocumentsRoute:
       AuthenticatedCaClientsClientIdDocumentsRoute,
+    AuthenticatedCaClientsClientIdEInvoicesRoute:
+      AuthenticatedCaClientsClientIdEInvoicesRoute,
   }
 
 const AuthenticatedCaClientsClientIdRouteWithChildren =
@@ -1523,6 +1586,7 @@ interface AuthenticatedCaSettingsRouteChildren {
   AuthenticatedCaSettingsAgreementTemplatesRoute: typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   AuthenticatedCaSettingsBillingRoute: typeof AuthenticatedCaSettingsBillingRoute
   AuthenticatedCaSettingsBillingSubscriptionRoute: typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  AuthenticatedCaSettingsEInvoiceRoute: typeof AuthenticatedCaSettingsEInvoiceRoute
   AuthenticatedCaSettingsReferralRoute: typeof AuthenticatedCaSettingsReferralRoute
 }
 
@@ -1533,6 +1597,7 @@ const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren
     AuthenticatedCaSettingsBillingRoute: AuthenticatedCaSettingsBillingRoute,
     AuthenticatedCaSettingsBillingSubscriptionRoute:
       AuthenticatedCaSettingsBillingSubscriptionRoute,
+    AuthenticatedCaSettingsEInvoiceRoute: AuthenticatedCaSettingsEInvoiceRoute,
     AuthenticatedCaSettingsReferralRoute: AuthenticatedCaSettingsReferralRoute,
   }
 
@@ -1587,6 +1652,7 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaComplianceCalendarRoute: typeof AuthenticatedCaComplianceCalendarRoute
   AuthenticatedCaDashboardRoute: typeof AuthenticatedCaDashboardRoute
   AuthenticatedCaDscVaultRoute: typeof AuthenticatedCaDscVaultRoute
+  AuthenticatedCaEInvoicesRoute: typeof AuthenticatedCaEInvoicesRoute
   AuthenticatedCaGrowRoute: typeof AuthenticatedCaGrowRoute
   AuthenticatedCaGstLibraryRoute: typeof AuthenticatedCaGstLibraryRoute
   AuthenticatedCaHelpRoute: typeof AuthenticatedCaHelpRoute
@@ -1610,6 +1676,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
     AuthenticatedCaComplianceCalendarRoute,
   AuthenticatedCaDashboardRoute: AuthenticatedCaDashboardRoute,
   AuthenticatedCaDscVaultRoute: AuthenticatedCaDscVaultRoute,
+  AuthenticatedCaEInvoicesRoute: AuthenticatedCaEInvoicesRoute,
   AuthenticatedCaGrowRoute: AuthenticatedCaGrowRoute,
   AuthenticatedCaGstLibraryRoute: AuthenticatedCaGstLibraryRoute,
   AuthenticatedCaHelpRoute: AuthenticatedCaHelpRoute,
