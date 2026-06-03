@@ -15,7 +15,7 @@ import {
 } from "@/lib/einvoice.functions";
 import { IrnStatusBadge, DeadlineCountdown, SandboxBanner } from "@/components/einvoice/StatusBadges";
 import { QrViewerDialog, CancelIrnDialog, type QrViewerData } from "@/components/einvoice/Dialogs";
-import { renderQrDataUrl } from "@/lib/einvoice.server";
+
 
 export const Route = createFileRoute("/_authenticated/ca/clients/$clientId/e-invoices")({
   component: ClientEInvoicesPage,

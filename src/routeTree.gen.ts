@@ -75,6 +75,7 @@ import { Route as AuthenticatedCaBillingNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedCaBillingInvoiceIdRouteImport } from './routes/_authenticated/ca.billing.$invoiceId'
 import { Route as AuthenticatedCaAgreementsNewRouteImport } from './routes/_authenticated/ca.agreements.new'
 import { Route as AuthenticatedCaAgreementsAgreementIdRouteImport } from './routes/_authenticated/ca.agreements.$agreementId'
+import { Route as AuthenticatedCaClientsClientIdEInvoicesRouteImport } from './routes/_authenticated/ca.clients.$clientId.e-invoices'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
 import { Route as AuthenticatedCaBillingInvoiceIdEditRouteImport } from './routes/_authenticated/ca.billing.$invoiceId.edit'
@@ -447,6 +448,12 @@ const AuthenticatedCaAgreementsAgreementIdRoute =
     path: '/$agreementId',
     getParentRoute: () => AuthenticatedCaAgreementsRoute,
   } as any)
+const AuthenticatedCaClientsClientIdEInvoicesRoute =
+  AuthenticatedCaClientsClientIdEInvoicesRouteImport.update({
+    id: '/e-invoices',
+    path: '/e-invoices',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdDocumentsRoute =
   AuthenticatedCaClientsClientIdDocumentsRouteImport.update({
     id: '/documents',
@@ -542,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -609,6 +617,7 @@ export interface FileRoutesByTo {
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -682,6 +691,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  '/_authenticated/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -755,6 +765,7 @@ export interface FileRouteTypes {
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
+    | '/ca/clients/$clientId/e-invoices'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -822,6 +833,7 @@ export interface FileRouteTypes {
     | '/ca/billing/$invoiceId/edit'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
+    | '/ca/clients/$clientId/e-invoices'
   id:
     | '__root__'
     | '/'
@@ -894,6 +906,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/billing/$invoiceId/edit'
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
+    | '/_authenticated/ca/clients/$clientId/e-invoices'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1372,6 +1385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaAgreementsAgreementIdRouteImport
       parentRoute: typeof AuthenticatedCaAgreementsRoute
     }
+    '/_authenticated/ca/clients/$clientId/e-invoices': {
+      id: '/_authenticated/ca/clients/$clientId/e-invoices'
+      path: '/e-invoices'
+      fullPath: '/ca/clients/$clientId/e-invoices'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
+    }
     '/_authenticated/ca/clients/$clientId/documents': {
       id: '/_authenticated/ca/clients/$clientId/documents'
       path: '/documents'
@@ -1474,6 +1494,7 @@ const AuthenticatedCaBillingRouteWithChildren =
 interface AuthenticatedCaClientsClientIdRouteChildren {
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
   AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
+  AuthenticatedCaClientsClientIdEInvoicesRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRoute
 }
 
 const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientIdRouteChildren =
@@ -1482,6 +1503,8 @@ const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientI
       AuthenticatedCaClientsClientIdComplianceRoute,
     AuthenticatedCaClientsClientIdDocumentsRoute:
       AuthenticatedCaClientsClientIdDocumentsRoute,
+    AuthenticatedCaClientsClientIdEInvoicesRoute:
+      AuthenticatedCaClientsClientIdEInvoicesRoute,
   }
 
 const AuthenticatedCaClientsClientIdRouteWithChildren =
