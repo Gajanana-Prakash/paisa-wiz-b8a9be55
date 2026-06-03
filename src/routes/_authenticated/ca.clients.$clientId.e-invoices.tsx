@@ -124,14 +124,6 @@ function ClientEInvoicesPage() {
       invoiceNumber,
     });
   };
-      irn: eInvoice.irn,
-      ackNumber: eInvoice.ack_number,
-      ackDate: eInvoice.ack_date,
-      qrImage: img,
-      signedJson: eInvoice.signed_invoice_json,
-      invoiceNumber,
-    });
-  };
 
   const runCancel = async (reason: "1" | "2" | "3" | "4", text: string) => {
     if (!cancelInvoice) return;
