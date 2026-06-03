@@ -42,6 +42,7 @@ import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCaHelpRouteImport } from './routes/_authenticated/ca.help'
 import { Route as AuthenticatedCaGstLibraryRouteImport } from './routes/_authenticated/ca.gst-library'
 import { Route as AuthenticatedCaGrowRouteImport } from './routes/_authenticated/ca.grow'
+import { Route as AuthenticatedCaEInvoicesRouteImport } from './routes/_authenticated/ca.e-invoices'
 import { Route as AuthenticatedCaDscVaultRouteImport } from './routes/_authenticated/ca.dsc-vault'
 import { Route as AuthenticatedCaDashboardRouteImport } from './routes/_authenticated/ca.dashboard'
 import { Route as AuthenticatedCaComplianceCalendarRouteImport } from './routes/_authenticated/ca.compliance-calendar'
@@ -253,6 +254,12 @@ const AuthenticatedCaGrowRoute = AuthenticatedCaGrowRouteImport.update({
   path: '/grow',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
+const AuthenticatedCaEInvoicesRoute =
+  AuthenticatedCaEInvoicesRouteImport.update({
+    id: '/e-invoices',
+    path: '/e-invoices',
+    getParentRoute: () => AuthenticatedCaRoute,
+  } as any)
 const AuthenticatedCaDscVaultRoute = AuthenticatedCaDscVaultRouteImport.update({
   id: '/dsc-vault',
   path: '/dsc-vault',
@@ -505,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
@@ -574,6 +582,7 @@ export interface FileRoutesByTo {
   '/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
   '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
@@ -647,6 +656,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/compliance-calendar': typeof AuthenticatedCaComplianceCalendarRoute
   '/_authenticated/ca/dashboard': typeof AuthenticatedCaDashboardRoute
   '/_authenticated/ca/dsc-vault': typeof AuthenticatedCaDscVaultRoute
+  '/_authenticated/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/_authenticated/ca/grow': typeof AuthenticatedCaGrowRoute
   '/_authenticated/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/_authenticated/ca/help': typeof AuthenticatedCaHelpRoute
@@ -721,6 +731,7 @@ export interface FileRouteTypes {
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/e-invoices'
     | '/ca/grow'
     | '/ca/gst-library'
     | '/ca/help'
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/ca/compliance-calendar'
     | '/ca/dashboard'
     | '/ca/dsc-vault'
+    | '/ca/e-invoices'
     | '/ca/grow'
     | '/ca/gst-library'
     | '/ca/help'
@@ -862,6 +874,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/compliance-calendar'
     | '/_authenticated/ca/dashboard'
     | '/_authenticated/ca/dsc-vault'
+    | '/_authenticated/ca/e-invoices'
     | '/_authenticated/ca/grow'
     | '/_authenticated/ca/gst-library'
     | '/_authenticated/ca/help'
@@ -1152,6 +1165,13 @@ declare module '@tanstack/react-router' {
       path: '/grow'
       fullPath: '/ca/grow'
       preLoaderRoute: typeof AuthenticatedCaGrowRouteImport
+      parentRoute: typeof AuthenticatedCaRoute
+    }
+    '/_authenticated/ca/e-invoices': {
+      id: '/_authenticated/ca/e-invoices'
+      path: '/e-invoices'
+      fullPath: '/ca/e-invoices'
+      preLoaderRoute: typeof AuthenticatedCaEInvoicesRouteImport
       parentRoute: typeof AuthenticatedCaRoute
     }
     '/_authenticated/ca/dsc-vault': {
@@ -1610,6 +1630,7 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaComplianceCalendarRoute: typeof AuthenticatedCaComplianceCalendarRoute
   AuthenticatedCaDashboardRoute: typeof AuthenticatedCaDashboardRoute
   AuthenticatedCaDscVaultRoute: typeof AuthenticatedCaDscVaultRoute
+  AuthenticatedCaEInvoicesRoute: typeof AuthenticatedCaEInvoicesRoute
   AuthenticatedCaGrowRoute: typeof AuthenticatedCaGrowRoute
   AuthenticatedCaGstLibraryRoute: typeof AuthenticatedCaGstLibraryRoute
   AuthenticatedCaHelpRoute: typeof AuthenticatedCaHelpRoute
@@ -1633,6 +1654,7 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
     AuthenticatedCaComplianceCalendarRoute,
   AuthenticatedCaDashboardRoute: AuthenticatedCaDashboardRoute,
   AuthenticatedCaDscVaultRoute: AuthenticatedCaDscVaultRoute,
+  AuthenticatedCaEInvoicesRoute: AuthenticatedCaEInvoicesRoute,
   AuthenticatedCaGrowRoute: AuthenticatedCaGrowRoute,
   AuthenticatedCaGstLibraryRoute: AuthenticatedCaGstLibraryRoute,
   AuthenticatedCaHelpRoute: AuthenticatedCaHelpRoute,
