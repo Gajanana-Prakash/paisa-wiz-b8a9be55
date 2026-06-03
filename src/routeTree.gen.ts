@@ -64,6 +64,7 @@ import { Route as AuthenticatedCaTimesheetsMyTimesheetRouteImport } from './rout
 import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authenticated/ca.tasks.my-tasks'
 import { Route as AuthenticatedCaStaffUserIdRouteImport } from './routes/_authenticated/ca.staff.$userId'
 import { Route as AuthenticatedCaSettingsReferralRouteImport } from './routes/_authenticated/ca.settings.referral'
+import { Route as AuthenticatedCaSettingsEInvoiceRouteImport } from './routes/_authenticated/ca.settings.e-invoice'
 import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from './routes/_authenticated/ca.settings.billing-subscription'
 import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_authenticated/ca.settings.billing'
 import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
@@ -383,6 +384,12 @@ const AuthenticatedCaSettingsReferralRoute =
     path: '/referral',
     getParentRoute: () => AuthenticatedCaSettingsRoute,
   } as any)
+const AuthenticatedCaSettingsEInvoiceRoute =
+  AuthenticatedCaSettingsEInvoiceRouteImport.update({
+    id: '/e-invoice',
+    path: '/e-invoice',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsBillingSubscriptionRoute =
   AuthenticatedCaSettingsBillingSubscriptionRouteImport.update({
     id: '/billing-subscription',
@@ -541,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -610,6 +618,7 @@ export interface FileRoutesByTo {
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -685,6 +694,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/_authenticated/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/_authenticated/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  '/_authenticated/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/_authenticated/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/_authenticated/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/_authenticated/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
@@ -760,6 +770,7 @@ export interface FileRouteTypes {
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
+    | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
@@ -829,6 +840,7 @@ export interface FileRouteTypes {
     | '/ca/settings/agreement-templates'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
+    | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
@@ -903,6 +915,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/settings/agreement-templates'
     | '/_authenticated/ca/settings/billing'
     | '/_authenticated/ca/settings/billing-subscription'
+    | '/_authenticated/ca/settings/e-invoice'
     | '/_authenticated/ca/settings/referral'
     | '/_authenticated/ca/staff/$userId'
     | '/_authenticated/ca/tasks/my-tasks'
@@ -1321,6 +1334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaSettingsReferralRouteImport
       parentRoute: typeof AuthenticatedCaSettingsRoute
     }
+    '/_authenticated/ca/settings/e-invoice': {
+      id: '/_authenticated/ca/settings/e-invoice'
+      path: '/e-invoice'
+      fullPath: '/ca/settings/e-invoice'
+      preLoaderRoute: typeof AuthenticatedCaSettingsEInvoiceRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/billing-subscription': {
       id: '/_authenticated/ca/settings/billing-subscription'
       path: '/billing-subscription'
@@ -1566,6 +1586,7 @@ interface AuthenticatedCaSettingsRouteChildren {
   AuthenticatedCaSettingsAgreementTemplatesRoute: typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   AuthenticatedCaSettingsBillingRoute: typeof AuthenticatedCaSettingsBillingRoute
   AuthenticatedCaSettingsBillingSubscriptionRoute: typeof AuthenticatedCaSettingsBillingSubscriptionRoute
+  AuthenticatedCaSettingsEInvoiceRoute: typeof AuthenticatedCaSettingsEInvoiceRoute
   AuthenticatedCaSettingsReferralRoute: typeof AuthenticatedCaSettingsReferralRoute
 }
 
@@ -1576,6 +1597,7 @@ const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren
     AuthenticatedCaSettingsBillingRoute: AuthenticatedCaSettingsBillingRoute,
     AuthenticatedCaSettingsBillingSubscriptionRoute:
       AuthenticatedCaSettingsBillingSubscriptionRoute,
+    AuthenticatedCaSettingsEInvoiceRoute: AuthenticatedCaSettingsEInvoiceRoute,
     AuthenticatedCaSettingsReferralRoute: AuthenticatedCaSettingsReferralRoute,
   }
 
