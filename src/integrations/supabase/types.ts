@@ -1137,6 +1137,114 @@ export type Database = {
           },
         ]
       }
+      e_invoice_settings: {
+        Row: {
+          ca_firm_id: string
+          client_id_irp: string | null
+          client_secret: string | null
+          created_at: string
+          gstin: string | null
+          id: string
+          irp_password: string | null
+          irp_username: string | null
+          is_configured: boolean
+          last_connected_at: string | null
+          sandbox_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id_irp?: string | null
+          client_secret?: string | null
+          created_at?: string
+          gstin?: string | null
+          id?: string
+          irp_password?: string | null
+          irp_username?: string | null
+          is_configured?: boolean
+          last_connected_at?: string | null
+          sandbox_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id_irp?: string | null
+          client_secret?: string | null
+          created_at?: string
+          gstin?: string | null
+          id?: string
+          irp_password?: string | null
+          irp_username?: string | null
+          is_configured?: boolean
+          last_connected_at?: string | null
+          sandbox_mode?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      e_invoices: {
+        Row: {
+          ack_date: string | null
+          ack_number: string | null
+          ca_firm_id: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          client_id: string
+          created_at: string
+          id: string
+          invoice_date: string
+          invoice_id: string
+          irn: string | null
+          irn_status: Database["public"]["Enums"]["irn_status"]
+          irp_response_raw: Json | null
+          qr_code_data: string | null
+          qr_code_image_url: string | null
+          signed_invoice_json: string | null
+          updated_at: string
+          upload_deadline: string | null
+        }
+        Insert: {
+          ack_date?: string | null
+          ack_number?: string | null
+          ca_firm_id: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          invoice_date: string
+          invoice_id: string
+          irn?: string | null
+          irn_status?: Database["public"]["Enums"]["irn_status"]
+          irp_response_raw?: Json | null
+          qr_code_data?: string | null
+          qr_code_image_url?: string | null
+          signed_invoice_json?: string | null
+          updated_at?: string
+          upload_deadline?: string | null
+        }
+        Update: {
+          ack_date?: string | null
+          ack_number?: string | null
+          ca_firm_id?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          invoice_date?: string
+          invoice_id?: string
+          irn?: string | null
+          irn_status?: Database["public"]["Enums"]["irn_status"]
+          irp_response_raw?: Json | null
+          qr_code_data?: string | null
+          qr_code_image_url?: string | null
+          signed_invoice_json?: string | null
+          updated_at?: string
+          upload_deadline?: string | null
+        }
+        Relationships: []
+      }
       engagement_letter_templates: {
         Row: {
           ca_firm_id: string
@@ -2050,6 +2158,7 @@ export type Database = {
         | "filed"
         | "error"
         | "approved"
+      irn_status: "PENDING" | "GENERATED" | "CANCELLED" | "FAILED"
       leave_status: "PENDING" | "APPROVED" | "REJECTED"
       leave_type: "CASUAL" | "SICK" | "EARNED" | "HALF_DAY" | "COMP_OFF"
       onboarding_doc_category:
@@ -2307,6 +2416,7 @@ export const Constants = {
         "error",
         "approved",
       ],
+      irn_status: ["PENDING", "GENERATED", "CANCELLED", "FAILED"],
       leave_status: ["PENDING", "APPROVED", "REJECTED"],
       leave_type: ["CASUAL", "SICK", "EARNED", "HALF_DAY", "COMP_OFF"],
       onboarding_doc_category: [
