@@ -1,106 +1,110 @@
+# E-Invoicing & IRN Generation
 
-# Permanent Document Vault
+Build a full e-invoicing module for IRN generation, cancellation, QR codes, deadline tracking, and per-firm IRP credential management. The integration targets NIC IRP sandbox by default, with a flip to production once tested.
 
-Google-Drive-style permanent storage layered on the existing `invoices` storage bucket and `invoices` table pattern. New dedicated tables for vault metadata, versioning, and access logging.
+## 1. Database
 
-## 1. Database (single migration)
+Single migration with two new tables + one enum.
 
-New enums:
-- `vault_file_type` — `PDF | IMAGE | EXCEL | WORD | OTHER`
-- `vault_doc_category` — `KYC | GST | INCOME_TAX | AUDIT | BANKING | CORPORATE | INVOICES | NOTICES | AGREEMENTS | OTHER`
-- `vault_source` — `MANUAL_UPLOAD | CLIENT_UPLOAD | ONBOARDING | AI_EXTRACTED | GENERATED`
-- `vault_access_level` — `CA_ONLY | CA_AND_CLIENT | CLIENT_ONLY`
-- `vault_access_action` — `VIEWED | DOWNLOADED | SHARED | DELETED_REQUEST`
+**Enum** `irn_status`: `PENDING | GENERATED | CANCELLED | FAILED`.
 
-New tables (public, RLS, scoped by `ca_firm_id`):
-- **document_vault** — `id`, `ca_firm_id`, `client_id`, `uploaded_by`, `file_path` (storage path in `invoices` bucket), `file_name`, `display_name`, `file_type`, `file_size_bytes`, `document_category`, `document_subcategory`, `financial_year`, `period`, `description`, `tags text[]`, `is_kyc_document`, `source`, `linked_filing_id` (FK → `compliance_deadlines`, nullable), `linked_notice_id` (nullable, no FK — notices table not yet built), `linked_invoice_id` (FK → `invoices`, nullable), `version_number int default 1`, `parent_document_id` (self FK), `is_latest_version bool default true`, `access_level`, timestamps. Indexes on `(ca_firm_id, client_id)`, `(client_id, document_category)`, `(client_id, financial_year)`, GIN on `tags`, and a `tsvector` GIN index on `display_name || subcategory || description || tags` for full-text search.
-- **document_access_log** — `id`, `ca_firm_id`, `document_id` FK→document_vault, `accessed_by`, `action`, `accessed_at`, `ip_address`. Append-only.
+**`e_invoices`** (per-IRN record, 1:1 with a CA invoice)
+- `ca_firm_id`, `client_id`, `invoice_id` (FK → `ca_invoices`)
+- `irn`, `irn_status`, `ack_number`, `ack_date`
+- `qr_code_data` (signed QR string), `qr_code_image_url` (storage path in `invoices` bucket)
+- `signed_invoice_json` (text), `irp_response_raw` (jsonb)
+- `cancellation_reason`, `cancelled_at`
+- `invoice_date`, `upload_deadline` (generated: `invoice_date + 30 days`)
+- `days_to_deadline` computed in queries (not stored)
+- Standard timestamps. Unique index on `(invoice_id)`.
 
-RLS:
-- `document_vault`: SELECT via `can_access_client`; for client portal users, additionally require `access_level IN ('CA_AND_CLIENT','CLIENT_ONLY')`. INSERT requires `can_access_client + uploaded_by = auth.uid()`. UPDATE/DELETE restricted to `is_ca_firm_member`.
-- `document_access_log`: SELECT for `is_ca_firm_member`; INSERT for `can_access_client + accessed_by = auth.uid()`; no UPDATE/DELETE.
-- GRANTs to `authenticated` + `service_role`.
+**`e_invoice_settings`** (one row per CA firm)
+- `ca_firm_id` (unique), `gstin`, `irp_username`, `client_id_irp`
+- `irp_password_encrypted`, `irp_client_secret_encrypted` (stored encrypted via pgcrypto using a server-only `EINVOICE_ENCRYPTION_KEY`)
+- `sandbox_mode` (default `true`), `is_configured`
+- `last_connected_at`
 
-Storage: reuse `invoices` bucket. Path: `{ca_firm_id}/{client_id}/vault/{uuid}-{filename}`. Bucket already private with appropriate object policies (`can_access_client` via prefix). Verify and add a storage policy if needed scoped to this prefix.
+**RLS**
+- `e_invoices`: SELECT for `is_ca_firm_member` OR `can_access_client`; write only for `is_ca_firm_member`.
+- `e_invoice_settings`: SELECT + write restricted to `is_ca_owner` (contains credentials).
+- Both get standard GRANTs to `authenticated` + `service_role`. Encrypted columns are never returned to the client — server functions strip them.
 
-## 2. Server functions (`src/lib/vault.functions.ts` + `.server.ts`)
+## 2. IRP API client
 
-All with `requireSupabaseAuth`:
-- `listVaultDocuments({ clientId, category?, financialYear?, fileType?, uploadedBy?, fromDate?, toDate?, search?, includeAllVersions? })` — returns latest versions by default
-- `getVaultFolderTree({ clientId })` — returns counts per category and FY sub-buckets for GST/Income Tax
-- `getVaultDocument({ id })` — logs VIEWED
-- `getVaultSignedUrl({ id, disposition? })` — creates signed URL (5 min), logs VIEWED/DOWNLOADED
-- `uploadVaultDocument({ clientId, filePath, fileName, displayName, category, subcategory, financialYear?, period?, description?, tags?, accessLevel, source? })` — single-file metadata insert after client uploads to storage
-- `bulkUploadVaultDocuments({ clientId, files[] })` — bulk insert
-- `updateVaultDocument({ id, ... })` — rename, edit metadata, change category/access
-- `replaceVaultDocument({ id, newFilePath, newFileName })` — creates new row with `version_number = parent.version_number+1`, `parent_document_id = id`, flips parent `is_latest_version=false`
-- `getVaultVersions({ documentId })` — returns version chain
-- `bulkMoveVaultDocuments({ ids[], category })`
-- `bulkSetAccessLevel({ ids[], accessLevel })`
-- `deleteVaultDocument({ id })` — CA-only; removes storage object; KYC docs require `confirm: true`
-- `getVaultStorageUsage({ caFirmId })` — sum bytes by client + total
-- `searchVaultGlobal({ query })` — firm-wide search across all clients
-- `getRecentVaultUploads({ caFirmId, limit })`
-- `listClientVaultDocuments({ category? })` — client-portal version; filters access_level
-- `downloadVaultCategoryZip({ clientId, category })` — streams a ZIP via `jszip`; logs DOWNLOADED per file
+`src/lib/einvoice.irp.server.ts` — pure server module with one IRP gateway client:
+- `getAuthToken(firmId)`: caches token in-memory per `ca_firm_id` for 5h45m; refreshes on 401.
+- `generateIrn(firmId, payload)`: POSTs the PEPPOL JSON, returns `{ irn, ackNo, ackDt, signedQRCode, signedInvoice }` or throws an `IrpError` with code + plain-English message (translation map).
+- `cancelIrn(firmId, irn, reason)` — 24h validity check enforced before call.
+- `getIrnStatus(firmId, irn)`.
+- Sandbox vs production base URL selected from `e_invoice_settings.sandbox_mode`.
 
-## 3. Routes & UI
+Payload builder maps a `ca_invoices` row + items into the IRP PEPPOL schema (SupplierGSTIN, BuyerGSTIN, InvoiceNumber, InvoiceDate, InvoiceType, SupplyType, ItemList, TotalValue, CGST/SGST/IGST).
 
-```text
-src/routes/_authenticated/
-  ca.clients.$clientId.documents.tsx       -> Client vault main view
-  ca.vault.tsx                              -> Firm-wide overview
-  client.documents.tsx                      -> Client portal vault
-```
+Error-code translation table covers the common IRP codes (e.g. `2150` → "Duplicate IRN", `3028` → "GSTIN invalid", `2172` → "Invalid supply type"). Unknown codes fall back to the raw IRP message.
 
-Add "Documents" tab to existing `ca.clients.$clientId.tsx` and a sidebar entry "Document Vault" to CA + client portal navs.
+## 3. Server functions (`src/lib/einvoice.functions.ts`)
 
-Components in `src/components/vault/`:
-- `VaultFolderTree.tsx` — collapsible category tree with FY sub-folders for GST/IT, document counts, "All Documents" root
-- `VaultToolbar.tsx` — search input, upload button, filter dropdowns, view toggle, bulk action bar
-- `VaultGridView.tsx` / `VaultListView.tsx` — view modes with row selection (checkbox in list view)
-- `VaultDocumentCard.tsx` — thumbnail (file-type icon, image preview via signed URL), hover actions
-- `VaultUploadDialog.tsx` — react-dropzone drag-and-drop, multi-file metadata form (per-file accordion), category/subcategory dropdowns mapped per category, FY picker
-- `VaultViewerDialog.tsx` — full-screen viewer: PDF via `<iframe src=signedUrl>` (browser-native PDF render, no PDF.js dep) + images render as `<img>` + Office files show "Download to view"; right-side metadata panel; version history list with one-click switch
-- `VaultBulkActionsBar.tsx`
-- `VaultStorageCard.tsx` — usage progress bar
-- `VaultStorageByClientChart.tsx` — recharts bar chart
-- `VaultGlobalSearchDialog.tsx` — Cmd/Ctrl+K trigger, command palette across firm
-- Client portal: `ClientVaultBrowser.tsx`, `ClientVaultCategoryDownloadButton.tsx`
+All gated by `requireSupabaseAuth`. Mutations use `supabaseAdmin`. Owner-only ops re-check `is_ca_owner`.
 
-Subcategory dropdown source: small static map in `src/components/vault/categories.ts` (KYC: PAN, Aadhaar, GST Cert, Incorporation, …; GST: GSTR-1, GSTR-3B, GSTR-9; etc.). Free-text fallback allowed.
+- `getEInvoiceSettings()` — returns config without secret values, plus `last_connected_at` and `is_configured`.
+- `saveEInvoiceSettings(input)` — owner-only; encrypts password + secret before insert/update.
+- `testIrpConnection()` — owner-only; calls `getAuthToken`, returns `{ ok, error? }`, stores `last_connected_at` on success.
+- `listClientEInvoices({ clientId, filters })` — register for a client with deadline computation.
+- `getEInvoiceDashboard()` — firm-wide summary cards + per-client breakdown.
+- `generateIrnForInvoice({ invoiceId })` — loads invoice + items, calls `generateIrn`, upserts row, saves QR PNG into `invoices` bucket at `{ca_firm_id}/{client_id}/einvoice/{invoice_id}-qr.png`.
+- `bulkGenerateIrns({ invoiceIds })` — serial loop, returns per-item result.
+- `cancelIrnForInvoice({ invoiceId, reason })` — validates 24h window.
+- `refreshIrnStatus({ invoiceId })`.
+- `getSignedJsonDownload({ invoiceId })` — returns the signed JSON text for download.
 
-Keyboard shortcut Cmd/Ctrl+K wired in CA layout (and client layout) to open `VaultGlobalSearchDialog`. If a global shortcut hook already exists, extend; otherwise add a small `useHotkey` in `src/hooks/`.
+## 4. Routes & UI
 
-## 4. Design
+**Per-client e-invoice tab** — `src/routes/_authenticated/ca.clients.$clientId.e-invoices.tsx`
+- Linked from the existing client workspace tabs.
+- Top: 4 summary cards (Total this month, Pending, Deadline ≤7d, Cancelled).
+- `EInvoiceRegisterTable` with the columns + status badges + deadline countdown.
+- Row actions: Generate IRN, View QR, Download JSON, Cancel IRN.
+- Bulk selection on PENDING rows with progress drawer.
+- Sandbox banner when `sandbox_mode = true`.
 
-- Drive-like split layout: left tree (240px, collapsible on mobile), right content scrolls independently.
-- File-type colored icons via existing `lucide-react` (FileText red for PDF, FileSpreadsheet green for Excel, FileType for Word, Image for images).
-- Grid cards: square thumbnail area + 2 lines metadata; hover reveals action chips.
-- Storage progress bar on `/ca/vault` uses `--util-warning` past 80%, `--destructive` past 95%.
-- Add CSS tokens `--vault-folder-active`, `--vault-card-hover` in `src/styles.css`.
-- Bulk-select bar slides up from bottom when selection > 0.
+**Firm-wide dashboard** — `src/routes/_authenticated/ca.e-invoices.tsx`
+- Red banner when deadline-≤7d count > 0.
+- 4 summary cards (Active, Pending, Deadline alert, Failed).
+- Client-wise table, click-through to per-client tab.
 
-## 5. Dependencies
+**Settings** — `src/routes/_authenticated/ca.settings.e-invoice.tsx`
+- Wizard when not configured: mode toggle, GSTIN + credentials, Test Connection.
+- Configured state shows masked credentials + last connection timestamp + Edit.
 
-- `jszip` for ZIP download
-- `react-dropzone` (verify if already installed; if so reuse, else add)
+**Shared components** (`src/components/einvoice/`)
+- `IrnStatusBadge`, `DeadlineCountdown`, `SummaryCards`, `EInvoiceRegisterTable`, `GenerateIrnDialog`, `QrViewerDialog` (download PNG / JSON / print), `BulkProgressDrawer`, `SettingsWizard`, `SandboxBanner`, `EInvoiceClientTable`.
 
-## 6. Out of scope / follow-ups
+**PDF update** — extend `InvoicePreview.tsx` so that when the linked `e_invoices` row has `irn_status = GENERATED`, the preview shows:
+- QR image top-right + IRN below it.
+- "Ack No / Ack Date" line.
+- Footer "Computer-generated e-invoice. Validated by IRP."
 
-- True thumbnail generation for PDFs/Office docs (use static icons + first-page preview only for images).
-- Hard storage quota enforcement (display only; quotas tied to plan tier come later with billing module).
-- E-signed links with expiry tracking (signed URLs are 5-min one-shot only).
-- Notices linkage is wired as a nullable UUID column but no FK — notices module not yet built.
-- OCR / AI auto-tagging — `source = AI_EXTRACTED` is reserved for the future invoice OCR pipeline.
+The existing PDF download path picks this up automatically.
 
-## Technical notes
+## 5. Deadline alerts (cron)
 
-- Reuse `invoices` storage bucket (already configured private + per-firm pathing). No new bucket needed; saves migration churn.
-- `is_latest_version` flips in a single transaction inside `replaceVaultDocument` server fn (no DB trigger needed).
-- Global search uses Postgres `to_tsvector('simple', display_name || ' ' || coalesce(subcategory,'') || ' ' || coalesce(description,'') || ' ' || array_to_string(tags,' '))` with a generated column + GIN index for speed.
-- Client portal RLS adds `access_level <> 'CA_ONLY'` check via a wrapper SECURITY DEFINER function `public.can_client_see_doc(_doc_id, _user_id)` to avoid policy complexity.
-- Access log writes use `supabaseAdmin` inside server fns to keep RLS simple and ensure logs are always captured.
-- All client portal write ops blocked by RLS (no INSERT for client users on `document_vault`).
+Public hook `src/routes/api/public/hooks/einvoice-deadline-check.ts` (anon-key auth). Scheduled daily via `pg_cron`:
+- 10 days before deadline → in-app notification to CA owner.
+- 5 days before → in-app + (existing) email channel.
+- 1 day before → urgent in-app + email.
+- Day-of → dashboard banner flag + WhatsApp via existing helper.
+- Monthly (1st @ 09:00) → summary notification to owner.
 
-Approve to proceed with the migration first, then server fns + UI in a follow-up batch.
+Reuses existing notification/WhatsApp infra; no new transport.
+
+## 6. Out of scope (will follow in a separate prompt if needed)
+- Digital Signature Certificate (DSC) signing of the JSON — IRP returns the signed JSON, we store it; we don't sign locally.
+- Bulk import of historical invoices for back-dated IRN.
+- E-Way Bill generation (separate IRP endpoint).
+- True per-staff role gating beyond ca_owner for settings.
+
+## Open questions (please confirm before I start)
+
+1. **IRP credentials at build time**: I'll wire the full sandbox flow but I cannot end-to-end test without real NIC IRP sandbox credentials. OK to ship with sandbox mode default + a clearly-marked "Test Connection" button the user runs themselves?
+2. **Encryption secret**: I'll request a new secret `EINVOICE_ENCRYPTION_KEY` (32-byte base64) before running migrations. Confirm.
+3. **PDF QR placement**: confirm top-right corner is correct, vs. a dedicated footer block.
