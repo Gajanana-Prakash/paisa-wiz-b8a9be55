@@ -115,8 +115,15 @@ function ClientEInvoicesPage() {
       toast.error("No QR available");
       return;
     }
-    const img = eInvoice.qr_code_image_url ?? (await renderQrDataUrl(eInvoice.qr_code_data));
     setQr({
+      irn: eInvoice.irn,
+      ackNumber: eInvoice.ack_number,
+      ackDate: eInvoice.ack_date,
+      qrImage: eInvoice.qr_code_image_url,
+      signedJson: eInvoice.signed_invoice_json,
+      invoiceNumber,
+    });
+  };
       irn: eInvoice.irn,
       ackNumber: eInvoice.ack_number,
       ackDate: eInvoice.ack_date,
