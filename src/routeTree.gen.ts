@@ -63,6 +63,7 @@ import { Route as AuthenticatedClientDashboardComplianceRouteImport } from './ro
 import { Route as AuthenticatedCaTimesheetsMyTimesheetRouteImport } from './routes/_authenticated/ca.timesheets.my-timesheet'
 import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authenticated/ca.tasks.my-tasks'
 import { Route as AuthenticatedCaStaffUserIdRouteImport } from './routes/_authenticated/ca.staff.$userId'
+import { Route as AuthenticatedCaSettingsTallyMappingsRouteImport } from './routes/_authenticated/ca.settings.tally-mappings'
 import { Route as AuthenticatedCaSettingsReferralRouteImport } from './routes/_authenticated/ca.settings.referral'
 import { Route as AuthenticatedCaSettingsEInvoiceRouteImport } from './routes/_authenticated/ca.settings.e-invoice'
 import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from './routes/_authenticated/ca.settings.billing-subscription'
@@ -77,6 +78,8 @@ import { Route as AuthenticatedCaBillingNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedCaBillingInvoiceIdRouteImport } from './routes/_authenticated/ca.billing.$invoiceId'
 import { Route as AuthenticatedCaAgreementsNewRouteImport } from './routes/_authenticated/ca.agreements.new'
 import { Route as AuthenticatedCaAgreementsAgreementIdRouteImport } from './routes/_authenticated/ca.agreements.$agreementId'
+import { Route as AuthenticatedCaClientsClientIdTallyImportRouteImport } from './routes/_authenticated/ca.clients.$clientId.tally-import'
+import { Route as AuthenticatedCaClientsClientIdTallyExportRouteImport } from './routes/_authenticated/ca.clients.$clientId.tally-export'
 import { Route as AuthenticatedCaClientsClientIdEInvoicesRouteImport } from './routes/_authenticated/ca.clients.$clientId.e-invoices'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
@@ -378,6 +381,12 @@ const AuthenticatedCaStaffUserIdRoute =
     path: '/$userId',
     getParentRoute: () => AuthenticatedCaStaffRoute,
   } as any)
+const AuthenticatedCaSettingsTallyMappingsRoute =
+  AuthenticatedCaSettingsTallyMappingsRouteImport.update({
+    id: '/tally-mappings',
+    path: '/tally-mappings',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsReferralRoute =
   AuthenticatedCaSettingsReferralRouteImport.update({
     id: '/referral',
@@ -461,6 +470,18 @@ const AuthenticatedCaAgreementsAgreementIdRoute =
     id: '/$agreementId',
     path: '/$agreementId',
     getParentRoute: () => AuthenticatedCaAgreementsRoute,
+  } as any)
+const AuthenticatedCaClientsClientIdTallyImportRoute =
+  AuthenticatedCaClientsClientIdTallyImportRouteImport.update({
+    id: '/tally-import',
+    path: '/tally-import',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
+const AuthenticatedCaClientsClientIdTallyExportRoute =
+  AuthenticatedCaClientsClientIdTallyExportRouteImport.update({
+    id: '/tally-export',
+    path: '/tally-export',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
   } as any)
 const AuthenticatedCaClientsClientIdEInvoicesRoute =
   AuthenticatedCaClientsClientIdEInvoicesRouteImport.update({
@@ -550,6 +571,7 @@ export interface FileRoutesByFullPath {
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
+  '/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
@@ -566,6 +588,8 @@ export interface FileRoutesByFullPath {
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
+  '/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -620,6 +644,7 @@ export interface FileRoutesByTo {
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
+  '/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
@@ -636,6 +661,8 @@ export interface FileRoutesByTo {
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
+  '/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -696,6 +723,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/_authenticated/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/_authenticated/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
+  '/_authenticated/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/_authenticated/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
   '/_authenticated/ca/tasks/my-tasks': typeof AuthenticatedCaTasksMyTasksRoute
   '/_authenticated/ca/timesheets/my-timesheet': typeof AuthenticatedCaTimesheetsMyTimesheetRoute
@@ -712,6 +740,8 @@ export interface FileRoutesById {
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/_authenticated/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/_authenticated/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
+  '/_authenticated/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -772,6 +802,7 @@ export interface FileRouteTypes {
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
+    | '/ca/settings/tally-mappings'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
     | '/ca/timesheets/my-timesheet'
@@ -788,6 +819,8 @@ export interface FileRouteTypes {
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
+    | '/ca/clients/$clientId/tally-export'
+    | '/ca/clients/$clientId/tally-import'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -842,6 +875,7 @@ export interface FileRouteTypes {
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
     | '/ca/settings/referral'
+    | '/ca/settings/tally-mappings'
     | '/ca/staff/$userId'
     | '/ca/tasks/my-tasks'
     | '/ca/timesheets/my-timesheet'
@@ -858,6 +892,8 @@ export interface FileRouteTypes {
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
+    | '/ca/clients/$clientId/tally-export'
+    | '/ca/clients/$clientId/tally-import'
   id:
     | '__root__'
     | '/'
@@ -917,6 +953,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/settings/billing-subscription'
     | '/_authenticated/ca/settings/e-invoice'
     | '/_authenticated/ca/settings/referral'
+    | '/_authenticated/ca/settings/tally-mappings'
     | '/_authenticated/ca/staff/$userId'
     | '/_authenticated/ca/tasks/my-tasks'
     | '/_authenticated/ca/timesheets/my-timesheet'
@@ -933,6 +970,8 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
     | '/_authenticated/ca/clients/$clientId/e-invoices'
+    | '/_authenticated/ca/clients/$clientId/tally-export'
+    | '/_authenticated/ca/clients/$clientId/tally-import'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1327,6 +1366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaStaffUserIdRouteImport
       parentRoute: typeof AuthenticatedCaStaffRoute
     }
+    '/_authenticated/ca/settings/tally-mappings': {
+      id: '/_authenticated/ca/settings/tally-mappings'
+      path: '/tally-mappings'
+      fullPath: '/ca/settings/tally-mappings'
+      preLoaderRoute: typeof AuthenticatedCaSettingsTallyMappingsRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/referral': {
       id: '/_authenticated/ca/settings/referral'
       path: '/referral'
@@ -1424,6 +1470,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/ca/agreements/$agreementId'
       preLoaderRoute: typeof AuthenticatedCaAgreementsAgreementIdRouteImport
       parentRoute: typeof AuthenticatedCaAgreementsRoute
+    }
+    '/_authenticated/ca/clients/$clientId/tally-import': {
+      id: '/_authenticated/ca/clients/$clientId/tally-import'
+      path: '/tally-import'
+      fullPath: '/ca/clients/$clientId/tally-import'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdTallyImportRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
+    }
+    '/_authenticated/ca/clients/$clientId/tally-export': {
+      id: '/_authenticated/ca/clients/$clientId/tally-export'
+      path: '/tally-export'
+      fullPath: '/ca/clients/$clientId/tally-export'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdTallyExportRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
     }
     '/_authenticated/ca/clients/$clientId/e-invoices': {
       id: '/_authenticated/ca/clients/$clientId/e-invoices'
@@ -1535,6 +1595,8 @@ interface AuthenticatedCaClientsClientIdRouteChildren {
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
   AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
   AuthenticatedCaClientsClientIdEInvoicesRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  AuthenticatedCaClientsClientIdTallyExportRoute: typeof AuthenticatedCaClientsClientIdTallyExportRoute
+  AuthenticatedCaClientsClientIdTallyImportRoute: typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
 
 const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientIdRouteChildren =
@@ -1545,6 +1607,10 @@ const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientI
       AuthenticatedCaClientsClientIdDocumentsRoute,
     AuthenticatedCaClientsClientIdEInvoicesRoute:
       AuthenticatedCaClientsClientIdEInvoicesRoute,
+    AuthenticatedCaClientsClientIdTallyExportRoute:
+      AuthenticatedCaClientsClientIdTallyExportRoute,
+    AuthenticatedCaClientsClientIdTallyImportRoute:
+      AuthenticatedCaClientsClientIdTallyImportRoute,
   }
 
 const AuthenticatedCaClientsClientIdRouteWithChildren =
@@ -1588,6 +1654,7 @@ interface AuthenticatedCaSettingsRouteChildren {
   AuthenticatedCaSettingsBillingSubscriptionRoute: typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   AuthenticatedCaSettingsEInvoiceRoute: typeof AuthenticatedCaSettingsEInvoiceRoute
   AuthenticatedCaSettingsReferralRoute: typeof AuthenticatedCaSettingsReferralRoute
+  AuthenticatedCaSettingsTallyMappingsRoute: typeof AuthenticatedCaSettingsTallyMappingsRoute
 }
 
 const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren =
@@ -1599,6 +1666,8 @@ const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren
       AuthenticatedCaSettingsBillingSubscriptionRoute,
     AuthenticatedCaSettingsEInvoiceRoute: AuthenticatedCaSettingsEInvoiceRoute,
     AuthenticatedCaSettingsReferralRoute: AuthenticatedCaSettingsReferralRoute,
+    AuthenticatedCaSettingsTallyMappingsRoute:
+      AuthenticatedCaSettingsTallyMappingsRoute,
   }
 
 const AuthenticatedCaSettingsRouteWithChildren =
