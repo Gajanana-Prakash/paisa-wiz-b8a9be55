@@ -1791,6 +1791,150 @@ export type Database = {
         }
         Relationships: []
       }
+      tally_exports: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          created_at: string
+          export_type: Database["public"]["Enums"]["tally_export_type"]
+          file_name: string | null
+          file_url: string | null
+          generated_by: string
+          id: string
+          period_from: string | null
+          period_to: string | null
+          record_count: number
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          created_at?: string
+          export_type: Database["public"]["Enums"]["tally_export_type"]
+          file_name?: string | null
+          file_url?: string | null
+          generated_by: string
+          id?: string
+          period_from?: string | null
+          period_to?: string | null
+          record_count?: number
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          created_at?: string
+          export_type?: Database["public"]["Enums"]["tally_export_type"]
+          file_name?: string | null
+          file_url?: string | null
+          generated_by?: string
+          id?: string
+          period_from?: string | null
+          period_to?: string | null
+          record_count?: number
+        }
+        Relationships: []
+      }
+      tally_imports: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          created_at: string
+          error_log: Json
+          failed_records: number
+          file_name: string
+          file_url: string | null
+          id: string
+          import_status: Database["public"]["Enums"]["tally_import_status"]
+          import_type: Database["public"]["Enums"]["tally_import_type"]
+          imported_by: string
+          imported_records: number
+          period_from: string | null
+          period_to: string | null
+          staging_data: Json
+          tally_version: Database["public"]["Enums"]["tally_version"]
+          total_records: number
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          created_at?: string
+          error_log?: Json
+          failed_records?: number
+          file_name: string
+          file_url?: string | null
+          id?: string
+          import_status?: Database["public"]["Enums"]["tally_import_status"]
+          import_type: Database["public"]["Enums"]["tally_import_type"]
+          imported_by: string
+          imported_records?: number
+          period_from?: string | null
+          period_to?: string | null
+          staging_data?: Json
+          tally_version?: Database["public"]["Enums"]["tally_version"]
+          total_records?: number
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          created_at?: string
+          error_log?: Json
+          failed_records?: number
+          file_name?: string
+          file_url?: string | null
+          id?: string
+          import_status?: Database["public"]["Enums"]["tally_import_status"]
+          import_type?: Database["public"]["Enums"]["tally_import_type"]
+          imported_by?: string
+          imported_records?: number
+          period_from?: string | null
+          period_to?: string | null
+          staging_data?: Json
+          tally_version?: Database["public"]["Enums"]["tally_version"]
+          total_records?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tally_mappings: {
+        Row: {
+          ca_firm_id: string
+          created_at: string
+          created_by: string | null
+          gst_category: Database["public"]["Enums"]["tally_gst_category"]
+          gst_rate: number
+          hsn_code: string | null
+          id: string
+          is_confirmed: boolean
+          tally_ledger_name: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string
+          created_by?: string | null
+          gst_category: Database["public"]["Enums"]["tally_gst_category"]
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          is_confirmed?: boolean
+          tally_ledger_name: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string
+          created_by?: string | null
+          gst_category?: Database["public"]["Enums"]["tally_gst_category"]
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          is_confirmed?: boolean
+          tally_ledger_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       task_attachments: {
         Row: {
           created_at: string
@@ -2187,6 +2331,25 @@ export type Database = {
         | "stale_upload_days"
         | "manual"
       service_unit: "FIXED" | "PER_RETURN" | "PER_HOUR" | "PER_MONTH"
+      tally_export_type:
+        | "GSTR1_JSON"
+        | "GSTR1_EXCEL"
+        | "TALLY_XML"
+        | "TALLY_VOUCHERS"
+      tally_gst_category: "SALES" | "PURCHASE" | "EXPENSE" | "ASSET"
+      tally_import_status:
+        | "UPLOADED"
+        | "PROCESSING"
+        | "COMPLETED"
+        | "FAILED"
+        | "PARTIAL"
+      tally_import_type:
+        | "SALES_LEDGER"
+        | "PURCHASE_LEDGER"
+        | "GSTR1_DATA"
+        | "GSTR2_DATA"
+        | "FULL_BACKUP"
+      tally_version: "TALLY_ERP9" | "TALLYPRIME" | "UNKNOWN"
       task_priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
       task_status: "TODO" | "IN_PROGRESS" | "REVIEW" | "COMPLETED" | "CANCELLED"
       task_type:
@@ -2449,6 +2612,28 @@ export const Constants = {
         "manual",
       ],
       service_unit: ["FIXED", "PER_RETURN", "PER_HOUR", "PER_MONTH"],
+      tally_export_type: [
+        "GSTR1_JSON",
+        "GSTR1_EXCEL",
+        "TALLY_XML",
+        "TALLY_VOUCHERS",
+      ],
+      tally_gst_category: ["SALES", "PURCHASE", "EXPENSE", "ASSET"],
+      tally_import_status: [
+        "UPLOADED",
+        "PROCESSING",
+        "COMPLETED",
+        "FAILED",
+        "PARTIAL",
+      ],
+      tally_import_type: [
+        "SALES_LEDGER",
+        "PURCHASE_LEDGER",
+        "GSTR1_DATA",
+        "GSTR2_DATA",
+        "FULL_BACKUP",
+      ],
+      tally_version: ["TALLY_ERP9", "TALLYPRIME", "UNKNOWN"],
       task_priority: ["LOW", "MEDIUM", "HIGH", "URGENT"],
       task_status: ["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED", "CANCELLED"],
       task_type: [
