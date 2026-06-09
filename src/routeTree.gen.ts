@@ -82,6 +82,7 @@ import { Route as AuthenticatedCaAgreementsNewRouteImport } from './routes/_auth
 import { Route as AuthenticatedCaAgreementsAgreementIdRouteImport } from './routes/_authenticated/ca.agreements.$agreementId'
 import { Route as AuthenticatedCaClientsClientIdTallyImportRouteImport } from './routes/_authenticated/ca.clients.$clientId.tally-import'
 import { Route as AuthenticatedCaClientsClientIdTallyExportRouteImport } from './routes/_authenticated/ca.clients.$clientId.tally-export'
+import { Route as AuthenticatedCaClientsClientIdEwayBillsRouteImport } from './routes/_authenticated/ca.clients.$clientId.eway-bills'
 import { Route as AuthenticatedCaClientsClientIdEInvoicesRouteImport } from './routes/_authenticated/ca.clients.$clientId.e-invoices'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
@@ -497,6 +498,12 @@ const AuthenticatedCaClientsClientIdTallyExportRoute =
     path: '/tally-export',
     getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
   } as any)
+const AuthenticatedCaClientsClientIdEwayBillsRoute =
+  AuthenticatedCaClientsClientIdEwayBillsRouteImport.update({
+    id: '/eway-bills',
+    path: '/eway-bills',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
 const AuthenticatedCaClientsClientIdEInvoicesRoute =
   AuthenticatedCaClientsClientIdEInvoicesRouteImport.update({
     id: '/e-invoices',
@@ -604,6 +611,7 @@ export interface FileRoutesByFullPath {
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/ca/clients/$clientId/eway-bills': typeof AuthenticatedCaClientsClientIdEwayBillsRoute
   '/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
   '/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
@@ -679,6 +687,7 @@ export interface FileRoutesByTo {
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/ca/clients/$clientId/eway-bills': typeof AuthenticatedCaClientsClientIdEwayBillsRoute
   '/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
   '/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
@@ -760,6 +769,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/_authenticated/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  '/_authenticated/ca/clients/$clientId/eway-bills': typeof AuthenticatedCaClientsClientIdEwayBillsRoute
   '/_authenticated/ca/clients/$clientId/tally-export': typeof AuthenticatedCaClientsClientIdTallyExportRoute
   '/_authenticated/ca/clients/$clientId/tally-import': typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
@@ -841,6 +851,7 @@ export interface FileRouteTypes {
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
+    | '/ca/clients/$clientId/eway-bills'
     | '/ca/clients/$clientId/tally-export'
     | '/ca/clients/$clientId/tally-import'
   fileRoutesByTo: FileRoutesByTo
@@ -916,6 +927,7 @@ export interface FileRouteTypes {
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
+    | '/ca/clients/$clientId/eway-bills'
     | '/ca/clients/$clientId/tally-export'
     | '/ca/clients/$clientId/tally-import'
   id:
@@ -996,6 +1008,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
     | '/_authenticated/ca/clients/$clientId/e-invoices'
+    | '/_authenticated/ca/clients/$clientId/eway-bills'
     | '/_authenticated/ca/clients/$clientId/tally-export'
     | '/_authenticated/ca/clients/$clientId/tally-import'
   fileRoutesById: FileRoutesById
@@ -1525,6 +1538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaClientsClientIdTallyExportRouteImport
       parentRoute: typeof AuthenticatedCaClientsClientIdRoute
     }
+    '/_authenticated/ca/clients/$clientId/eway-bills': {
+      id: '/_authenticated/ca/clients/$clientId/eway-bills'
+      path: '/eway-bills'
+      fullPath: '/ca/clients/$clientId/eway-bills'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdEwayBillsRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
+    }
     '/_authenticated/ca/clients/$clientId/e-invoices': {
       id: '/_authenticated/ca/clients/$clientId/e-invoices'
       path: '/e-invoices'
@@ -1635,6 +1655,7 @@ interface AuthenticatedCaClientsClientIdRouteChildren {
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
   AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
   AuthenticatedCaClientsClientIdEInvoicesRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRoute
+  AuthenticatedCaClientsClientIdEwayBillsRoute: typeof AuthenticatedCaClientsClientIdEwayBillsRoute
   AuthenticatedCaClientsClientIdTallyExportRoute: typeof AuthenticatedCaClientsClientIdTallyExportRoute
   AuthenticatedCaClientsClientIdTallyImportRoute: typeof AuthenticatedCaClientsClientIdTallyImportRoute
 }
@@ -1647,6 +1668,8 @@ const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientI
       AuthenticatedCaClientsClientIdDocumentsRoute,
     AuthenticatedCaClientsClientIdEInvoicesRoute:
       AuthenticatedCaClientsClientIdEInvoicesRoute,
+    AuthenticatedCaClientsClientIdEwayBillsRoute:
+      AuthenticatedCaClientsClientIdEwayBillsRoute,
     AuthenticatedCaClientsClientIdTallyExportRoute:
       AuthenticatedCaClientsClientIdTallyExportRoute,
     AuthenticatedCaClientsClientIdTallyImportRoute:

@@ -297,6 +297,17 @@ function SettingsPage() {
         </Link>
       </section>
 
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">E-Way Bill</h2>
+        <p className="text-xs text-muted-foreground mt-1">Generate EWBs for goods movement above ₹50,000, track validity, and manage NIC EWB credentials. Currently running in mock mode.</p>
+        <Link to="/ca/settings/eway-bill" className="inline-block mt-4">
+          <Button variant="outline" size="sm">E-Way Bill configuration</Button>
+        </Link>
+        <Link to="/ca/eway-bills" className="inline-block mt-4 ml-2">
+          <Button size="sm" variant="ghost">Open EWB dashboard</Button>
+        </Link>
+      </section>
+
       <div className="text-center">
         <Link to="/ca/dashboard" className="text-xs text-muted-foreground hover:text-foreground">← Back to dashboard</Link>
       </div>
