@@ -1343,6 +1343,267 @@ export type Database = {
           },
         ]
       }
+      eway_bill_items: {
+        Row: {
+          cess_rate: number | null
+          cgst_rate: number
+          created_at: string
+          eway_bill_id: string
+          hsn_code: string | null
+          id: string
+          igst_rate: number
+          product_name: string
+          quantity: number
+          sgst_rate: number
+          taxable_value: number
+          unit: string | null
+        }
+        Insert: {
+          cess_rate?: number | null
+          cgst_rate?: number
+          created_at?: string
+          eway_bill_id: string
+          hsn_code?: string | null
+          id?: string
+          igst_rate?: number
+          product_name: string
+          quantity?: number
+          sgst_rate?: number
+          taxable_value?: number
+          unit?: string | null
+        }
+        Update: {
+          cess_rate?: number | null
+          cgst_rate?: number
+          created_at?: string
+          eway_bill_id?: string
+          hsn_code?: string | null
+          id?: string
+          igst_rate?: number
+          product_name?: string
+          quantity?: number
+          sgst_rate?: number
+          taxable_value?: number
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eway_bill_items_eway_bill_id_fkey"
+            columns: ["eway_bill_id"]
+            isOneToOne: false
+            referencedRelation: "eway_bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eway_bill_settings: {
+        Row: {
+          auto_link_with_einvoice: boolean
+          ca_firm_id: string
+          created_at: string
+          default_transport_mode: Database["public"]["Enums"]["ewb_transport_mode"]
+          default_vehicle_type: Database["public"]["Enums"]["ewb_vehicle_type"]
+          ewb_password: string | null
+          ewb_username: string | null
+          gstin: string | null
+          id: string
+          is_configured: boolean
+          last_connected_at: string | null
+          sandbox_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          auto_link_with_einvoice?: boolean
+          ca_firm_id: string
+          created_at?: string
+          default_transport_mode?: Database["public"]["Enums"]["ewb_transport_mode"]
+          default_vehicle_type?: Database["public"]["Enums"]["ewb_vehicle_type"]
+          ewb_password?: string | null
+          ewb_username?: string | null
+          gstin?: string | null
+          id?: string
+          is_configured?: boolean
+          last_connected_at?: string | null
+          sandbox_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auto_link_with_einvoice?: boolean
+          ca_firm_id?: string
+          created_at?: string
+          default_transport_mode?: Database["public"]["Enums"]["ewb_transport_mode"]
+          default_vehicle_type?: Database["public"]["Enums"]["ewb_vehicle_type"]
+          ewb_password?: string | null
+          ewb_username?: string | null
+          gstin?: string | null
+          id?: string
+          is_configured?: boolean
+          last_connected_at?: string | null
+          sandbox_mode?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eway_bill_settings_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: true
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eway_bills: {
+        Row: {
+          ca_firm_id: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          client_id: string
+          created_at: string
+          distance_km: number
+          document_date: string
+          document_number: string
+          document_type: Database["public"]["Enums"]["ewb_document_type"]
+          e_invoice_id: string | null
+          ewb_date: string | null
+          ewb_number: string | null
+          ewb_status: Database["public"]["Enums"]["ewb_status"]
+          ewb_valid_until: string | null
+          extension_count: number
+          from_gstin: string | null
+          from_pincode: string | null
+          from_place: string | null
+          from_state_code: string | null
+          generated_by: string | null
+          hsn_code: string | null
+          id: string
+          invoice_id: string | null
+          raw_api_response: Json | null
+          supply_type: Database["public"]["Enums"]["ewb_supply_type"]
+          to_gstin: string | null
+          to_pincode: string | null
+          to_place: string | null
+          to_state_code: string | null
+          to_trade_name: string | null
+          total_value: number
+          transaction_type: Database["public"]["Enums"]["ewb_transaction_type"]
+          transport_mode: Database["public"]["Enums"]["ewb_transport_mode"]
+          transporter_id: string | null
+          transporter_name: string | null
+          updated_at: string
+          vehicle_number: string | null
+          vehicle_type: Database["public"]["Enums"]["ewb_vehicle_type"]
+        }
+        Insert: {
+          ca_firm_id: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          client_id: string
+          created_at?: string
+          distance_km?: number
+          document_date: string
+          document_number: string
+          document_type?: Database["public"]["Enums"]["ewb_document_type"]
+          e_invoice_id?: string | null
+          ewb_date?: string | null
+          ewb_number?: string | null
+          ewb_status?: Database["public"]["Enums"]["ewb_status"]
+          ewb_valid_until?: string | null
+          extension_count?: number
+          from_gstin?: string | null
+          from_pincode?: string | null
+          from_place?: string | null
+          from_state_code?: string | null
+          generated_by?: string | null
+          hsn_code?: string | null
+          id?: string
+          invoice_id?: string | null
+          raw_api_response?: Json | null
+          supply_type: Database["public"]["Enums"]["ewb_supply_type"]
+          to_gstin?: string | null
+          to_pincode?: string | null
+          to_place?: string | null
+          to_state_code?: string | null
+          to_trade_name?: string | null
+          total_value?: number
+          transaction_type?: Database["public"]["Enums"]["ewb_transaction_type"]
+          transport_mode?: Database["public"]["Enums"]["ewb_transport_mode"]
+          transporter_id?: string | null
+          transporter_name?: string | null
+          updated_at?: string
+          vehicle_number?: string | null
+          vehicle_type?: Database["public"]["Enums"]["ewb_vehicle_type"]
+        }
+        Update: {
+          ca_firm_id?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          client_id?: string
+          created_at?: string
+          distance_km?: number
+          document_date?: string
+          document_number?: string
+          document_type?: Database["public"]["Enums"]["ewb_document_type"]
+          e_invoice_id?: string | null
+          ewb_date?: string | null
+          ewb_number?: string | null
+          ewb_status?: Database["public"]["Enums"]["ewb_status"]
+          ewb_valid_until?: string | null
+          extension_count?: number
+          from_gstin?: string | null
+          from_pincode?: string | null
+          from_place?: string | null
+          from_state_code?: string | null
+          generated_by?: string | null
+          hsn_code?: string | null
+          id?: string
+          invoice_id?: string | null
+          raw_api_response?: Json | null
+          supply_type?: Database["public"]["Enums"]["ewb_supply_type"]
+          to_gstin?: string | null
+          to_pincode?: string | null
+          to_place?: string | null
+          to_state_code?: string | null
+          to_trade_name?: string | null
+          total_value?: number
+          transaction_type?: Database["public"]["Enums"]["ewb_transaction_type"]
+          transport_mode?: Database["public"]["Enums"]["ewb_transport_mode"]
+          transporter_id?: string | null
+          transporter_name?: string | null
+          updated_at?: string
+          vehicle_number?: string | null
+          vehicle_type?: Database["public"]["Enums"]["ewb_vehicle_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eway_bills_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eway_bills_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eway_bills_e_invoice_id_fkey"
+            columns: ["e_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "e_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eway_bills_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -2294,6 +2555,22 @@ export type Database = {
         | "PRIVATE_LTD"
         | "PUBLIC_LTD"
         | "TRUST"
+      ewb_document_type:
+        | "TAX_INVOICE"
+        | "BILL_OF_SUPPLY"
+        | "CHALLAN"
+        | "CREDIT_NOTE"
+        | "BILL_OF_ENTRY"
+        | "OTHERS"
+      ewb_status: "ACTIVE" | "CANCELLED" | "EXPIRED" | "EXTENDED"
+      ewb_supply_type: "OUTWARD" | "INWARD"
+      ewb_transaction_type:
+        | "REGULAR"
+        | "BILL_TO_SHIP_TO"
+        | "BILL_FROM_DISPATCH_FROM"
+        | "COMBINATION"
+      ewb_transport_mode: "ROAD" | "RAIL" | "AIR" | "SHIP"
+      ewb_vehicle_type: "REGULAR" | "OVER_DIMENSIONAL_CARGO"
       invoice_status:
         | "uploaded"
         | "processing"
@@ -2570,6 +2847,24 @@ export const Constants = {
         "PUBLIC_LTD",
         "TRUST",
       ],
+      ewb_document_type: [
+        "TAX_INVOICE",
+        "BILL_OF_SUPPLY",
+        "CHALLAN",
+        "CREDIT_NOTE",
+        "BILL_OF_ENTRY",
+        "OTHERS",
+      ],
+      ewb_status: ["ACTIVE", "CANCELLED", "EXPIRED", "EXTENDED"],
+      ewb_supply_type: ["OUTWARD", "INWARD"],
+      ewb_transaction_type: [
+        "REGULAR",
+        "BILL_TO_SHIP_TO",
+        "BILL_FROM_DISPATCH_FROM",
+        "COMBINATION",
+      ],
+      ewb_transport_mode: ["ROAD", "RAIL", "AIR", "SHIP"],
+      ewb_vehicle_type: ["REGULAR", "OVER_DIMENSIONAL_CARGO"],
       invoice_status: [
         "uploaded",
         "processing",
