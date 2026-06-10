@@ -70,6 +70,7 @@ import { Route as AuthenticatedCaSettingsEwayBillRouteImport } from './routes/_a
 import { Route as AuthenticatedCaSettingsEInvoiceRouteImport } from './routes/_authenticated/ca.settings.e-invoice'
 import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from './routes/_authenticated/ca.settings.billing-subscription'
 import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_authenticated/ca.settings.billing'
+import { Route as AuthenticatedCaSettingsBankReconciliationRouteImport } from './routes/_authenticated/ca.settings.bank-reconciliation'
 import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
 import { Route as AuthenticatedCaReportsTimesheetsRouteImport } from './routes/_authenticated/ca.reports.timesheets'
 import { Route as AuthenticatedCaMyProfileCpeRouteImport } from './routes/_authenticated/ca.my-profile.cpe'
@@ -86,6 +87,7 @@ import { Route as AuthenticatedCaClientsClientIdEwayBillsRouteImport } from './r
 import { Route as AuthenticatedCaClientsClientIdEInvoicesRouteImport } from './routes/_authenticated/ca.clients.$clientId.e-invoices'
 import { Route as AuthenticatedCaClientsClientIdDocumentsRouteImport } from './routes/_authenticated/ca.clients.$clientId.documents'
 import { Route as AuthenticatedCaClientsClientIdComplianceRouteImport } from './routes/_authenticated/ca.clients.$clientId.compliance'
+import { Route as AuthenticatedCaClientsClientIdBankReconciliationRouteImport } from './routes/_authenticated/ca.clients.$clientId.bank-reconciliation'
 import { Route as AuthenticatedCaBillingInvoiceIdEditRouteImport } from './routes/_authenticated/ca.billing.$invoiceId.edit'
 import { Route as AuthenticatedCaAgreementsAgreementIdEditRouteImport } from './routes/_authenticated/ca.agreements.$agreementId.edit'
 
@@ -426,6 +428,12 @@ const AuthenticatedCaSettingsBillingRoute =
     path: '/billing',
     getParentRoute: () => AuthenticatedCaSettingsRoute,
   } as any)
+const AuthenticatedCaSettingsBankReconciliationRoute =
+  AuthenticatedCaSettingsBankReconciliationRouteImport.update({
+    id: '/bank-reconciliation',
+    path: '/bank-reconciliation',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsAgreementTemplatesRoute =
   AuthenticatedCaSettingsAgreementTemplatesRouteImport.update({
     id: '/agreement-templates',
@@ -522,6 +530,12 @@ const AuthenticatedCaClientsClientIdComplianceRoute =
     path: '/compliance',
     getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
   } as any)
+const AuthenticatedCaClientsClientIdBankReconciliationRoute =
+  AuthenticatedCaClientsClientIdBankReconciliationRouteImport.update({
+    id: '/bank-reconciliation',
+    path: '/bank-reconciliation',
+    getParentRoute: () => AuthenticatedCaClientsClientIdRoute,
+  } as any)
 const AuthenticatedCaBillingInvoiceIdEditRoute =
   AuthenticatedCaBillingInvoiceIdEditRouteImport.update({
     id: '/edit',
@@ -589,6 +603,7 @@ export interface FileRoutesByFullPath {
   '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
+  '/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
@@ -608,6 +623,7 @@ export interface FileRoutesByFullPath {
   '/client/dashboard/': typeof AuthenticatedClientDashboardIndexRoute
   '/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
+  '/ca/clients/$clientId/bank-reconciliation': typeof AuthenticatedCaClientsClientIdBankReconciliationRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
@@ -665,6 +681,7 @@ export interface FileRoutesByTo {
   '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
+  '/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
   '/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
@@ -684,6 +701,7 @@ export interface FileRoutesByTo {
   '/client/dashboard': typeof AuthenticatedClientDashboardIndexRoute
   '/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
+  '/ca/clients/$clientId/bank-reconciliation': typeof AuthenticatedCaClientsClientIdBankReconciliationRoute
   '/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
@@ -747,6 +765,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/_authenticated/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
+  '/_authenticated/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
   '/_authenticated/ca/settings/billing': typeof AuthenticatedCaSettingsBillingRoute
   '/_authenticated/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/_authenticated/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
@@ -766,6 +785,7 @@ export interface FileRoutesById {
   '/_authenticated/client/dashboard/': typeof AuthenticatedClientDashboardIndexRoute
   '/_authenticated/ca/agreements/$agreementId/edit': typeof AuthenticatedCaAgreementsAgreementIdEditRoute
   '/_authenticated/ca/billing/$invoiceId/edit': typeof AuthenticatedCaBillingInvoiceIdEditRoute
+  '/_authenticated/ca/clients/$clientId/bank-reconciliation': typeof AuthenticatedCaClientsClientIdBankReconciliationRoute
   '/_authenticated/ca/clients/$clientId/compliance': typeof AuthenticatedCaClientsClientIdComplianceRoute
   '/_authenticated/ca/clients/$clientId/documents': typeof AuthenticatedCaClientsClientIdDocumentsRoute
   '/_authenticated/ca/clients/$clientId/e-invoices': typeof AuthenticatedCaClientsClientIdEInvoicesRoute
@@ -829,6 +849,7 @@ export interface FileRouteTypes {
     | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
+    | '/ca/settings/bank-reconciliation'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
@@ -848,6 +869,7 @@ export interface FileRouteTypes {
     | '/client/dashboard/'
     | '/ca/agreements/$agreementId/edit'
     | '/ca/billing/$invoiceId/edit'
+    | '/ca/clients/$clientId/bank-reconciliation'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
@@ -905,6 +927,7 @@ export interface FileRouteTypes {
     | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
+    | '/ca/settings/bank-reconciliation'
     | '/ca/settings/billing'
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
@@ -924,6 +947,7 @@ export interface FileRouteTypes {
     | '/client/dashboard'
     | '/ca/agreements/$agreementId/edit'
     | '/ca/billing/$invoiceId/edit'
+    | '/ca/clients/$clientId/bank-reconciliation'
     | '/ca/clients/$clientId/compliance'
     | '/ca/clients/$clientId/documents'
     | '/ca/clients/$clientId/e-invoices'
@@ -986,6 +1010,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/my-profile/cpe'
     | '/_authenticated/ca/reports/timesheets'
     | '/_authenticated/ca/settings/agreement-templates'
+    | '/_authenticated/ca/settings/bank-reconciliation'
     | '/_authenticated/ca/settings/billing'
     | '/_authenticated/ca/settings/billing-subscription'
     | '/_authenticated/ca/settings/e-invoice'
@@ -1005,6 +1030,7 @@ export interface FileRouteTypes {
     | '/_authenticated/client/dashboard/'
     | '/_authenticated/ca/agreements/$agreementId/edit'
     | '/_authenticated/ca/billing/$invoiceId/edit'
+    | '/_authenticated/ca/clients/$clientId/bank-reconciliation'
     | '/_authenticated/ca/clients/$clientId/compliance'
     | '/_authenticated/ca/clients/$clientId/documents'
     | '/_authenticated/ca/clients/$clientId/e-invoices'
@@ -1454,6 +1480,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaSettingsBillingRouteImport
       parentRoute: typeof AuthenticatedCaSettingsRoute
     }
+    '/_authenticated/ca/settings/bank-reconciliation': {
+      id: '/_authenticated/ca/settings/bank-reconciliation'
+      path: '/bank-reconciliation'
+      fullPath: '/ca/settings/bank-reconciliation'
+      preLoaderRoute: typeof AuthenticatedCaSettingsBankReconciliationRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/agreement-templates': {
       id: '/_authenticated/ca/settings/agreement-templates'
       path: '/agreement-templates'
@@ -1566,6 +1599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaClientsClientIdComplianceRouteImport
       parentRoute: typeof AuthenticatedCaClientsClientIdRoute
     }
+    '/_authenticated/ca/clients/$clientId/bank-reconciliation': {
+      id: '/_authenticated/ca/clients/$clientId/bank-reconciliation'
+      path: '/bank-reconciliation'
+      fullPath: '/ca/clients/$clientId/bank-reconciliation'
+      preLoaderRoute: typeof AuthenticatedCaClientsClientIdBankReconciliationRouteImport
+      parentRoute: typeof AuthenticatedCaClientsClientIdRoute
+    }
     '/_authenticated/ca/billing/$invoiceId/edit': {
       id: '/_authenticated/ca/billing/$invoiceId/edit'
       path: '/edit'
@@ -1652,6 +1692,7 @@ const AuthenticatedCaBillingRouteWithChildren =
   )
 
 interface AuthenticatedCaClientsClientIdRouteChildren {
+  AuthenticatedCaClientsClientIdBankReconciliationRoute: typeof AuthenticatedCaClientsClientIdBankReconciliationRoute
   AuthenticatedCaClientsClientIdComplianceRoute: typeof AuthenticatedCaClientsClientIdComplianceRoute
   AuthenticatedCaClientsClientIdDocumentsRoute: typeof AuthenticatedCaClientsClientIdDocumentsRoute
   AuthenticatedCaClientsClientIdEInvoicesRoute: typeof AuthenticatedCaClientsClientIdEInvoicesRoute
@@ -1662,6 +1703,8 @@ interface AuthenticatedCaClientsClientIdRouteChildren {
 
 const AuthenticatedCaClientsClientIdRouteChildren: AuthenticatedCaClientsClientIdRouteChildren =
   {
+    AuthenticatedCaClientsClientIdBankReconciliationRoute:
+      AuthenticatedCaClientsClientIdBankReconciliationRoute,
     AuthenticatedCaClientsClientIdComplianceRoute:
       AuthenticatedCaClientsClientIdComplianceRoute,
     AuthenticatedCaClientsClientIdDocumentsRoute:
@@ -1713,6 +1756,7 @@ const AuthenticatedCaReportsRouteWithChildren =
 
 interface AuthenticatedCaSettingsRouteChildren {
   AuthenticatedCaSettingsAgreementTemplatesRoute: typeof AuthenticatedCaSettingsAgreementTemplatesRoute
+  AuthenticatedCaSettingsBankReconciliationRoute: typeof AuthenticatedCaSettingsBankReconciliationRoute
   AuthenticatedCaSettingsBillingRoute: typeof AuthenticatedCaSettingsBillingRoute
   AuthenticatedCaSettingsBillingSubscriptionRoute: typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   AuthenticatedCaSettingsEInvoiceRoute: typeof AuthenticatedCaSettingsEInvoiceRoute
@@ -1725,6 +1769,8 @@ const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren
   {
     AuthenticatedCaSettingsAgreementTemplatesRoute:
       AuthenticatedCaSettingsAgreementTemplatesRoute,
+    AuthenticatedCaSettingsBankReconciliationRoute:
+      AuthenticatedCaSettingsBankReconciliationRoute,
     AuthenticatedCaSettingsBillingRoute: AuthenticatedCaSettingsBillingRoute,
     AuthenticatedCaSettingsBillingSubscriptionRoute:
       AuthenticatedCaSettingsBillingSubscriptionRoute,

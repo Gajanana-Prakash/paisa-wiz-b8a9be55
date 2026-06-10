@@ -53,6 +53,232 @@ export type Database = {
         }
         Relationships: []
       }
+      bank_recon_settings: {
+        Row: {
+          auto_exclude_below: number
+          ca_firm_id: string
+          created_at: string
+          date_window_days: number
+          match_tolerance: number
+          updated_at: string
+        }
+        Insert: {
+          auto_exclude_below?: number
+          ca_firm_id: string
+          created_at?: string
+          date_window_days?: number
+          match_tolerance?: number
+          updated_at?: string
+        }
+        Update: {
+          auto_exclude_below?: number
+          ca_firm_id?: string
+          created_at?: string
+          date_window_days?: number
+          match_tolerance?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_recon_settings_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: true
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_statements: {
+        Row: {
+          account_number: string | null
+          account_type: Database["public"]["Enums"]["bank_account_type"]
+          bank_name: string
+          ca_firm_id: string
+          client_id: string
+          closing_balance: number | null
+          created_at: string
+          file_type: Database["public"]["Enums"]["bank_statement_file_type"]
+          file_url: string
+          id: string
+          opening_balance: number | null
+          parse_error: string | null
+          reconciled_count: number | null
+          reconciliation_status: Database["public"]["Enums"]["bank_recon_status"]
+          statement_period_from: string | null
+          statement_period_to: string | null
+          total_credits: number | null
+          total_debits: number | null
+          transaction_count: number | null
+          unreconciled_count: number | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: Database["public"]["Enums"]["bank_account_type"]
+          bank_name: string
+          ca_firm_id: string
+          client_id: string
+          closing_balance?: number | null
+          created_at?: string
+          file_type: Database["public"]["Enums"]["bank_statement_file_type"]
+          file_url: string
+          id?: string
+          opening_balance?: number | null
+          parse_error?: string | null
+          reconciled_count?: number | null
+          reconciliation_status?: Database["public"]["Enums"]["bank_recon_status"]
+          statement_period_from?: string | null
+          statement_period_to?: string | null
+          total_credits?: number | null
+          total_debits?: number | null
+          transaction_count?: number | null
+          unreconciled_count?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: Database["public"]["Enums"]["bank_account_type"]
+          bank_name?: string
+          ca_firm_id?: string
+          client_id?: string
+          closing_balance?: number | null
+          created_at?: string
+          file_type?: Database["public"]["Enums"]["bank_statement_file_type"]
+          file_url?: string
+          id?: string
+          opening_balance?: number | null
+          parse_error?: string | null
+          reconciled_count?: number | null
+          reconciliation_status?: Database["public"]["Enums"]["bank_recon_status"]
+          statement_period_from?: string | null
+          statement_period_to?: string | null
+          total_credits?: number | null
+          total_debits?: number | null
+          transaction_count?: number | null
+          unreconciled_count?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_statements_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_statements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          ca_firm_id: string
+          category: Database["public"]["Enums"]["bank_txn_category"]
+          cleaned_description: string | null
+          client_id: string
+          created_at: string
+          description: string
+          id: string
+          match_confidence: number | null
+          matched_by: Database["public"]["Enums"]["bank_txn_matched_by"] | null
+          matched_invoice_id: string | null
+          notes: string | null
+          reconciliation_status: Database["public"]["Enums"]["bank_txn_match_status"]
+          reference_number: string | null
+          row_index: number | null
+          statement_id: string
+          transaction_date: string
+          transaction_type: Database["public"]["Enums"]["bank_txn_type"]
+          updated_at: string
+          value_date: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          ca_firm_id: string
+          category?: Database["public"]["Enums"]["bank_txn_category"]
+          cleaned_description?: string | null
+          client_id: string
+          created_at?: string
+          description: string
+          id?: string
+          match_confidence?: number | null
+          matched_by?: Database["public"]["Enums"]["bank_txn_matched_by"] | null
+          matched_invoice_id?: string | null
+          notes?: string | null
+          reconciliation_status?: Database["public"]["Enums"]["bank_txn_match_status"]
+          reference_number?: string | null
+          row_index?: number | null
+          statement_id: string
+          transaction_date: string
+          transaction_type: Database["public"]["Enums"]["bank_txn_type"]
+          updated_at?: string
+          value_date?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          ca_firm_id?: string
+          category?: Database["public"]["Enums"]["bank_txn_category"]
+          cleaned_description?: string | null
+          client_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          match_confidence?: number | null
+          matched_by?: Database["public"]["Enums"]["bank_txn_matched_by"] | null
+          matched_invoice_id?: string | null
+          notes?: string | null
+          reconciliation_status?: Database["public"]["Enums"]["bank_txn_match_status"]
+          reference_number?: string | null
+          row_index?: number | null
+          statement_id?: string
+          transaction_date?: string
+          transaction_type?: Database["public"]["Enums"]["bank_txn_type"]
+          updated_at?: string
+          value_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_matched_invoice_id_fkey"
+            columns: ["matched_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_statement_id_fkey"
+            columns: ["statement_id"]
+            isOneToOne: false
+            referencedRelation: "bank_statements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_client_retainers: {
         Row: {
           amount: number
@@ -1917,6 +2143,53 @@ export type Database = {
         }
         Relationships: []
       }
+      reconciliation_rules: {
+        Row: {
+          amount_max: number | null
+          amount_min: number | null
+          ca_firm_id: string
+          category: Database["public"]["Enums"]["bank_txn_category"]
+          created_at: string
+          description_contains: string
+          id: string
+          is_active: boolean
+          rule_name: string
+          updated_at: string
+        }
+        Insert: {
+          amount_max?: number | null
+          amount_min?: number | null
+          ca_firm_id: string
+          category: Database["public"]["Enums"]["bank_txn_category"]
+          created_at?: string
+          description_contains: string
+          id?: string
+          is_active?: boolean
+          rule_name: string
+          updated_at?: string
+        }
+        Update: {
+          amount_max?: number | null
+          amount_min?: number | null
+          ca_firm_id?: string
+          category?: Database["public"]["Enums"]["bank_txn_category"]
+          created_at?: string
+          description_contains?: string
+          id?: string
+          is_active?: boolean
+          rule_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_rules_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reminder_rules: {
         Row: {
           ca_firm_id: string
@@ -2504,6 +2777,25 @@ export type Database = {
         | "ca_staff"
         | "client_owner"
         | "client_employee"
+      bank_account_type: "CURRENT" | "SAVINGS" | "OD" | "CC"
+      bank_recon_status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
+      bank_statement_file_type: "PDF" | "EXCEL" | "CSV"
+      bank_txn_category:
+        | "SALES_RECEIPT"
+        | "PURCHASE_PAYMENT"
+        | "TAX_PAYMENT"
+        | "SALARY"
+        | "BANK_CHARGES"
+        | "LOAN"
+        | "INTEREST"
+        | "UNKNOWN"
+      bank_txn_match_status:
+        | "UNMATCHED"
+        | "MATCHED"
+        | "MANUALLY_MATCHED"
+        | "EXCLUDED"
+      bank_txn_matched_by: "AI" | "MANUAL" | "AUTO_RULE"
+      bank_txn_type: "CREDIT" | "DEBIT"
       ca_invoice_status:
         | "DRAFT"
         | "SENT"
@@ -2796,6 +3088,27 @@ export const Constants = {
         "client_owner",
         "client_employee",
       ],
+      bank_account_type: ["CURRENT", "SAVINGS", "OD", "CC"],
+      bank_recon_status: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
+      bank_statement_file_type: ["PDF", "EXCEL", "CSV"],
+      bank_txn_category: [
+        "SALES_RECEIPT",
+        "PURCHASE_PAYMENT",
+        "TAX_PAYMENT",
+        "SALARY",
+        "BANK_CHARGES",
+        "LOAN",
+        "INTEREST",
+        "UNKNOWN",
+      ],
+      bank_txn_match_status: [
+        "UNMATCHED",
+        "MATCHED",
+        "MANUALLY_MATCHED",
+        "EXCLUDED",
+      ],
+      bank_txn_matched_by: ["AI", "MANUAL", "AUTO_RULE"],
+      bank_txn_type: ["CREDIT", "DEBIT"],
       ca_invoice_status: [
         "DRAFT",
         "SENT",
