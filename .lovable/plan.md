@@ -1,75 +1,58 @@
-# Tally Import / Export Integration
+## Bank Statement Auto-Reconciliation Module
 
-Add a Tally interop layer so CA firms can pull data **from Tally** (XML / Excel / GSTR-1 XML) into GSTify and push GSTify invoices **back to Tally** as XML vouchers. Built additive — Tally remains the system of record where the client uses it.
+Build a full bank reconciliation system: upload Indian bank statements (PDF/Excel/CSV), parse them, auto-match to invoices via heuristics + AI, and let CAs review/confirm in a workspace UI.
 
-## 1. Database (single migration)
+### 1. Database (single migration)
 
-**Enums**
-- `tally_import_type`: `SALES_LEDGER | PURCHASE_LEDGER | GSTR1_DATA | GSTR2_DATA | FULL_BACKUP`
-- `tally_version`: `TALLY_ERP9 | TALLYPRIME | UNKNOWN`
-- `tally_import_status`: `UPLOADED | PROCESSING | COMPLETED | FAILED | PARTIAL`
-- `tally_gst_category`: `SALES | PURCHASE | EXPENSE | ASSET`
-- `tally_export_type`: `GSTR1_JSON | GSTR1_EXCEL | TALLY_XML | TALLY_VOUCHERS`
+Three new tables + supporting enums:
 
-**`tally_imports`** — per upload record. Stores original file in `invoices` bucket at `{ca_firm_id}/{client_id}/tally-imports/{import_id}/{original_name}`. Columns per spec + `staging_data jsonb` (parsed-but-not-committed rows for step 4 preview). RLS: select `is_ca_firm_member OR can_access_client`; write `is_ca_firm_member`.
+- **`bank_statements`** — uploaded file metadata, period, opening/closing balance, reconciliation summary counters, status.
+- **`bank_transactions`** — one row per parsed transaction; holds cleaned description, category, match status, matched invoice id, confidence, matched_by.
+- **`reconciliation_rules`** — CA-defined auto-categorization rules (description contains + amount range → category).
 
-**`tally_mappings`** — per CA firm. Unique on `(ca_firm_id, lower(tally_ledger_name))`. RLS: members read, owners write (writes also allowed by staff for in-flow confirmations).
+Enums: `bank_account_type`, `bank_statement_file_type`, `bank_recon_status`, `bank_txn_type`, `bank_txn_category`, `bank_txn_match_status`, `bank_txn_matched_by`.
 
-**`tally_exports`** — per generated export. Stored at `{ca_firm_id}/{client_id}/tally-exports/{export_id}.{ext}`. Standard RLS.
+RLS: tenant-scoped via `is_ca_firm_member` / `can_access_client`; service_role full; no anon. Standard 4-step pattern (CREATE → GRANT → ENABLE RLS → POLICY). Add `updated_at` triggers.
 
-All three tables get GRANTs to `authenticated` + `service_role`, RLS enabled, policies created in the same migration.
+Storage: reuse existing `invoices` bucket under path `{ca_firm_id}/{client_id}/bank-statements/{statement_id}/{filename}` (private; matches existing path convention from memory).
 
-## 2. Parsers (`src/lib/tally.parsers.server.ts`)
+### 2. Server modules
 
-- **XML parser** — `fast-xml-parser` (already in tree, otherwise add). Walks `ENVELOPE.BODY.IMPORTDATA.REQUESTDATA.TALLYMESSAGE[]`. For each `VOUCHER`, extracts `DATE`, `VOUCHERNUMBER`, `PARTYLEDGERNAME`, `NARRATION`, `VOUCHERTYPENAME`, and the `LEDGERENTRIES.LIST[]` (ledger name + AMOUNT + IS-DEEMED-POSITIVE for debit/credit).
-- **Excel parser** — uses existing `xlsx` lib. Recognises the standard Tally daybook columns (`Date | Voucher No | Ref No | Ref Date | Narration | Party Name | Alias | Debit | Credit | Closing Balance`); tolerant of header casing/order.
-- **GSTR-1 XML / JSON** — separate path that maps GSTN sections (`b2b`, `b2cl`, `b2cs`) into invoice rows.
-- **Version detector** — sniffs `<TALLYMESSAGE>` / `<ENVELOPE>` for `TallyPrime` vs `ERP 9` markers; Excel heuristic on header signature; falls back to `UNKNOWN`.
-- **Normaliser** — every parser returns the same `ParsedRow[]` shape: `{ date, voucherNo, party, partyGstin?, amount, taxableValue?, cgst?, sgst?, igst?, totalTax?, ledger, narration?, rate? }`.
+**`src/lib/bank.parsers.server.ts`** — bank-specific extractors:
+- HDFC / SBI / ICICI / Axis / Kotak Excel/CSV column maps using `xlsx` (already installed for Tally).
+- PDF parsing: forward the file to Lovable AI Gateway (`google/gemini-2.5-flash` with file input) using the prompt from the spec → JSON array of `{date, description, debit, credit, balance}`.
+- Bank auto-detection from filename + header keywords; fallback returns raw header rows so the UI can prompt for manual column mapping.
 
-## 3. Mapping engine (`src/lib/tally.mapping.server.ts`)
+**`src/lib/bank.match.server.ts`** — matcher:
+- Attempt 1: amount (±tolerance) + date ±30d + direction → 0.95.
+- Attempt 2: amount + party name substring in cleaned description → 0.88.
+- Attempt 3: reference number found in invoice payment ref / invoice number → 0.99.
+- Auto-category keyword pass for unmatched (GST/SALARY/INTEREST/BANK CHARGES/EMI).
+- Apply user `reconciliation_rules` first.
 
-- `extractLedgers(rows)` → unique ledger list.
-- `aiSuggestMapping(ledgerName)` — heuristic first (regex on `Sales`, `Purchase`, `GST @5/12/18/28`, `Freight`, `Capital`); falls back to Lovable AI Gateway prompt when ambiguous. Returns `{ category, rate, hsn? }`.
-- On import-complete, confirmed mappings are upserted into `tally_mappings` when "Save for future imports" is checked. Next import auto-applies known mappings and only prompts for new ledgers.
+**`src/lib/bank.export.server.ts`** — Excel report builder (`xlsx`) with the 4 tabs from spec.
 
-## 4. Duplicate detection (`src/lib/tally.dedupe.server.ts`)
+**`src/lib/bank.functions.ts`** — `createServerFn` endpoints (all `requireSupabaseAuth`):
+- `uploadBankStatement` (signed upload URL via supabaseAdmin)
+- `parseAndStageStatement` (parse → insert txns → run rules + matcher → update counters)
+- `listStatements`, `getStatementDashboard` (summary + paginated txns)
+- `confirmMatch`, `rejectMatch`, `manualMatch`, `excludeTxn`, `addTxnNote`, `bulkConfirm`
+- `searchInvoicesForMatch` (filtered candidates panel)
+- `downloadReconciliationReport` (returns base64 xlsx)
+- Rules CRUD: `listReconRules`, `upsertReconRule`, `deleteReconRule`
 
-For each candidate row, query `ca_invoices` + `invoices` for the same `client_id`:
-- Exact: `invoice_number` + `invoice_date` → `DUPLICATE`.
-- Fuzzy: party name (lowered, trimmed) + amount (±1) + date (±1 day) → `POSSIBLE_DUPLICATE`.
-Returns per-row decision; UI offers skip-all / overwrite-all / review-each.
+Feature flag: `ENABLE_BANK_AI_PDF` (default `true` since Lovable AI key is present; falls back to "manual column mapping" UX when off or when PDF parsing fails).
 
-## 5. Server functions (`src/lib/tally.functions.ts`)
+### 3. Routes & UI
 
-All `requireSupabaseAuth`, mutations via `supabaseAdmin`.
-- `uploadTallyFile({ clientId, importType, file })` — stores file, creates `tally_imports` row (`UPLOADED`), returns `importId`.
-- `parseTallyImport({ importId })` — runs the right parser, fills `total_records`, `staging_data`, `tally_version`, `period_from/to` (auto-detected, overridable), returns `{ ledgers, sampleRows, periodGuess }`.
-- `getSuggestedMappings({ importId })` — returns per-ledger AI/heuristic suggestion + any existing `tally_mappings` hit.
-- `saveMappings({ importId, mappings, persistForFuture })`.
-- `previewImport({ importId })` — applies mappings, runs dedupe, returns first 10 rows + counts `{ ready, warnings, errors, duplicates }` + downloadable error report URL.
-- `runImport({ importId, duplicateStrategy })` — streams insert into `ca_invoices` / `invoices`; updates progress every 25 rows; writes `error_log`, sets final `import_status`.
-- `cancelImport({ importId })`.
-- `listImports({ clientId })`, `getImportSummary({ importId })`, `getErrorLogDownload({ importId })`.
-- `listMappings()`, `updateMapping`, `deleteMapping`, `exportMappingsCsv` — for `/ca/settings/tally-mappings`.
-- `generateTallyExport({ clientId, periodFrom, periodTo, includeSales, includePurchase, includeJournal })` — builds Tally XML from `ca_invoices` (Sales/Purchase/Journal voucher templates), stores file, inserts `tally_exports` row, returns signed URL.
+- **`/ca/clients/$clientId/bank-reconciliation`** — empty state → upload → bank/period confirmation → reconciliation dashboard (4 summary cards, progress bar, transactions table with status chips, side panel for manual match, bulk confirm bar, "Download Report" button).
+- **`/ca/settings/bank-reconciliation`** — rules manager (table + add/edit dialog), tolerance + auto-exclude threshold settings (stored per firm in a small `bank_recon_settings` table or reuse `ca_firm_billing_settings` — using a dedicated `bank_recon_settings` table for clarity).
+- Add link card to `/ca/settings` and a tab in client workspace nav (`ca.clients.$clientId.tsx`).
 
-## 6. Routes & UI
+Shared components under `src/components/bank/`: `MatchStatusBadge`, `ConfidencePill`, `TxnAmount` (green credit / red debit), `ManualMatchPanel`, `MatchComparisonView` (side-by-side invoice vs txn).
 
-- **`/ca/clients/$clientId/tally-import`** — wizard with stepper (1 Type → 2 Upload → 3 Mapping → 4 Preview → 5 Progress) + "Import History" tab. Components in `src/components/tally/`: `ImportTypeStep`, `UploadDropzone`, `LedgerMappingTable` (AI suggestions shown blue/italic, full-width, sticky header), `ImportPreviewTable`, `ImportProgressPanel` (polls server fn), `ImportHistoryTable`.
-- **Client workspace** — add an "Import from Tally" button on the existing client page header that routes here.
-- **Client documents / export panel** — add **Tally XML (Vouchers)** option to the existing export block with the period + voucher-type checkboxes and a `Generate Tally Export` action.
-- **`/ca/settings/tally-mappings`** — searchable mapping library: inline edit (rate / category / HSN), delete, CSV export, reset-all guarded behind a confirm dialog. Linked from `ca.settings.tsx`.
+### 4. Notes
 
-Status colours follow the design system — red for errors, amber for warnings, green for ready, blue italic for AI suggestions.
-
-## 7. Out of scope (separate prompt if needed)
-- Live Tally ODBC / Tally Gateway TCP push (we stick to file-based round-trip).
-- Two-way auto-sync / scheduled imports.
-- Reconciliation of imported Tally data against GSTN portal (handled by the existing GSTR module).
-- Importing Tally masters (stock items, cost centres) — only vouchers/ledger entries for now.
-
-## Notes
-- No new external secrets required. AI suggestions reuse the existing Lovable AI Gateway (`LOVABLE_API_KEY` already present).
-- File parsing runs entirely in `createServerFn` handlers (Worker-safe libs only: `fast-xml-parser`, `xlsx`).
-- Original upload is always saved to storage **before** parsing, so a failed parse never loses the source file.
+- Pre-existing TS errors from agreements/client_queries persist and are out of scope.
+- All security defaults applied: service_role grants, RLS via existing helper functions, no public reads.
+- Original uploaded files are always stored in Storage regardless of parse success (spec requirement).
