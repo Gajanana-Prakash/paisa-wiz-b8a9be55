@@ -308,6 +308,14 @@ function SettingsPage() {
         </Link>
       </section>
 
+      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <h2 className="font-display text-lg font-semibold">Bank Reconciliation</h2>
+        <p className="text-xs text-muted-foreground mt-1">Matching tolerance, auto-exclude thresholds, and custom auto-categorization rules for recurring bank transactions.</p>
+        <Link to="/ca/settings/bank-reconciliation" className="inline-block mt-4">
+          <Button variant="outline" size="sm">Reconciliation settings</Button>
+        </Link>
+      </section>
+
       <div className="text-center">
         <Link to="/ca/dashboard" className="text-xs text-muted-foreground hover:text-foreground">← Back to dashboard</Link>
       </div>
