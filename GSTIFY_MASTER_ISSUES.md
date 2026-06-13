@@ -1,4 +1,4 @@
-# GSTify — Master Issues & Feature Request Document
+# PracticeDesk — Master Issues & Feature Request Document
 
 **Generated:** June 1, 2026  
 **Last Updated:** June 2, 2026 — Security fixes applied (see ✅ FIXED markers)  
@@ -78,7 +78,7 @@ This JWT is the Supabase **anon** key (role: `anon`, not service_role) so it doe
 All versions of SheetJS CE (the `xlsx` npm package) through 0.19.2 are vulnerable to prototype pollution when parsing specially crafted spreadsheet files. An attacker who can supply a malicious `.xlsx` or `.xls` file can corrupt the JavaScript prototype chain on the server.
 
 **Risk**  
-GSTify allows users to upload Excel files for Tally import and bulk client import. Any user — including a client with portal access — can upload a crafted file. Prototype pollution can lead to authentication bypass, privilege escalation, or remote code execution depending on which prototypes are overwritten.
+PracticeDesk allows users to upload Excel files for Tally import and bulk client import. Any user — including a client with portal access — can upload a crafted file. Prototype pollution can lead to authentication bypass, privilege escalation, or remote code execution depending on which prototypes are overwritten.
 
 **Remediation**  
 Replace `xlsx` with one of:
@@ -130,7 +130,7 @@ Same as HIGH-001 — replace `xlsx` with the patched version from `cdn.sheetjs.c
 A type-confusion bug in `seroval ≤ 1.5.2` allows a crafted HTTP body sent to one `/_serverFn/<id>` endpoint to trigger invocation of a **different** server function as a side effect of deserializing the request payload.
 
 **Risk**  
-GSTify has ~25 server functions that use `supabaseAdmin` (service role — bypasses RLS). While the target function's own `requireSupabaseAuth` middleware still runs, request-level middleware does not re-execute. If any function can be triggered in an unintended context it may cause unexpected privileged database operations. Risk is elevated compared to the advisory's default assessment due to the number of admin-privileged functions.
+PracticeDesk has ~25 server functions that use `supabaseAdmin` (service role — bypasses RLS). While the target function's own `requireSupabaseAuth` middleware still runs, request-level middleware does not re-execute. If any function can be triggered in an unintended context it may cause unexpected privileged database operations. Risk is elevated compared to the advisory's default assessment due to the number of admin-privileged functions.
 
 **Remediation**  
 ```bash
@@ -491,10 +491,10 @@ npm update brace-expansion
 
 | ID | Feature | Description | Est. Effort |
 |---|---|---|---|
-| FR-001 | **Direct GST Portal filing** | Submit GSTR-1, GSTR-3B, and GSTR-9 JSON directly to gstin.gov.in via the GST System API. Currently GSTify only tracks filing status; CAs must manually upload JSON. This is the #1 reason CAs cite for preferring ClearTax or Masters India. | L (3–4 weeks) |
+| FR-001 | **Direct GST Portal filing** | Submit GSTR-1, GSTR-3B, and GSTR-9 JSON directly to gstin.gov.in via the GST System API. Currently PracticeDesk only tracks filing status; CAs must manually upload JSON. This is the #1 reason CAs cite for preferring ClearTax or Masters India. | L (3–4 weeks) |
 | FR-002 | **GSTR-2A / 2B ITC Reconciliation** | Auto-match purchase invoices against GSTR-2B data downloaded from the GST portal. Flag ITC mismatches, suggest eligible vs. ineligible split, and generate a reconciliation statement. This single feature drives the most word-of-mouth in the CA community. | L (2–3 weeks) |
-| FR-003 | **Multi-GSTIN per client** | Allow each client to have multiple GSTINs (one per state registration). Large businesses with pan-India presence have 5–20 GSTINs. The current single-GSTIN model blocks any enterprise client from adopting GSTify. | M (1 week) |
-| FR-004 | **E-invoice (IRN) generation** | Integrate with the IRP (Invoice Registration Portal) API to generate IRNs and QR codes for clients above the e-invoicing threshold (currently ₹5 Cr turnover). Mandatory compliance for a large portion of GSTify's target clients. | L (2–3 weeks) |
+| FR-003 | **Multi-GSTIN per client** | Allow each client to have multiple GSTINs (one per state registration). Large businesses with pan-India presence have 5–20 GSTINs. The current single-GSTIN model blocks any enterprise client from adopting PracticeDesk. | M (1 week) |
+| FR-004 | **E-invoice (IRN) generation** | Integrate with the IRP (Invoice Registration Portal) API to generate IRNs and QR codes for clients above the e-invoicing threshold (currently ₹5 Cr turnover). Mandatory compliance for a large portion of PracticeDesk's target clients. | L (2–3 weeks) |
 | FR-005 | **E-way bill generation** | Integrate with the NIC e-waybill API for generating and cancelling e-way bills. Required for any client moving goods above ₹50,000. High-frequency daily operation for manufacturing and trading clients. | L (2 weeks) |
 
 ---
@@ -519,7 +519,7 @@ npm update brace-expansion
 |---|---|---|---|
 | FR-013 | **White-label client portal** | Allow CA firms to use their own logo, firm name, and subdomain on the client portal. Turns CA firms into distribution channels — each white-label firm brings 20–100 clients organically. | L (2 weeks) |
 | FR-014 | **AI Compliance Health Score** | Score each client 0–100 on GST compliance: filing regularity, notice history, ITC utilization, late fee history. Surface as a "portfolio risk radar" on the CA dashboard. | M (1 week) |
-| FR-015 | **AI Cash Flow Forecaster (for clients)** | Use 12 months of invoice and GST payment data to project 90-day cash position, flag GST liability months, and suggest advance tax provisions. Turns GSTify from a compliance tool to a business advisory tool for clients. | L (2 weeks) |
+| FR-015 | **AI Cash Flow Forecaster (for clients)** | Use 12 months of invoice and GST payment data to project 90-day cash position, flag GST liability months, and suggest advance tax provisions. Turns PracticeDesk from a compliance tool to a business advisory tool for clients. | L (2 weeks) |
 | FR-016 | **Automated late fee & interest calculator** | Input: return type, filing period, tax liability → Output: exact late fee under Section 47 + interest under Section 50 CGST. Eliminates manual penalty calculation errors. | S (2–3 days) |
 | FR-017 | **Benchmarking dashboard** | Show CAs how their firm metrics compare to anonymised peer benchmarks (e.g., "Your on-time filing rate: 94%, industry avg: 78%"). Increases product stickiness and NPS significantly. | L (2–3 weeks) |
 | FR-018 | **CPE / professional development tracker** | ICAI requires 120 CPE credit hours every 3 years. No existing tool tracks this for Indian CAs. Bundle with the Pro plan to create an additional retention hook. | S (3–5 days) |
@@ -567,4 +567,4 @@ MED-002  Open redirect fix      |
 
 ---
 
-*Last updated: June 1, 2026 — GSTify Security Audit + PM Analysis*
+*Last updated: June 1, 2026 — PracticeDesk Security Audit + PM Analysis*

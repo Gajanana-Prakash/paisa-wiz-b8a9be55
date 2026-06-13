@@ -21,13 +21,13 @@ import { getGrowthCenter, updateReferralPreferences } from "@/lib/referrals.func
 import { formatInr } from "@/components/billing/utils";
 
 function whatsappShare(url: string, reward: number) {
-  const text = `Hey! I've been using GSTify for managing my clients' GST and compliance — it's fantastic. Use my link to get 1 month free: ${url}`;
+  const text = `Hey! I've been using PracticeDesk for managing my clients' GST and compliance — it's fantastic. Use my link to get 1 month free: ${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 }
 
 function emailShare(url: string) {
-  const subject = "Try GSTify for your CA practice";
-  const body = `I've been using GSTify to manage client GST and compliance. Sign up with my link for a free trial:\n\n${url}`;
+  const subject = "Try PracticeDesk for your CA practice";
+  const body = `I've been using PracticeDesk to manage client GST and compliance. Sign up with my link for a free trial:\n\n${url}`;
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
@@ -84,7 +84,7 @@ export function GrowCenterPage() {
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary font-medium">
           <Gift className="size-4" /> Growth
         </div>
-        <h1 className="font-display text-3xl font-semibold mt-1">Grow with GSTify</h1>
+        <h1 className="font-display text-3xl font-semibold mt-1">Grow with PracticeDesk</h1>
         <p className="text-muted-foreground mt-1">Refer firms, onboard clients, earn rewards</p>
       </div>
 
@@ -276,11 +276,11 @@ export function GrowCenterPage() {
         <TabsContent value="rewards" className="space-y-8">
           <Card className="border-2 border-amber-400/50 bg-gradient-to-r from-amber-50 to-primary/5">
             <CardContent className="pt-8 pb-8 text-center">
-              <p className="text-sm uppercase tracking-widest text-muted-foreground">Your GSTify credit balance</p>
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Your PracticeDesk credit balance</p>
               <p className="text-4xl md:text-5xl font-display font-bold text-primary mt-2">
                 {formatInr(data?.creditBalance ?? 0)}
               </p>
-              <p className="text-muted-foreground mt-2">Applied automatically to your next GSTify subscription invoice</p>
+              <p className="text-muted-foreground mt-2">Applied automatically to your next PracticeDesk subscription invoice</p>
             </CardContent>
           </Card>
 

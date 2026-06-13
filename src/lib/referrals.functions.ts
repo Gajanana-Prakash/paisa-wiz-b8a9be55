@@ -37,7 +37,7 @@ async function getOwnerFirmId(userId: string) {
 }
 
 const BADGE_META: Record<string, { emoji: string; title: string; howTo: string }> = {
-  EARLY_ADOPTER: { emoji: "🏆", title: "Early Adopter", howTo: "Join among the first 500 CA firms on GSTify" },
+  EARLY_ADOPTER: { emoji: "🏆", title: "Early Adopter", howTo: "Join among the first 500 CA firms on PracticeDesk" },
   REFERRAL_STAR: { emoji: "⭐", title: "Referral Star", howTo: "Refer 5+ CA firms who subscribe" },
   CHAMPION: { emoji: "👑", title: "Champion", howTo: "Get 100% of your clients actively using the portal" },
   AMBASSADOR: { emoji: "🚀", title: "Ambassador", howTo: "Refer 10+ CA firms who subscribe" },

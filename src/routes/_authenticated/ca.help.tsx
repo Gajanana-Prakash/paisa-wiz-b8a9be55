@@ -139,7 +139,7 @@ function HelpSupportPage() {
           <p className="text-sm text-muted-foreground mt-1 flex-1">
             Free 30-min walkthrough with our team
           </p>
-          <p className="text-xs text-muted-foreground mt-2">We&apos;ll set up GSTify for your firm together</p>
+          <p className="text-xs text-muted-foreground mt-2">We&apos;ll set up PracticeDesk for your firm together</p>
           <div className="mt-4 space-y-2">
             <Input
               type="datetime-local"

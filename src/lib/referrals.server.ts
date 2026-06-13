@@ -2,7 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const _appUrl = typeof process !== "undefined" ? process.env.VITE_APP_URL : undefined;
 if (!_appUrl && typeof process !== "undefined" && process.env.NODE_ENV === "production") {
-  console.error("[GSTify] VITE_APP_URL is not set in production — referral links will point to https://gstify.in instead of the correct deployment URL. Set this env var in production.");
+  console.error("[PracticeDesk] VITE_APP_URL is not set in production — referral links will point to https://gstify.in instead of the correct deployment URL. Set this env var in production.");
 }
 const APP_BASE = _appUrl ?? "https://gstify.in";
 
@@ -111,10 +111,10 @@ export async function checkAndAwardBadges(caFirmId: string) {
 
   const n = converted ?? 0;
   if (n >= 5) {
-    await awardBadge(caFirmId, "REFERRAL_STAR", "Referred 5+ CA firms to GSTify");
+    await awardBadge(caFirmId, "REFERRAL_STAR", "Referred 5+ CA firms to PracticeDesk");
   }
   if (n >= 10) {
-    await awardBadge(caFirmId, "AMBASSADOR", "Referred 10+ CA firms to GSTify");
+    await awardBadge(caFirmId, "AMBASSADOR", "Referred 10+ CA firms to PracticeDesk");
   }
 
   const { data: clients } = await supabaseAdmin
@@ -124,14 +124,14 @@ export async function checkAndAwardBadges(caFirmId: string) {
   const total = (clients ?? []).filter((c) => c.status !== "pending_invite").length;
   const active = (clients ?? []).filter((c) => c.status === "active").length;
   if (total >= 3 && active === total) {
-    await awardBadge(caFirmId, "CHAMPION", "100% client adoption on GSTify");
+    await awardBadge(caFirmId, "CHAMPION", "100% client adoption on PracticeDesk");
   }
 
   const { count: firmRank } = await supabaseAdmin
     .from("ca_firms")
     .select("id", { count: "exact", head: true });
   if ((firmRank ?? 0) <= 500) {
-    await awardBadge(caFirmId, "EARLY_ADOPTER", "One of the first 500 CA firms on GSTify");
+    await awardBadge(caFirmId, "EARLY_ADOPTER", "One of the first 500 CA firms on PracticeDesk");
   }
 }
 
@@ -164,7 +164,7 @@ export async function issueReferralCredit(
     .eq("id", referralId);
 
   await notifyCaReferral(referrerFirmId, {
-    title: `₹${amount} GSTify credit earned`,
+    title: `₹${amount} PracticeDesk credit earned`,
     body: `${description} Thank you for the referral!`,
     link: "/ca/grow",
   });

@@ -9,11 +9,11 @@ function SignupChooser() {
       <div className="hidden md:block relative" style={{ background: "var(--gradient-hero)" }}>
         <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-primary-foreground">
           <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
-          <span className="font-display text-lg font-semibold">GSTify</span>
+          <span className="font-display text-lg font-semibold">PracticeDesk</span>
         </Link>
         <div className="absolute bottom-12 left-12 right-12 text-primary-foreground">
           <h2 className="font-display text-3xl font-semibold">One platform. CAs and their clients.</h2>
-          <p className="mt-3 text-primary-foreground/70">Pick how you'll use GSTify.</p>
+          <p className="mt-3 text-primary-foreground/70">Pick how you'll use PracticeDesk.</p>
         </div>
       </div>
       <div className="flex items-center justify-center p-8">

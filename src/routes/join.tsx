@@ -42,20 +42,20 @@ function JoinPage() {
       <div className="max-w-md w-full text-center space-y-6">
         <Link to="/" className="inline-flex items-center gap-2 font-display text-xl font-semibold">
           <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
-          GSTify
+          PracticeDesk
         </Link>
         {loading ? (
           <Loader2 className="size-8 animate-spin mx-auto text-primary" />
         ) : (
           <>
-            <h1 className="font-display text-2xl font-semibold">Join GSTify</h1>
+            <h1 className="font-display text-2xl font-semibold">Join PracticeDesk</h1>
             {info ? (
               <p className="text-muted-foreground text-lg">
                 <span className="font-medium text-foreground">{info.referrerName}</span> invited you.
                 Start with a {info.trialDays}-day free trial.
               </p>
             ) : (
-              <p className="text-muted-foreground">Create your CA firm workspace on GSTify.</p>
+              <p className="text-muted-foreground">Create your CA firm workspace on PracticeDesk.</p>
             )}
             <Button size="lg" className="w-full h-12 text-base" onClick={continueSignup}>
               Create your CA firm

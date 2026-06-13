@@ -217,7 +217,7 @@ function BillingSubscriptionPage() {
           <FileText className="size-4 text-primary" /> Invoices
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
-          GST-compliant invoices with GSTify GSTIN for your records
+          GST-compliant invoices with PracticeDesk GSTIN for your records
         </p>
         <div className="mt-4 overflow-x-auto">
           <Table>

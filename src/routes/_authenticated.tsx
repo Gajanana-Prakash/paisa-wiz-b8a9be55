@@ -194,7 +194,7 @@ function AppShell() {
         <div className="size-9 rounded-xl bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold shadow-[var(--shadow-gold)]">G</div>
         {!collapsed && (
           <div className="leading-tight">
-            <div className="font-display text-base font-semibold">GSTify</div>
+            <div className="font-display text-base font-semibold">PracticeDesk</div>
             <div className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50">AI Tax Suite</div>
           </div>
         )}

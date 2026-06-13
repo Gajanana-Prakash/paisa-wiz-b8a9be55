@@ -209,7 +209,7 @@ export function ClientPortal() {
         </div>
         <div className="min-w-0 leading-tight">
           <div className="font-display font-semibold truncate">{firm?.name || "Your CA firm"}</div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Powered by GSTify</div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Powered by PracticeDesk</div>
         </div>
       </div>
 

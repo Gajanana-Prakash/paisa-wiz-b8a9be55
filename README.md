@@ -1,10 +1,10 @@
-# GSTify – Smart GST Compliance & Practice Management Platform for CA Firms
+# PracticeDesk – Smart GST Compliance & Practice Management Platform for CA Firms
 
 ## 🚀 Overview
 
-GSTify is an AI-powered GST compliance and practice management platform built specifically for Chartered Accountants (CA Firms), Tax Consultants, and GST Practitioners.
+PracticeDesk is an AI-powered GST compliance and practice management platform built specifically for Chartered Accountants (CA Firms), Tax Consultants, and GST Practitioners.
 
-Traditional GST workflows are fragmented across WhatsApp messages, Excel sheets, emails, phone calls, and multiple government portals. GSTify centralizes everything into a single dashboard, helping firms automate compliance operations, reduce manual work, improve client communication, and increase productivity.
+Traditional GST workflows are fragmented across WhatsApp messages, Excel sheets, emails, phone calls, and multiple government portals. PracticeDesk centralizes everything into a single dashboard, helping firms automate compliance operations, reduce manual work, improve client communication, and increase productivity.
 
 ---
 
@@ -27,9 +27,9 @@ As firms grow, these problems increase operational costs and create compliance r
 
 ---
 
-## 💡 The GSTify Solution
+## 💡 The PracticeDesk Solution
 
-GSTify provides a centralized compliance operating system where CA firms can manage:
+PracticeDesk provides a centralized compliance operating system where CA firms can manage:
 
 * GST Compliance
 * Client Management
@@ -264,7 +264,7 @@ No more searching through folders, emails, or chat histories.
 
 # ⚡ 30-Second Sales Pitch
 
-> Right now your GST workflow runs on WhatsApp photos, Excel sheets, and phone calls. GSTify gives you one dashboard where every client's invoices, deadlines, tasks, notices, and payments are organized automatically. Your clients upload bills from their phone, your staff gets the data already extracted, you review and file. That's it. No more chasing anyone on WhatsApp.
+> Right now your GST workflow runs on WhatsApp photos, Excel sheets, and phone calls. PracticeDesk gives you one dashboard where every client's invoices, deadlines, tasks, notices, and payments are organized automatically. Your clients upload bills from their phone, your staff gets the data already extracted, you review and file. That's it. No more chasing anyone on WhatsApp.
 
 ---
 
@@ -306,7 +306,7 @@ No more searching through folders, emails, or chat histories.
 
 # 🔒 Security
 
-GSTify is designed with modern security practices including:
+PracticeDesk is designed with modern security practices including:
 
 * Secure Authentication
 * Role-Based Access Control
@@ -325,4 +325,4 @@ To become the operating system for GST compliance and practice management across
 
 Transform your GST practice from WhatsApp, Excel sheets, and manual follow-ups into a streamlined, AI-powered compliance workflow.
 
-**GSTify – Compliance Made Simple.**
+**PracticeDesk – Compliance Made Simple.**

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "GSTify — The GST Collaboration Platform for CA Firms & Clients" },
+      { title: "PracticeDesk — The GST Collaboration Platform for CA Firms & Clients" },
       { name: "description", content: "Stop chasing documents on WhatsApp. Give clients a simple portal to upload invoices, and manage all their GST filings from one dashboard." },
     ],
   }),
@@ -19,7 +19,7 @@ function Nav() {
       <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-primary-foreground">
           <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
-          <span className="font-display text-lg font-semibold tracking-tight">GSTify</span>
+          <span className="font-display text-lg font-semibold tracking-tight">PracticeDesk</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-primary-foreground/80">
           <a href="#features" className="hover:text-primary-foreground transition">Features</a>
@@ -73,7 +73,7 @@ function Hero() {
         </div>
         <div className="relative">
           <div className="absolute -inset-6 rounded-3xl bg-gold/10 blur-3xl" />
-          <img src={heroImg} alt="GSTify dashboard preview" width={1600} height={1200} className="relative rounded-2xl shadow-[var(--shadow-elegant)] border border-white/10" />
+          <img src={heroImg} alt="PracticeDesk dashboard preview" width={1600} height={1200} className="relative rounded-2xl shadow-[var(--shadow-elegant)] border border-white/10" />
         </div>
       </div>
     </section>
@@ -141,7 +141,7 @@ function Workflow1() {
 
 const TESTIMONIALS = [
   {
-    quote: "We replaced three WhatsApp groups and a shared Drive folder with GSTify. Our clients actually upload on time now.",
+    quote: "We replaced three WhatsApp groups and a shared Drive folder with PracticeDesk. Our clients actually upload on time now.",
     name: "CA Priya Menon",
     firm: "Menon & Associates, Bengaluru",
   },
@@ -163,7 +163,7 @@ function Testimonials() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center max-w-2xl mx-auto">
           <p className="text-sm font-medium uppercase tracking-wider text-primary">Loved by CA firms</p>
-          <h2 className="mt-3 font-display text-4xl md:text-5xl font-semibold text-foreground">Practices running on GSTify.</h2>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl font-semibold text-foreground">Practices running on PracticeDesk.</h2>
         </div>
         <div className="mt-16 grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
@@ -300,7 +300,7 @@ function Pricing() {
           <div>
             <div className="font-display text-lg font-semibold">14-day free trial</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Try GSTify with up to 3 clients. No credit card required. Pick a plan whenever you're ready.
+              Try PracticeDesk with up to 3 clients. No credit card required. Pick a plan whenever you're ready.
             </p>
           </div>
           <Link to="/signup/ca">
@@ -332,7 +332,7 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-6 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="size-7 rounded-md bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold text-sm">G</div>
-          <span className="font-display font-semibold text-foreground">GSTify</span>
+          <span className="font-display font-semibold text-foreground">PracticeDesk</span>
           <span className="ml-2">© {new Date().getFullYear()}</span>
         </div>
         <p>AI-assisted GST preparation. Human verification required for filing.</p>

@@ -14,10 +14,10 @@ export type SupportTutorial = {
 
 if (import.meta.env.PROD) {
   if (!import.meta.env.VITE_GSTIFY_SUPPORT_WHATSAPP) {
-    console.error("[GSTify] VITE_GSTIFY_SUPPORT_WHATSAPP is not set — support WhatsApp links will use a placeholder number. Set this env var before deploying.");
+    console.error("[PracticeDesk] VITE_GSTIFY_SUPPORT_WHATSAPP is not set — support WhatsApp links will use a placeholder number. Set this env var before deploying.");
   }
   if (!import.meta.env.VITE_GSTIFY_INTRO_VIDEO_ID) {
-    console.error("[GSTify] VITE_GSTIFY_INTRO_VIDEO_ID is not set — intro video will use a placeholder. Set this env var before deploying.");
+    console.error("[PracticeDesk] VITE_GSTIFY_INTRO_VIDEO_ID is not set — intro video will use a placeholder. Set this env var before deploying.");
   }
 }
 
@@ -153,7 +153,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "How does my client upload documents?",
-        a: "Clients sign in to their GSTify portal (or use the invite link) and use Upload. They can photograph bills or upload PDFs — no WhatsApp needed.",
+        a: "Clients sign in to their PracticeDesk portal (or use the invite link) and use Upload. They can photograph bills or upload PDFs — no WhatsApp needed.",
       },
       {
         q: "Can I import my existing data from Tally?",
@@ -170,7 +170,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         q: "What file format should I use to upload invoices?",
-        a: "PDF and clear photos (JPG/PNG) work best. GSTify extracts key fields with AI. For bulk data, use Excel/CSV or Tally XML from Reports.",
+        a: "PDF and clear photos (JPG/PNG) work best. PracticeDesk extracts key fields with AI. For bulk data, use Excel/CSV or Tally XML from Reports.",
       },
       {
         q: "How do I generate GSTR-1 JSON for portal upload?",
@@ -178,7 +178,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "What is e-invoicing and do my clients need it?",
-        a: "E-invoicing (IRN) is mandatory above turnover thresholds. GSTify helps prepare invoice data; see the e-invoice tutorial for IRN workflow.",
+        a: "E-invoicing (IRN) is mandatory above turnover thresholds. PracticeDesk helps prepare invoice data; see the e-invoice tutorial for IRN workflow.",
       },
       {
         q: "How does GSTR-2A reconciliation work?",
@@ -194,11 +194,11 @@ export const FAQ_SECTIONS: FaqSection[] = [
         a: "Billing → New invoice. Add your fee lines, GST, and send by email or share the client portal link where they can view and upload payment proof.",
       },
       {
-        q: "Does GSTify generate a GST invoice for my subscription?",
-        a: "Yes. Every GSTify subscription payment includes a GST-compliant invoice with our GSTIN — available under Settings → Billing & subscription.",
+        q: "Does PracticeDesk generate a GST invoice for my subscription?",
+        a: "Yes. Every PracticeDesk subscription payment includes a GST-compliant invoice with our GSTIN — available under Settings → Billing & subscription.",
       },
       {
-        q: "Can my client pay fees directly from GSTify?",
+        q: "Can my client pay fees directly from PracticeDesk?",
         a: "Clients can view invoices in their portal and upload UPI/bank payment proof. Direct payment gateway integration is coming soon.",
       },
     ],
@@ -207,7 +207,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
     title: "Technical",
     items: [
       {
-        q: "Does GSTify work without internet?",
+        q: "Does PracticeDesk work without internet?",
         a: "You need internet to sync data. You can draft work offline in your browser; changes sync when you're back online.",
       },
       {
@@ -252,7 +252,7 @@ export function searchHelp(query: string): Array<{ type: "tutorial" | "faq"; tit
 }
 
 export function buildWhatsAppUrl(firmName: string, extraQuery?: string) {
-  const text = `Hi GSTify! I need help with ${firmName}. My query: ${extraQuery ?? ""}`.trim();
+  const text = `Hi PracticeDesk! I need help with ${firmName}. My query: ${extraQuery ?? ""}`.trim();
   return `https://wa.me/${SUPPORT_WHATSAPP_E164.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
 }
 
