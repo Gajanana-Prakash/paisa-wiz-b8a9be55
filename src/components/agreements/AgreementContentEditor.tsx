@@ -1,6 +1,11 @@
+import DOMPurify from "isomorphic-dompurify";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MERGE_TAGS } from "@/lib/agreements.server";
+
+function sanitize(html: string) {
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+}
 
 export function AgreementContentEditor({
   value,
