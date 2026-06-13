@@ -108,7 +108,7 @@ function ReferralSettingsPage() {
 
         <div className="flex items-center justify-between gap-4 border-t pt-4">
           <div>
-            <Label>Powered by GSTify badge</Label>
+            <Label>Powered by PracticeDesk badge</Label>
             <p className="text-xs text-muted-foreground">Show in your client portal footer</p>
           </div>
           <Switch checked={poweredBy} onCheckedChange={setPoweredBy} />

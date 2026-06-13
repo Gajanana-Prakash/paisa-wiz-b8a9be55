@@ -200,7 +200,7 @@ INSERT INTO public.gst_notifications (
   'Notification No. 49/2023 – Central Tax',
   'E-invoicing threshold reduced to ₹5 crore',
   'Mandatory e-invoicing for businesses with turnover above ₹5 crore.',
-  'Clients crossing threshold must register on IRP. CAs should enable e-invoice workflow in GSTify.',
+  'Clients crossing threshold must register on IRP. CAs should enable e-invoice workflow in PracticeDesk.',
   '2023-08-01',
   'PROCEDURE',
   NULL,

@@ -15,7 +15,7 @@ export const PLAN_CATALOG = {
       "Up to 3 clients",
       "Document upload & AI extraction",
       "Client portal",
-      "GSTify branding on portal",
+      "PracticeDesk branding on portal",
       "Email support",
     ],
     cta: "Start Free — No card needed",

@@ -76,7 +76,7 @@ export function CAWelcomeOnboarding() {
         {step === 1 && (
           <>
             <DialogHeader>
-              <DialogTitle className="font-display">Welcome to GSTify! Let&apos;s get your firm set up.</DialogTitle>
+              <DialogTitle className="font-display">Welcome to PracticeDesk! Let&apos;s get your firm set up.</DialogTitle>
               <DialogDescription>Tell us a bit about your practice — takes 30 seconds.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-2">
@@ -125,7 +125,7 @@ export function CAWelcomeOnboarding() {
           <>
             <DialogHeader>
               <DialogTitle className="font-display">Would you like a free setup call?</DialogTitle>
-              <DialogDescription>30-minute walkthrough with our team — we&apos;ll configure GSTify for your firm.</DialogDescription>
+              <DialogDescription>30-minute walkthrough with our team — we&apos;ll configure PracticeDesk for your firm.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
@@ -170,11 +170,11 @@ export function CAWelcomeOnboarding() {
           <>
             <DialogHeader>
               <DialogTitle className="font-display">Watch this 3-minute intro first?</DialogTitle>
-              <DialogDescription>GSTify in 3 minutes — how CA firms and clients work together.</DialogDescription>
+              <DialogDescription>PracticeDesk in 3 minutes — how CA firms and clients work together.</DialogDescription>
             </DialogHeader>
             <div className="mt-2 aspect-video rounded-xl overflow-hidden bg-black">
               <iframe
-                title="GSTify intro"
+                title="PracticeDesk intro"
                 className="w-full h-full"
                 src={`https://www.youtube.com/embed/${SUPPORT_INTRO_YOUTUBE_ID}?rel=0`}
                 allowFullScreen

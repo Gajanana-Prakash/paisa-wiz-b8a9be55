@@ -200,7 +200,7 @@ function SettingsPage() {
             </div>
             <div className="leading-tight min-w-0">
               <div className="font-display font-semibold truncate">{name || "Your Firm"}</div>
-              <div className="text-[11px] uppercase tracking-widest opacity-80">Powered by GSTify</div>
+              <div className="text-[11px] uppercase tracking-widest opacity-80">Powered by PracticeDesk</div>
             </div>
           </div>
         </div>
@@ -268,8 +268,8 @@ function SettingsPage() {
       </section>
 
       <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
-        <h2 className="font-display text-lg font-semibold">GSTify subscription</h2>
-        <p className="text-xs text-muted-foreground mt-1">Your plan, usage, and GST invoices for GSTify fees.</p>
+        <h2 className="font-display text-lg font-semibold">PracticeDesk subscription</h2>
+        <p className="text-xs text-muted-foreground mt-1">Your plan, usage, and GST invoices for PracticeDesk fees.</p>
         <Link to="/ca/settings/billing-subscription" className="inline-block mt-4">
           <Button variant="outline" size="sm">Billing &amp; subscription</Button>
         </Link>

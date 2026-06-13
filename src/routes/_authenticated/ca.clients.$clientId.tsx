@@ -850,7 +850,7 @@ function WhatsAppPanel({ client }: { client: Client }) {
       id: "welcome",
       icon: <Send className="size-4" />,
       title: "Welcome & upload link",
-      body: `Hi ${client.contact_name || client.business_name}, this is your secure GSTify upload link. Send your invoice photos here and your CA will review them automatically:\n\n${uploadLink}`,
+      body: `Hi ${client.contact_name || client.business_name}, this is your secure PracticeDesk upload link. Send your invoice photos here and your CA will review them automatically:\n\n${uploadLink}`,
     },
     {
       id: "monthly",

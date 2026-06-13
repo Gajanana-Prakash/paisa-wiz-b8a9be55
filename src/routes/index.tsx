@@ -7,8 +7,8 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "GSTify — The GST Collaboration Platform for CA Firms & Clients" },
-      { name: "description", content: "Stop chasing documents on WhatsApp. Give clients a simple portal to upload invoices, and manage all their GST filings from one dashboard." },
+      { title: "PracticeDesk — The Practice Management Platform for CA Firms" },
+      { name: "description", content: "The Practice Management Platform for CA Firms — works alongside your existing tax software. Manage clients, teams, and deadlines while you keep using CompuTax/Spectrum for filing." },
     ],
   }),
 });
@@ -18,8 +18,8 @@ function Nav() {
     <header className="absolute top-0 inset-x-0 z-20">
       <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-primary-foreground">
-          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
-          <span className="font-display text-lg font-semibold tracking-tight">GSTify</span>
+          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">P</div>
+          <span className="font-display text-lg font-semibold tracking-tight">PracticeDesk</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-primary-foreground/80">
           <a href="#features" className="hover:text-primary-foreground transition">Features</a>
@@ -45,14 +45,14 @@ function Hero() {
       <div className="relative mx-auto max-w-7xl px-6 pt-36 pb-24 md:pt-40 md:pb-32 grid md:grid-cols-2 gap-12 items-center">
         <div className="text-primary-foreground">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/40 bg-white/5 text-gold text-xs font-medium tracking-wide uppercase">
-            <Sparkles className="size-3.5" /> Built for CA firms & their clients
+            <Sparkles className="size-3.5" /> Practice management for CA firms
           </div>
           <h1 className="mt-6 font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
-            The GST Collaboration Platform for{" "}
-            <span className="text-gold">CA Firms &amp; Their Clients.</span>
+            Your clients. Your team. Your deadlines.{" "}
+            <span className="text-gold">All organized</span> — while you keep using CompuTax/Spectrum for filing.
           </h1>
           <p className="mt-6 text-lg text-primary-foreground/75 max-w-xl">
-            Stop chasing documents on WhatsApp. Give your clients a simple portal to upload invoices — and manage all their GST filings from one dashboard.
+            The Practice Management Platform for CA Firms — works alongside your existing tax software.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link to="/signup/ca">
@@ -73,7 +73,7 @@ function Hero() {
         </div>
         <div className="relative">
           <div className="absolute -inset-6 rounded-3xl bg-gold/10 blur-3xl" />
-          <img src={heroImg} alt="GSTify dashboard preview" width={1600} height={1200} className="relative rounded-2xl shadow-[var(--shadow-elegant)] border border-white/10" />
+          <img src={heroImg} alt="PracticeDesk dashboard preview" width={1600} height={1200} className="relative rounded-2xl shadow-[var(--shadow-elegant)] border border-white/10" />
         </div>
       </div>
     </section>
@@ -141,7 +141,7 @@ function Workflow1() {
 
 const TESTIMONIALS = [
   {
-    quote: "We replaced three WhatsApp groups and a shared Drive folder with GSTify. Our clients actually upload on time now.",
+    quote: "We replaced three WhatsApp groups and a shared Drive folder with PracticeDesk. Our clients actually upload on time now.",
     name: "CA Priya Menon",
     firm: "Menon & Associates, Bengaluru",
   },
@@ -163,7 +163,7 @@ function Testimonials() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center max-w-2xl mx-auto">
           <p className="text-sm font-medium uppercase tracking-wider text-primary">Loved by CA firms</p>
-          <h2 className="mt-3 font-display text-4xl md:text-5xl font-semibold text-foreground">Practices running on GSTify.</h2>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl font-semibold text-foreground">Practices running on PracticeDesk.</h2>
         </div>
         <div className="mt-16 grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
@@ -300,7 +300,7 @@ function Pricing() {
           <div>
             <div className="font-display text-lg font-semibold">14-day free trial</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Try GSTify with up to 3 clients. No credit card required. Pick a plan whenever you're ready.
+              Try PracticeDesk with up to 3 clients. No credit card required. Pick a plan whenever you're ready.
             </p>
           </div>
           <Link to="/signup/ca">
@@ -332,7 +332,7 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-6 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="size-7 rounded-md bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold text-sm">G</div>
-          <span className="font-display font-semibold text-foreground">GSTify</span>
+          <span className="font-display font-semibold text-foreground">PracticeDesk</span>
           <span className="ml-2">© {new Date().getFullYear()}</span>
         </div>
         <p>AI-assisted GST preparation. Human verification required for filing.</p>

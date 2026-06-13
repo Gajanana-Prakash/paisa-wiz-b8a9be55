@@ -25,10 +25,10 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
   head: () => ({
     meta: [
-      { title: "Pricing — GSTify" },
+      { title: "Pricing — PracticeDesk — Practice Management for CA Firms" },
       {
         name: "description",
-        content: "Simple pricing that grows with your CA practice. Start free. Pay only for active clients.",
+        content: "Simple pricing that grows with your CA practice. Practice management — works alongside CompuTax/Spectrum. Start free.",
       },
     ],
   }),
@@ -43,8 +43,8 @@ function PricingNav() {
     <header className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-20">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
-          <span className="font-display text-lg font-semibold">GSTify</span>
+          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">P</div>
+          <span className="font-display text-lg font-semibold">PracticeDesk</span>
         </Link>
         <div className="flex items-center gap-2">
           <Link to="/login">

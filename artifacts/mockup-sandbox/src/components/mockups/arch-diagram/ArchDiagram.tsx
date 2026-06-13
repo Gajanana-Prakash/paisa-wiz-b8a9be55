@@ -66,7 +66,7 @@ export function ArchDiagram() {
             fontSize: 18, fontWeight: 800, color: "#fff"
           }}>G</div>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#f8fafc", letterSpacing: "-0.5px" }}>GSTify</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#f8fafc", letterSpacing: "-0.5px" }}>PracticeDesk</div>
             <div style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>Architecture Diagram</div>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function ArchDiagram() {
       {/* ── LAYER 1: Users ── */}
       <div className="layer" style={{ background: "#1a1f2e", border: "1px solid #2d3748" }}>
         <div className="layer-header" style={{ background: "#1e2a3a", color: "#93c5fd" }}>
-          <span>👥</span> User Layer — Who Uses GSTify
+          <span>👥</span> User Layer — Who Uses PracticeDesk
         </div>
         <div className="layer-body">
           <div className="four-col">
@@ -418,7 +418,7 @@ export function ArchDiagram() {
 
       {/* Footer */}
       <div style={{ textAlign: "center", marginTop: 20, color: "#334155", fontSize: 10 }}>
-        GSTify Architecture · TanStack Start + React 19 + Cloudflare Workers + Supabase · June 2026
+        PracticeDesk Architecture · TanStack Start + React 19 + Cloudflare Workers + Supabase · June 2026
       </div>
     </div>
   );
