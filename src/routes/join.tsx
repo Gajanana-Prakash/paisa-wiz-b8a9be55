@@ -41,7 +41,7 @@ function JoinPage() {
     <div className="min-h-screen grid place-items-center p-8 bg-gradient-to-b from-background to-muted/40">
       <div className="max-w-md w-full text-center space-y-6">
         <Link to="/" className="inline-flex items-center gap-2 font-display text-xl font-semibold">
-          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
+          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">P</div>
           PracticeDesk
         </Link>
         {loading ? (

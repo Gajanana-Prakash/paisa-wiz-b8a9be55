@@ -8,7 +8,7 @@ function SignupChooser() {
     <div className="min-h-screen grid md:grid-cols-2">
       <div className="hidden md:block relative" style={{ background: "var(--gradient-hero)" }}>
         <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-primary-foreground">
-          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
+          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">P</div>
           <span className="font-display text-lg font-semibold">PracticeDesk</span>
         </Link>
         <div className="absolute bottom-12 left-12 right-12 text-primary-foreground">

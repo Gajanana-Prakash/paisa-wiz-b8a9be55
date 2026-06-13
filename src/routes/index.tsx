@@ -18,7 +18,7 @@ function Nav() {
     <header className="absolute top-0 inset-x-0 z-20">
       <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-primary-foreground">
-          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">G</div>
+          <div className="size-9 rounded-lg bg-[var(--gradient-gold)] grid place-items-center text-primary font-bold">P</div>
           <span className="font-display text-lg font-semibold tracking-tight">PracticeDesk</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-primary-foreground/80">
