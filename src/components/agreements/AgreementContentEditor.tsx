@@ -48,7 +48,7 @@ export function AgreementContentEditor({
       </div>
       {previewHtml && (
         <div className="rounded-xl border bg-card p-6 prose prose-sm max-w-none agreement-preview">
-          <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitize(previewHtml) }} />
         </div>
       )}
     </div>
@@ -60,7 +60,7 @@ export function AgreementDocumentView({ html, className }: { html: string; class
     <div
       className={`prose prose-base max-w-none leading-relaxed agreement-document ${className ?? ""}`}
       style={{ fontSize: "17px", lineHeight: 1.7 }}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitize(html) }}
     />
   );
 }
