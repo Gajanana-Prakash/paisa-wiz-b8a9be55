@@ -17,7 +17,7 @@ import {
 import { listFirmClientsLite } from "@/lib/tasks.functions";
 import { formatInr, addDays } from "./utils";
 import { computeInvoiceTotals } from "@/lib/billing.calc";
-import { HsnRateLookup } from "@/components/gst-library/HsnRateLookup";
+
 
 type LineRow = {
   key: string;
