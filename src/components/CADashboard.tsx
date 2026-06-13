@@ -218,8 +218,6 @@ export function CADashboard() {
         <Summary icon={<CheckCircle2 className="size-5" />} label="Ready to file" value={totals.ready} tone="success" />
       </div>
 
-      {/* Personal CPE widget — only visible to logged-in CA */}
-      <CpeDashboardWidget />
 
       {/* Client compliance table */}
       <div className="rounded-3xl border border-border/70 bg-card overflow-hidden">
