@@ -29,7 +29,7 @@ function SignAgreementPage() {
   const [designation, setDesignation] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
+  
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
@@ -49,7 +49,6 @@ function SignAgreementPage() {
     try {
       const r = await requestOtp({ data: { token } });
       setOtpSent(true);
-      setDemoOtp(r.demoOtp ?? null);
       toast.success(r.phoneMasked ? `OTP sent to ${r.phoneMasked}` : "OTP generated");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Could not send OTP");
@@ -181,11 +180,6 @@ function SignAgreementPage() {
             </Button>
           ) : (
             <div className="space-y-4">
-              {demoOtp && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                  Demo mode: your OTP is <strong>{demoOtp}</strong>. In production this is sent via SMS.
-                </p>
-              )}
               <div>
                 <Label>Enter 6-digit OTP</Label>
                 <InputOTP maxLength={6} value={otp} onChange={setOtp} className="mt-2">

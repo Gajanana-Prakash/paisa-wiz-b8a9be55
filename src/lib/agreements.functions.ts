@@ -629,7 +629,6 @@ export const requestSigningOtp = createServerFn({ method: "POST" })
     return {
       ok: true,
       phoneMasked: agreement.signer_phone ? `****${agreement.signer_phone.slice(-4)}` : null,
-      demoOtp: otp,
     };
   });
 

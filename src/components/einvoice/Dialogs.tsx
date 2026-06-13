@@ -41,17 +41,22 @@ export function QrViewerDialog({
     a.click();
     URL.revokeObjectURL(url);
   };
+  const escHtml = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   const printQr = () => {
     if (!data.qrImage) return;
     const w = window.open("", "_blank");
     if (!w) return;
+    const invNo = escHtml(data.invoiceNumber);
+    const irn = escHtml(data.irn ?? "");
+    const ack = escHtml(data.ackNumber ?? "");
+    const ackDate = escHtml(data.ackDate ? new Date(data.ackDate).toLocaleString("en-IN") : "");
+    const qr = escHtml(data.qrImage);
     w.document.write(
-      `<html><head><title>IRN ${data.invoiceNumber}</title></head><body style="text-align:center;font-family:sans-serif;padding:32px">
-       <img src="${data.qrImage}" style="width:280px;height:280px"/>
-       <div style="font-size:11px;margin-top:12px;word-break:break-all">${data.irn ?? ""}</div>
-       <div style="font-size:11px;margin-top:4px">Ack: ${data.ackNumber ?? ""} · ${
-         data.ackDate ? new Date(data.ackDate).toLocaleString("en-IN") : ""
-       }</div>
+      `<html><head><title>IRN ${invNo}</title></head><body style="text-align:center;font-family:sans-serif;padding:32px">
+       <img src="${qr}" style="width:280px;height:280px"/>
+       <div style="font-size:11px;margin-top:12px;word-break:break-all">${irn}</div>
+       <div style="font-size:11px;margin-top:4px">Ack: ${ack} · ${ackDate}</div>
        </body></html>`,
     );
     w.document.close();
