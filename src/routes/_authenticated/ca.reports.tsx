@@ -42,7 +42,7 @@ type Client = { id: string; business_name: string; gstin: string | null };
 type Format = "gstr1" | "excel" | "csv" | "tally";
 
 const FORMAT_META: Record<Format, { label: string; ext: string; icon: any; mime: string }> = {
-  gstr1: { label: "GSTR-1 JSON", ext: "json", icon: FileJson, mime: "application/json" },
+  gstr1: { label: "GSTR-1 JSON (for CompuTax / Spectrum)", ext: "json", icon: FileJson, mime: "application/json" },
   excel: { label: "Excel (.xlsx)", ext: "xlsx", icon: FileSpreadsheet, mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
   csv: { label: "CSV", ext: "csv", icon: FileText, mime: "text/csv" },
   tally: { label: "Tally XML", ext: "xml", icon: FileCode2, mime: "application/xml" },
