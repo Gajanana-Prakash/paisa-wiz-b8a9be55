@@ -29,7 +29,7 @@ function SignAgreementPage() {
   const [designation, setDesignation] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
+  
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
