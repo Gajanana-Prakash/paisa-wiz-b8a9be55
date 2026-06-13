@@ -114,7 +114,7 @@ function Features() {
 const STEPS = [
   { n: "01", title: "Upload anything", desc: "Drag in PDFs, scans, photos or ZIPs. We handle multi-page docs and bulk uploads." },
   { n: "02", title: "AI extracts &amp; validates", desc: "Every field captured, every GSTIN checked, every duplicate flagged — with confidence scores." },
-  { n: "03", title: "Review &amp; export", desc: "Approve flagged items, then export GSTR-ready JSON, Excel or PDF in one click." },
+  { n: "03", title: "Review &amp; export", desc: "Approve flagged items, then export CompuTax / Spectrum / Tally-compatible data — ready to hand off to your filing software." },
 ];
 
 function Workflow1() {
