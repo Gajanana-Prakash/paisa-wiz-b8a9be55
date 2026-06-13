@@ -20,7 +20,7 @@ import {
   Bell, FileDown, Copy, ArrowRight, Building2, CalendarClock, CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
-import { CpeDashboardWidget } from "@/components/cpe/CpeDashboardWidget";
+
 
 type Client = {
   id: string;
@@ -218,8 +218,6 @@ export function CADashboard() {
         <Summary icon={<CheckCircle2 className="size-5" />} label="Ready to file" value={totals.ready} tone="success" />
       </div>
 
-      {/* Personal CPE widget — only visible to logged-in CA */}
-      <CpeDashboardWidget />
 
       {/* Client compliance table */}
       <div className="rounded-3xl border border-border/70 bg-card overflow-hidden">

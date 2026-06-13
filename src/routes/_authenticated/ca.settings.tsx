@@ -287,25 +287,37 @@ function SettingsPage() {
       </section>
 
       <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
-        <h2 className="font-display text-lg font-semibold">e-Invoicing (IRP)</h2>
-        <p className="text-xs text-muted-foreground mt-1">IRN generation, QR codes, and NIC IRP portal credentials. Currently running in mock mode.</p>
-        <Link to="/ca/settings/e-invoice" className="inline-block mt-4">
-          <Button variant="outline" size="sm">e-Invoice configuration</Button>
-        </Link>
-        <Link to="/ca/e-invoices" className="inline-block mt-4 ml-2">
-          <Button size="sm" variant="ghost">Open e-Invoice dashboard</Button>
-        </Link>
-      </section>
-
-      <section className="bg-card border border-border rounded-3xl p-6 md:p-8">
-        <h2 className="font-display text-lg font-semibold">E-Way Bill</h2>
-        <p className="text-xs text-muted-foreground mt-1">Generate EWBs for goods movement above ₹50,000, track validity, and manage NIC EWB credentials. Currently running in mock mode.</p>
-        <Link to="/ca/settings/eway-bill" className="inline-block mt-4">
-          <Button variant="outline" size="sm">E-Way Bill configuration</Button>
-        </Link>
-        <Link to="/ca/eway-bills" className="inline-block mt-4 ml-2">
-          <Button size="sm" variant="ghost">Open EWB dashboard</Button>
-        </Link>
+        <details>
+          <summary className="cursor-pointer list-none flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Advanced (Beta)</h2>
+              <p className="text-xs text-muted-foreground mt-1">Experimental modules — e-Invoicing (IRP) and E-Way Bill. Currently running in mock mode.</p>
+            </div>
+            <span className="text-xs text-muted-foreground">Show ▾</span>
+          </summary>
+          <div className="mt-6 space-y-6">
+            <div className="rounded-2xl border border-border/70 p-5">
+              <h3 className="font-display text-base font-semibold">e-Invoicing (IRP) <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground">Beta</span></h3>
+              <p className="text-xs text-muted-foreground mt-1">IRN generation, QR codes, and NIC IRP portal credentials. Optional — configure only if you actively need it.</p>
+              <Link to="/ca/settings/e-invoice" className="inline-block mt-3">
+                <Button variant="outline" size="sm">e-Invoice configuration</Button>
+              </Link>
+              <Link to="/ca/e-invoices" className="inline-block mt-3 ml-2">
+                <Button size="sm" variant="ghost">Open e-Invoice dashboard</Button>
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-border/70 p-5">
+              <h3 className="font-display text-base font-semibold">E-Way Bill <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground">Beta</span></h3>
+              <p className="text-xs text-muted-foreground mt-1">Generate EWBs for goods movement above ₹50,000, track validity, manage NIC EWB credentials.</p>
+              <Link to="/ca/settings/eway-bill" className="inline-block mt-3">
+                <Button variant="outline" size="sm">E-Way Bill configuration</Button>
+              </Link>
+              <Link to="/ca/eway-bills" className="inline-block mt-3 ml-2">
+                <Button size="sm" variant="ghost">Open EWB dashboard</Button>
+              </Link>
+            </div>
+          </div>
+        </details>
       </section>
 
       <section className="bg-card border border-border rounded-3xl p-6 md:p-8">

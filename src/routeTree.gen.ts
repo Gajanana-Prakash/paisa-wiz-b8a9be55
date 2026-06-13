@@ -40,7 +40,6 @@ import { Route as AuthenticatedCaStaffRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCaSettingsRouteImport } from './routes/_authenticated/ca.settings'
 import { Route as AuthenticatedCaReportsRouteImport } from './routes/_authenticated/ca.reports'
 import { Route as AuthenticatedCaHelpRouteImport } from './routes/_authenticated/ca.help'
-import { Route as AuthenticatedCaGstLibraryRouteImport } from './routes/_authenticated/ca.gst-library'
 import { Route as AuthenticatedCaGrowRouteImport } from './routes/_authenticated/ca.grow'
 import { Route as AuthenticatedCaEwayBillsRouteImport } from './routes/_authenticated/ca.eway-bills'
 import { Route as AuthenticatedCaEInvoicesRouteImport } from './routes/_authenticated/ca.e-invoices'
@@ -73,7 +72,6 @@ import { Route as AuthenticatedCaSettingsBillingRouteImport } from './routes/_au
 import { Route as AuthenticatedCaSettingsBankReconciliationRouteImport } from './routes/_authenticated/ca.settings.bank-reconciliation'
 import { Route as AuthenticatedCaSettingsAgreementTemplatesRouteImport } from './routes/_authenticated/ca.settings.agreement-templates'
 import { Route as AuthenticatedCaReportsTimesheetsRouteImport } from './routes/_authenticated/ca.reports.timesheets'
-import { Route as AuthenticatedCaMyProfileCpeRouteImport } from './routes/_authenticated/ca.my-profile.cpe'
 import { Route as AuthenticatedCaClientsClientIdRouteImport } from './routes/_authenticated/ca.clients.$clientId'
 import { Route as AuthenticatedCaBillingServicesRouteImport } from './routes/_authenticated/ca.billing.services'
 import { Route as AuthenticatedCaBillingReportsRouteImport } from './routes/_authenticated/ca.billing.reports'
@@ -252,12 +250,6 @@ const AuthenticatedCaHelpRoute = AuthenticatedCaHelpRouteImport.update({
   path: '/help',
   getParentRoute: () => AuthenticatedCaRoute,
 } as any)
-const AuthenticatedCaGstLibraryRoute =
-  AuthenticatedCaGstLibraryRouteImport.update({
-    id: '/gst-library',
-    path: '/gst-library',
-    getParentRoute: () => AuthenticatedCaRoute,
-  } as any)
 const AuthenticatedCaGrowRoute = AuthenticatedCaGrowRouteImport.update({
   id: '/grow',
   path: '/grow',
@@ -446,12 +438,6 @@ const AuthenticatedCaReportsTimesheetsRoute =
     path: '/timesheets',
     getParentRoute: () => AuthenticatedCaReportsRoute,
   } as any)
-const AuthenticatedCaMyProfileCpeRoute =
-  AuthenticatedCaMyProfileCpeRouteImport.update({
-    id: '/my-profile/cpe',
-    path: '/my-profile/cpe',
-    getParentRoute: () => AuthenticatedCaRoute,
-  } as any)
 const AuthenticatedCaClientsClientIdRoute =
   AuthenticatedCaClientsClientIdRouteImport.update({
     id: '/$clientId',
@@ -578,7 +564,6 @@ export interface FileRoutesByFullPath {
   '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/eway-bills': typeof AuthenticatedCaEwayBillsRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
-  '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
   '/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
@@ -600,7 +585,6 @@ export interface FileRoutesByFullPath {
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
-  '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
@@ -657,7 +641,6 @@ export interface FileRoutesByTo {
   '/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/ca/eway-bills': typeof AuthenticatedCaEwayBillsRoute
   '/ca/grow': typeof AuthenticatedCaGrowRoute
-  '/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/ca/help': typeof AuthenticatedCaHelpRoute
   '/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
@@ -678,7 +661,6 @@ export interface FileRoutesByTo {
   '/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
-  '/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
@@ -740,7 +722,6 @@ export interface FileRoutesById {
   '/_authenticated/ca/e-invoices': typeof AuthenticatedCaEInvoicesRoute
   '/_authenticated/ca/eway-bills': typeof AuthenticatedCaEwayBillsRoute
   '/_authenticated/ca/grow': typeof AuthenticatedCaGrowRoute
-  '/_authenticated/ca/gst-library': typeof AuthenticatedCaGstLibraryRoute
   '/_authenticated/ca/help': typeof AuthenticatedCaHelpRoute
   '/_authenticated/ca/reports': typeof AuthenticatedCaReportsRouteWithChildren
   '/_authenticated/ca/settings': typeof AuthenticatedCaSettingsRouteWithChildren
@@ -762,7 +743,6 @@ export interface FileRoutesById {
   '/_authenticated/ca/billing/reports': typeof AuthenticatedCaBillingReportsRoute
   '/_authenticated/ca/billing/services': typeof AuthenticatedCaBillingServicesRoute
   '/_authenticated/ca/clients/$clientId': typeof AuthenticatedCaClientsClientIdRouteWithChildren
-  '/_authenticated/ca/my-profile/cpe': typeof AuthenticatedCaMyProfileCpeRoute
   '/_authenticated/ca/reports/timesheets': typeof AuthenticatedCaReportsTimesheetsRoute
   '/_authenticated/ca/settings/agreement-templates': typeof AuthenticatedCaSettingsAgreementTemplatesRoute
   '/_authenticated/ca/settings/bank-reconciliation': typeof AuthenticatedCaSettingsBankReconciliationRoute
@@ -824,7 +804,6 @@ export interface FileRouteTypes {
     | '/ca/e-invoices'
     | '/ca/eway-bills'
     | '/ca/grow'
-    | '/ca/gst-library'
     | '/ca/help'
     | '/ca/reports'
     | '/ca/settings'
@@ -846,7 +825,6 @@ export interface FileRouteTypes {
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
-    | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
     | '/ca/settings/bank-reconciliation'
@@ -903,7 +881,6 @@ export interface FileRouteTypes {
     | '/ca/e-invoices'
     | '/ca/eway-bills'
     | '/ca/grow'
-    | '/ca/gst-library'
     | '/ca/help'
     | '/ca/reports'
     | '/ca/settings'
@@ -924,7 +901,6 @@ export interface FileRouteTypes {
     | '/ca/billing/reports'
     | '/ca/billing/services'
     | '/ca/clients/$clientId'
-    | '/ca/my-profile/cpe'
     | '/ca/reports/timesheets'
     | '/ca/settings/agreement-templates'
     | '/ca/settings/bank-reconciliation'
@@ -985,7 +961,6 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/e-invoices'
     | '/_authenticated/ca/eway-bills'
     | '/_authenticated/ca/grow'
-    | '/_authenticated/ca/gst-library'
     | '/_authenticated/ca/help'
     | '/_authenticated/ca/reports'
     | '/_authenticated/ca/settings'
@@ -1007,7 +982,6 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/billing/reports'
     | '/_authenticated/ca/billing/services'
     | '/_authenticated/ca/clients/$clientId'
-    | '/_authenticated/ca/my-profile/cpe'
     | '/_authenticated/ca/reports/timesheets'
     | '/_authenticated/ca/settings/agreement-templates'
     | '/_authenticated/ca/settings/bank-reconciliation'
@@ -1270,13 +1244,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaHelpRouteImport
       parentRoute: typeof AuthenticatedCaRoute
     }
-    '/_authenticated/ca/gst-library': {
-      id: '/_authenticated/ca/gst-library'
-      path: '/gst-library'
-      fullPath: '/ca/gst-library'
-      preLoaderRoute: typeof AuthenticatedCaGstLibraryRouteImport
-      parentRoute: typeof AuthenticatedCaRoute
-    }
     '/_authenticated/ca/grow': {
       id: '/_authenticated/ca/grow'
       path: '/grow'
@@ -1500,13 +1467,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ca/reports/timesheets'
       preLoaderRoute: typeof AuthenticatedCaReportsTimesheetsRouteImport
       parentRoute: typeof AuthenticatedCaReportsRoute
-    }
-    '/_authenticated/ca/my-profile/cpe': {
-      id: '/_authenticated/ca/my-profile/cpe'
-      path: '/my-profile/cpe'
-      fullPath: '/ca/my-profile/cpe'
-      preLoaderRoute: typeof AuthenticatedCaMyProfileCpeRouteImport
-      parentRoute: typeof AuthenticatedCaRoute
     }
     '/_authenticated/ca/clients/$clientId': {
       id: '/_authenticated/ca/clients/$clientId'
@@ -1835,7 +1795,6 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaEInvoicesRoute: typeof AuthenticatedCaEInvoicesRoute
   AuthenticatedCaEwayBillsRoute: typeof AuthenticatedCaEwayBillsRoute
   AuthenticatedCaGrowRoute: typeof AuthenticatedCaGrowRoute
-  AuthenticatedCaGstLibraryRoute: typeof AuthenticatedCaGstLibraryRoute
   AuthenticatedCaHelpRoute: typeof AuthenticatedCaHelpRoute
   AuthenticatedCaReportsRoute: typeof AuthenticatedCaReportsRouteWithChildren
   AuthenticatedCaSettingsRoute: typeof AuthenticatedCaSettingsRouteWithChildren
@@ -1844,7 +1803,6 @@ interface AuthenticatedCaRouteChildren {
   AuthenticatedCaTimesheetsRoute: typeof AuthenticatedCaTimesheetsRouteWithChildren
   AuthenticatedCaVaultRoute: typeof AuthenticatedCaVaultRoute
   AuthenticatedCaIndexRoute: typeof AuthenticatedCaIndexRoute
-  AuthenticatedCaMyProfileCpeRoute: typeof AuthenticatedCaMyProfileCpeRoute
 }
 
 const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
@@ -1860,7 +1818,6 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaEInvoicesRoute: AuthenticatedCaEInvoicesRoute,
   AuthenticatedCaEwayBillsRoute: AuthenticatedCaEwayBillsRoute,
   AuthenticatedCaGrowRoute: AuthenticatedCaGrowRoute,
-  AuthenticatedCaGstLibraryRoute: AuthenticatedCaGstLibraryRoute,
   AuthenticatedCaHelpRoute: AuthenticatedCaHelpRoute,
   AuthenticatedCaReportsRoute: AuthenticatedCaReportsRouteWithChildren,
   AuthenticatedCaSettingsRoute: AuthenticatedCaSettingsRouteWithChildren,
@@ -1869,7 +1826,6 @@ const AuthenticatedCaRouteChildren: AuthenticatedCaRouteChildren = {
   AuthenticatedCaTimesheetsRoute: AuthenticatedCaTimesheetsRouteWithChildren,
   AuthenticatedCaVaultRoute: AuthenticatedCaVaultRoute,
   AuthenticatedCaIndexRoute: AuthenticatedCaIndexRoute,
-  AuthenticatedCaMyProfileCpeRoute: AuthenticatedCaMyProfileCpeRoute,
 }
 
 const AuthenticatedCaRouteWithChildren = AuthenticatedCaRoute._addFileChildren(

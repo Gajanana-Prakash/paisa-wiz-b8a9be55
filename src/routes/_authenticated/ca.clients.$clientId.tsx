@@ -240,7 +240,7 @@ function ClientWorkspace() {
           <div className="rounded-2xl border border-border bg-card p-6">
             <h3 className="font-display font-semibold">GST reconciliation</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              GSTR-1 / GSTR-2A reconciliation for {client.business_name}. Use the export tools to generate filing-ready JSON.
+              Prepare GSTR-1 / GSTR-2A data for {client.business_name}. Use the export tools to hand off the data to your filing software (CompuTax, Spectrum, Tally).
             </p>
             <div className="mt-4 grid sm:grid-cols-3 gap-3">
               <Stat label="Taxable value" value={fmt(stats.taxable)} />

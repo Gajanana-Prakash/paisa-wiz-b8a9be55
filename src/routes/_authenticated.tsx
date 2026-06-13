@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
   Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive, FileSignature, BarChart3, Gift,
-  CircleHelp, BookOpen, GraduationCap,
+  CircleHelp,
 } from "lucide-react";
 import { HelpWidget } from "@/components/support/HelpWidget";
 import { CAWelcomeOnboarding } from "@/components/support/CAWelcomeOnboarding";
@@ -108,7 +108,6 @@ const CA_NAV_OWNER = [
   { to: "/ca/timesheets", icon: Clock, label: "Timesheets" },
   { to: "/ca/staff", icon: UserCog, label: "Staff" },
   { to: "/ca/billing", icon: IndianRupee, label: "Billing" },
-  { to: "/ca/gst-library", icon: BookOpen, label: "GST Library" },
   { to: "/ca/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/ca/grow", icon: Gift, label: "Grow" },
   { to: "/ca/help", icon: CircleHelp, label: "Help" },
@@ -120,7 +119,6 @@ const CA_NAV_OWNER = [
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
-  { to: "/ca/my-profile/cpe", icon: GraduationCap, label: "My CPE" },
 ] as const;
 
 const CA_NAV_STAFF = [
@@ -129,12 +127,10 @@ const CA_NAV_STAFF = [
   { to: "/ca/tasks/my-tasks", icon: KanbanSquare, label: "My tasks" },
   { to: "/ca/timesheets/my-timesheet", icon: Clock, label: "My timesheet" },
   { to: "/ca/dsc-vault", icon: KeyRound, label: "DSC Vault" },
-  { to: "/ca/gst-library", icon: BookOpen, label: "GST Library" },
   { to: "/invoices", icon: FileText, label: "Invoices" },
   { to: "/reminders", icon: Bell, label: "Reminders" },
   { to: "/ca/help", icon: CircleHelp, label: "Help" },
   { to: "/assistant", icon: Sparkles, label: "AI Assistant" },
-  { to: "/ca/my-profile/cpe", icon: GraduationCap, label: "My CPE" },
 ] as const;
 
 const CLIENT_NAV = [
