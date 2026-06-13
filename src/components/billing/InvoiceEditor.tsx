@@ -269,13 +269,6 @@ export function InvoiceEditor({
                       className="h-8 font-mono text-xs"
                       placeholder="998231"
                     />
-                    <HsnRateLookup
-                      code={l.hsnSac}
-                      compact
-                      onApplyRate={(rate) =>
-                        setLines((p) => p.map((x) => (x.key === l.key ? { ...x, gstRate: rate } : x)))
-                      }
-                    />
                   </td>
                   <td className="py-2 pr-2">
                     <Input value={l.description} onChange={(e) => setLines((p) => p.map((x) => x.key === l.key ? { ...x, description: e.target.value } : x))} className="h-8" />
