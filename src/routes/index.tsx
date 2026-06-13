@@ -7,8 +7,8 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "PracticeDesk — The GST Collaboration Platform for CA Firms & Clients" },
-      { name: "description", content: "Stop chasing documents on WhatsApp. Give clients a simple portal to upload invoices, and manage all their GST filings from one dashboard." },
+      { title: "PracticeDesk — The Practice Management Platform for CA Firms" },
+      { name: "description", content: "The Practice Management Platform for CA Firms — works alongside your existing tax software. Manage clients, teams, and deadlines while you keep using CompuTax/Spectrum for filing." },
     ],
   }),
 });
