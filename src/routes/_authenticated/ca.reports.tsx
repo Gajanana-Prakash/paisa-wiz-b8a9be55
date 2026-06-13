@@ -292,8 +292,8 @@ function ExportsPage() {
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto">
-      <h1 className="font-display text-3xl font-semibold">Reports &amp; Export Center</h1>
-      <p className="text-muted-foreground mt-1">GSTR-1 JSON, Excel, CSV, Tally XML — for one client or many, in one click.</p>
+      <h1 className="font-display text-3xl font-semibold">Export Data for Your Tax Software</h1>
+      <p className="text-muted-foreground mt-1">Export in CompuTax-compatible, Spectrum-compatible, and Tally-compatible formats — import directly into your filing software. PracticeDesk organizes your client data so it's ready to hand off.</p>
 
       <Link
         to="/ca/reports/timesheets"
