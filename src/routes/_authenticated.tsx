@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Upload, FileText, LogOut, FileDown, Users, Sparkles,
   Search, ChevronDown, Plus, Settings, Menu, Briefcase, Loader2, Bell, KanbanSquare,
   Clock, UserCog, IndianRupee, MessagesSquare, KeyRound, FolderArchive, FileSignature, BarChart3, Gift,
-  CircleHelp, BookOpen, GraduationCap,
+  CircleHelp,
 } from "lucide-react";
 import { HelpWidget } from "@/components/support/HelpWidget";
 import { CAWelcomeOnboarding } from "@/components/support/CAWelcomeOnboarding";
