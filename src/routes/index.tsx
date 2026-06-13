@@ -45,14 +45,14 @@ function Hero() {
       <div className="relative mx-auto max-w-7xl px-6 pt-36 pb-24 md:pt-40 md:pb-32 grid md:grid-cols-2 gap-12 items-center">
         <div className="text-primary-foreground">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/40 bg-white/5 text-gold text-xs font-medium tracking-wide uppercase">
-            <Sparkles className="size-3.5" /> Built for CA firms & their clients
+            <Sparkles className="size-3.5" /> Practice management for CA firms
           </div>
           <h1 className="mt-6 font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
-            The GST Collaboration Platform for{" "}
-            <span className="text-gold">CA Firms &amp; Their Clients.</span>
+            Your clients. Your team. Your deadlines.{" "}
+            <span className="text-gold">All organized</span> — while you keep using CompuTax/Spectrum for filing.
           </h1>
           <p className="mt-6 text-lg text-primary-foreground/75 max-w-xl">
-            Stop chasing documents on WhatsApp. Give your clients a simple portal to upload invoices — and manage all their GST filings from one dashboard.
+            The Practice Management Platform for CA Firms — works alongside your existing tax software.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link to="/signup/ca">
