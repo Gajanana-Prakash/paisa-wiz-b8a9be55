@@ -49,7 +49,6 @@ function SignAgreementPage() {
     try {
       const r = await requestOtp({ data: { token } });
       setOtpSent(true);
-      setDemoOtp(r.demoOtp ?? null);
       toast.success(r.phoneMasked ? `OTP sent to ${r.phoneMasked}` : "OTP generated");
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Could not send OTP");
