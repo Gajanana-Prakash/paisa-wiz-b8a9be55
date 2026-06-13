@@ -180,11 +180,6 @@ function SignAgreementPage() {
             </Button>
           ) : (
             <div className="space-y-4">
-              {demoOtp && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                  Demo mode: your OTP is <strong>{demoOtp}</strong>. In production this is sent via SMS.
-                </p>
-              )}
               <div>
                 <Label>Enter 6-digit OTP</Label>
                 <InputOTP maxLength={6} value={otp} onChange={setOtp} className="mt-2">
