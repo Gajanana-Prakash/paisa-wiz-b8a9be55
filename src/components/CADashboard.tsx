@@ -20,7 +20,7 @@ import {
   Bell, FileDown, Copy, ArrowRight, Building2, CalendarClock, CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
-import { CpeDashboardWidget } from "@/components/cpe/CpeDashboardWidget";
+
 
 type Client = {
   id: string;
