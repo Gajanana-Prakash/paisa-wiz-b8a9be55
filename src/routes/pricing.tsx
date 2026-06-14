@@ -113,10 +113,13 @@ function PricingPage() {
             <Sparkles className="size-3.5 text-primary" /> Indian CA pricing
           </div>
           <h1 className="mt-5 font-display text-4xl md:text-5xl font-semibold">
-            Simple pricing that grows with your practice
+            Practice management that works with the software you already use
           </h1>
           <p className="mt-4 text-muted-foreground text-lg">
             Start free. Pay only for what you use. No hidden fees.
+          </p>
+          <p className="mt-3 inline-block text-sm text-primary bg-primary/5 border border-primary/20 px-3 py-1.5 rounded-full">
+            Doesn&apos;t replace your filing software — organizes everything around it.
           </p>
 
           <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2">

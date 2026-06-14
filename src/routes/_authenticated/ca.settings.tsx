@@ -94,6 +94,23 @@ function SettingsPage() {
         </p>
       </div>
 
+      <section className="bg-card border-2 border-primary/30 rounded-3xl p-6 md:p-8">
+        <div className="flex items-start gap-3">
+          <div className="size-10 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0">
+            <Upload className="size-5" />
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-semibold">Import your existing clients in 2 minutes</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Bring in your CompuTax, Spectrum, or CSV client list. Auto-detect columns, skip duplicates, and send invites in one go.
+            </p>
+            <Link to="/ca/settings/import-clients" className="inline-block mt-3">
+              <Button size="sm">Start client import</Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {!isOwner && (
         <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
           Only the CA firm owner can change branding. You can view current settings below.
