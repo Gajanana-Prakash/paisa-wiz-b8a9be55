@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
 import { useServerFn } from "@tanstack/react-start";
 import { DeadlineSupportBanner } from "@/components/support/DeadlineSupportBanner";
-import { getSupportContext } from "@/lib/support.functions";
+import { getSupportContext, dismissPracticeDeskInfoCard } from "@/lib/support.functions";
 import { inviteClient } from "@/lib/tenant.functions";
 import { getComplianceSummary } from "@/lib/compliance.functions";
+import { taxSoftwareLabels } from "@/lib/support.content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ import {
 import {
   Users, FileText, AlertTriangle, CheckCircle2, Clock, UserPlus,
   Bell, FileDown, Copy, ArrowRight, Building2, CalendarClock, CalendarDays,
+  Info, X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -150,6 +152,8 @@ export function CADashboard() {
           tier={supportCtx?.tier ?? "FREE"}
         />
       )}
+      <PracticeDeskInfoCard />
+
       {overdueCount > 0 && (
         <Link to="/ca/compliance-calendar" className="block">
           <div className="rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive px-5 py-4 flex items-center justify-between gap-3 hover:bg-destructive/15 transition">
@@ -422,5 +426,39 @@ function InviteDialog({
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+function PracticeDeskInfoCard() {
+  const { firm, role } = useTenant();
+  const dismissFn = useServerFn(dismissPracticeDeskInfoCard);
+  const [hidden, setHidden] = useState(false);
+  if (role !== "ca_owner" || !firm || hidden) return null;
+  const f = firm as any;
+  const created = f.created_at ? new Date(f.created_at).getTime() : Date.now();
+  const ageMs = Date.now() - created;
+  if (ageMs > THIRTY_DAYS_MS) return null;
+  if (f.practicedesk_info_dismissed_at) return null;
+  const software = taxSoftwareLabels(f.existing_tax_software ?? []);
+  return (
+    <div className="rounded-2xl border border-primary/30 bg-primary/5 px-5 py-4 flex items-start gap-3">
+      <div className="size-9 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0">
+        <Info className="size-4" />
+      </div>
+      <div className="flex-1 text-sm">
+        <div className="font-semibold">PracticeDesk works alongside {software}.</div>
+        <p className="text-muted-foreground text-xs mt-1">
+          We don&apos;t file returns — we make sure nothing falls through the cracks between you, your team, and your clients.
+        </p>
+      </div>
+      <button
+        aria-label="Dismiss"
+        className="p-1 rounded-md text-muted-foreground hover:bg-muted shrink-0"
+        onClick={async () => { setHidden(true); try { await dismissFn({ data: undefined as any }); } catch {} }}
+      >
+        <X className="size-4" />
+      </button>
+    </div>
   );
 }

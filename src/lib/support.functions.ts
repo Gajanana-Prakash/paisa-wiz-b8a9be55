@@ -105,6 +105,7 @@ export const completeCaOnboardingWizard = createServerFn({ method: "POST" })
         firmName: z.string().trim().min(2).max(120).optional(),
         firmCity: z.string().max(80).optional(),
         clientCountBand: z.string().max(20).optional(),
+        existingTaxSoftware: z.array(z.string().max(40)).max(10).optional(),
         skipCall: z.boolean().optional(),
         scheduledCallAt: z.string().optional(),
         markCallDone: z.boolean().optional(),
@@ -123,13 +124,14 @@ export const completeCaOnboardingWizard = createServerFn({ method: "POST" })
     if (data.firmName) patch.name = data.firmName;
     if (data.firmCity) patch.firm_city = data.firmCity;
     if (data.clientCountBand) patch.firm_client_count_band = data.clientCountBand;
+    if (data.existingTaxSoftware) patch.existing_tax_software = data.existingTaxSoftware;
     if (data.scheduledCallAt) patch.onboarding_call_scheduled_at = new Date(data.scheduledCallAt).toISOString();
     if (data.markCallDone) patch.onboarding_call_done = true;
     if (data.skipCall === false && data.scheduledCallAt) {
       patch.onboarding_call_scheduled_at = new Date(data.scheduledCallAt).toISOString();
     }
 
-    const { error } = await supabaseAdmin.from("ca_firms").update(patch).eq("id", firmId);
+    const { error } = await supabaseAdmin.from("ca_firms").update(patch as any).eq("id", firmId);
     if (error) throw new Error(error.message);
 
     return { ok: true };
@@ -141,7 +143,19 @@ export const markOnboardingCallDone = createServerFn({ method: "POST" })
     const firmId = await getOwnerFirmId(context.userId);
     const { error } = await supabaseAdmin
       .from("ca_firms")
-      .update({ onboarding_call_done: true, updated_at: new Date().toISOString() })
+      .update({ onboarding_call_done: true, updated_at: new Date().toISOString() } as any)
+      .eq("id", firmId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const dismissPracticeDeskInfoCard = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const firmId = await getOwnerFirmId(context.userId);
+    const { error } = await supabaseAdmin
+      .from("ca_firms")
+      .update({ practicedesk_info_dismissed_at: new Date().toISOString(), updated_at: new Date().toISOString() } as any)
       .eq("id", firmId);
     if (error) throw new Error(error.message);
     return { ok: true };

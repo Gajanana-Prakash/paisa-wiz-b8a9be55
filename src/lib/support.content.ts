@@ -39,6 +39,29 @@ export const CLIENT_COUNT_BANDS = [
   { value: "100+", label: "100+ clients" },
 ] as const;
 
+export const TAX_SOFTWARE_OPTIONS = [
+  { value: "computax", label: "CompuTax / CompuOffice" },
+  { value: "spectrum", label: "Spectrum Cloud (KDK)" },
+  { value: "winman", label: "Winman" },
+  { value: "saral", label: "Saral" },
+  { value: "cleartax", label: "ClearTax" },
+  { value: "other", label: "Other" },
+  { value: "none", label: "We don't use one yet" },
+] as const;
+
+export type TaxSoftwareValue = (typeof TAX_SOFTWARE_OPTIONS)[number]["value"];
+
+export function taxSoftwareLabels(values: string[] | null | undefined): string {
+  if (!values || values.length === 0) return "your current tax software";
+  const labels = values
+    .map((v) => TAX_SOFTWARE_OPTIONS.find((o) => o.value === v)?.label)
+    .filter(Boolean) as string[];
+  if (labels.length === 0) return "your current tax software";
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}`;
+}
+
 export const TUTORIALS: SupportTutorial[] = [
   {
     id: "firm-setup",

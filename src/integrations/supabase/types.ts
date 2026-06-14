@@ -395,33 +395,39 @@ export type Database = {
       ca_firms: {
         Row: {
           created_at: string
+          existing_tax_software: string[]
           id: string
           logo_url: string | null
           name: string
           owner_user_id: string
           phone: string | null
+          practicedesk_info_dismissed_at: string | null
           primary_color: string | null
           subdomain_slug: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          existing_tax_software?: string[]
           id?: string
           logo_url?: string | null
           name: string
           owner_user_id: string
           phone?: string | null
+          practicedesk_info_dismissed_at?: string | null
           primary_color?: string | null
           subdomain_slug?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          existing_tax_software?: string[]
           id?: string
           logo_url?: string | null
           name?: string
           owner_user_id?: string
           phone?: string | null
+          practicedesk_info_dismissed_at?: string | null
           primary_color?: string | null
           subdomain_slug?: string | null
           updated_at?: string

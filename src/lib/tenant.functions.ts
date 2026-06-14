@@ -229,7 +229,7 @@ export const loadTenantContext = createServerFn({ method: "POST" })
     let firm: { id: string; name: string; logo_url: string | null; primary_color: string | null; subdomain_slug: string | null } | null = null;
     let availableClients: Array<{ id: string; business_name: string; gstin: string | null; status: string }> = [];
     const firmCols =
-      "id, name, logo_url, primary_color, subdomain_slug, show_powered_by_gstify, ca_onboarding_wizard_done";
+      "id, name, logo_url, primary_color, subdomain_slug, show_powered_by_gstify, ca_onboarding_wizard_done, existing_tax_software, practicedesk_info_dismissed_at, created_at";
 
     if (caOwner?.ca_firm_id) {
       const { data: f } = await supabaseAdmin.from("ca_firms").select(firmCols).eq("id", caOwner.ca_firm_id).single();
