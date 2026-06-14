@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,10 @@ import {
   CLIENT_COUNT_BANDS,
   INDIAN_CITIES,
   SUPPORT_INTRO_YOUTUBE_ID,
+  TAX_SOFTWARE_OPTIONS,
+  taxSoftwareLabels,
 } from "@/lib/support.content";
+import { CheckCircle2, Upload } from "lucide-react";
 
 export function CAWelcomeOnboarding() {
   const { firm, role, refresh } = useTenant();
@@ -36,6 +40,7 @@ export function CAWelcomeOnboarding() {
   const [firmName, setFirmName] = useState("");
   const [city, setCity] = useState("");
   const [band, setBand] = useState("");
+  const [software, setSoftware] = useState<string[]>([]);
   const [callAt, setCallAt] = useState("");
   const [scheduledIso, setScheduledIso] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -43,7 +48,7 @@ export function CAWelcomeOnboarding() {
   const show =
     role === "ca_owner" &&
     firm &&
-    firm.ca_onboarding_wizard_done === false;
+    (firm as any).ca_onboarding_wizard_done === false;
 
   useEffect(() => {
     if (firm?.name) setFirmName(firm.name);
@@ -51,7 +56,11 @@ export function CAWelcomeOnboarding() {
 
   if (!show) return null;
 
-  const finishWizard = async () => {
+  const toggleSoftware = (v: string) => {
+    setSoftware((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
+  };
+
+  const finishWizard = async (goImport: boolean) => {
     setBusy(true);
     try {
       await complete({
@@ -59,12 +68,13 @@ export function CAWelcomeOnboarding() {
           firmName: firmName.trim() || undefined,
           firmCity: city || undefined,
           clientCountBand: band || undefined,
+          existingTaxSoftware: software,
           scheduledCallAt: scheduledIso ?? undefined,
           skipCall: !scheduledIso,
         },
       });
       await refresh();
-      navigate({ to: "/ca/dashboard" });
+      navigate({ to: goImport ? "/ca/settings/import-clients" : "/ca/dashboard" });
     } finally {
       setBusy(false);
     }
@@ -72,7 +82,7 @@ export function CAWelcomeOnboarding() {
 
   return (
     <Dialog open onOpenChange={() => {}}>
-      <DialogContent className="max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
         {step === 1 && (
           <>
             <DialogHeader>
@@ -115,13 +125,84 @@ export function CAWelcomeOnboarding() {
                 disabled={!firmName.trim() || !city || !band || busy}
                 onClick={() => setStep(2)}
               >
-                Get Started
+                Next
               </Button>
             </div>
           </>
         )}
 
         {step === 2 && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="font-display">Which tax filing software does your firm currently use?</DialogTitle>
+              <DialogDescription>
+                Select all that apply. PracticeDesk works alongside your existing tools — we don&apos;t replace them.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 mt-2">
+              {TAX_SOFTWARE_OPTIONS.map((opt) => (
+                <label
+                  key={opt.value}
+                  className="flex items-center gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/50"
+                >
+                  <Checkbox
+                    checked={software.includes(opt.value)}
+                    onCheckedChange={() => toggleSoftware(opt.value)}
+                  />
+                  <span className="text-sm font-medium">{opt.label}</span>
+                </label>
+              ))}
+              {software.length > 0 && (
+                <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 text-sm text-primary mt-3 flex gap-2">
+                  <CheckCircle2 className="size-4 shrink-0 mt-0.5" />
+                  <span>
+                    Great — PracticeDesk works alongside <strong>{taxSoftwareLabels(software)}</strong>. We organize
+                    your clients, team, and deadlines. You keep filing with {taxSoftwareLabels(software)} exactly as you do today.
+                  </span>
+                </div>
+              )}
+              <Button
+                className="w-full mt-3"
+                disabled={software.length === 0 || busy}
+                onClick={() => setStep(3)}
+              >
+                Continue
+              </Button>
+            </div>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="font-display">Import your existing clients in 2 minutes</DialogTitle>
+              <DialogDescription>
+                Already have a client list in CompuTax, Spectrum, or a spreadsheet? Bring them in now — invite links go out automatically.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 mt-2">
+              <div className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 flex items-start gap-3">
+                <div className="size-10 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0">
+                  <Upload className="size-5" />
+                </div>
+                <div className="text-sm">
+                  <div className="font-semibold">Import from your tax software or CSV</div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Upload a CompuTax export, Spectrum file, or any CSV. We&apos;ll map columns, skip duplicates, and create invite links in one go.
+                  </p>
+                </div>
+              </div>
+              <Button className="w-full" disabled={busy} onClick={() => finishWizard(true)}>
+                Import my clients now
+              </Button>
+              <Button variant="ghost" className="w-full" disabled={busy} onClick={() => setStep(4)}>
+                Skip for now
+              </Button>
+            </div>
+          </>
+        )}
+
+        {step === 4 && (
           <>
             <DialogHeader>
               <DialogTitle className="font-display">Would you like a free setup call?</DialogTitle>
@@ -146,7 +227,7 @@ export function CAWelcomeOnboarding() {
                     const iso = new Date(callAt).toISOString();
                     await schedule({ data: { scheduledAt: iso } });
                     setScheduledIso(iso);
-                    setStep(3);
+                    setStep(5);
                   } finally {
                     setBusy(false);
                   }
@@ -158,7 +239,7 @@ export function CAWelcomeOnboarding() {
                 variant="ghost"
                 className="w-full"
                 disabled={busy}
-                onClick={() => setStep(3)}
+                onClick={() => setStep(5)}
               >
                 No, I&apos;ll explore myself
               </Button>
@@ -166,7 +247,7 @@ export function CAWelcomeOnboarding() {
           </>
         )}
 
-        {step === 3 && (
+        {step === 5 && (
           <>
             <DialogHeader>
               <DialogTitle className="font-display">Watch this 3-minute intro first?</DialogTitle>
@@ -180,7 +261,7 @@ export function CAWelcomeOnboarding() {
                 allowFullScreen
               />
             </div>
-            <Button className="w-full mt-4" disabled={busy} onClick={finishWizard}>
+            <Button className="w-full mt-4" disabled={busy} onClick={() => finishWizard(false)}>
               Done, show me the dashboard
             </Button>
           </>
