@@ -65,6 +65,7 @@ import { Route as AuthenticatedCaTasksMyTasksRouteImport } from './routes/_authe
 import { Route as AuthenticatedCaStaffUserIdRouteImport } from './routes/_authenticated/ca.staff.$userId'
 import { Route as AuthenticatedCaSettingsTallyMappingsRouteImport } from './routes/_authenticated/ca.settings.tally-mappings'
 import { Route as AuthenticatedCaSettingsReferralRouteImport } from './routes/_authenticated/ca.settings.referral'
+import { Route as AuthenticatedCaSettingsImportClientsRouteImport } from './routes/_authenticated/ca.settings.import-clients'
 import { Route as AuthenticatedCaSettingsEwayBillRouteImport } from './routes/_authenticated/ca.settings.eway-bill'
 import { Route as AuthenticatedCaSettingsEInvoiceRouteImport } from './routes/_authenticated/ca.settings.e-invoice'
 import { Route as AuthenticatedCaSettingsBillingSubscriptionRouteImport } from './routes/_authenticated/ca.settings.billing-subscription'
@@ -396,6 +397,12 @@ const AuthenticatedCaSettingsReferralRoute =
     path: '/referral',
     getParentRoute: () => AuthenticatedCaSettingsRoute,
   } as any)
+const AuthenticatedCaSettingsImportClientsRoute =
+  AuthenticatedCaSettingsImportClientsRouteImport.update({
+    id: '/import-clients',
+    path: '/import-clients',
+    getParentRoute: () => AuthenticatedCaSettingsRoute,
+  } as any)
 const AuthenticatedCaSettingsEwayBillRoute =
   AuthenticatedCaSettingsEwayBillRouteImport.update({
     id: '/eway-bill',
@@ -592,6 +599,7 @@ export interface FileRoutesByFullPath {
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/eway-bill': typeof AuthenticatedCaSettingsEwayBillRoute
+  '/ca/settings/import-clients': typeof AuthenticatedCaSettingsImportClientsRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
@@ -668,6 +676,7 @@ export interface FileRoutesByTo {
   '/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/ca/settings/eway-bill': typeof AuthenticatedCaSettingsEwayBillRoute
+  '/ca/settings/import-clients': typeof AuthenticatedCaSettingsImportClientsRoute
   '/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
@@ -750,6 +759,7 @@ export interface FileRoutesById {
   '/_authenticated/ca/settings/billing-subscription': typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   '/_authenticated/ca/settings/e-invoice': typeof AuthenticatedCaSettingsEInvoiceRoute
   '/_authenticated/ca/settings/eway-bill': typeof AuthenticatedCaSettingsEwayBillRoute
+  '/_authenticated/ca/settings/import-clients': typeof AuthenticatedCaSettingsImportClientsRoute
   '/_authenticated/ca/settings/referral': typeof AuthenticatedCaSettingsReferralRoute
   '/_authenticated/ca/settings/tally-mappings': typeof AuthenticatedCaSettingsTallyMappingsRoute
   '/_authenticated/ca/staff/$userId': typeof AuthenticatedCaStaffUserIdRoute
@@ -832,6 +842,7 @@ export interface FileRouteTypes {
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
     | '/ca/settings/eway-bill'
+    | '/ca/settings/import-clients'
     | '/ca/settings/referral'
     | '/ca/settings/tally-mappings'
     | '/ca/staff/$userId'
@@ -908,6 +919,7 @@ export interface FileRouteTypes {
     | '/ca/settings/billing-subscription'
     | '/ca/settings/e-invoice'
     | '/ca/settings/eway-bill'
+    | '/ca/settings/import-clients'
     | '/ca/settings/referral'
     | '/ca/settings/tally-mappings'
     | '/ca/staff/$userId'
@@ -989,6 +1001,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ca/settings/billing-subscription'
     | '/_authenticated/ca/settings/e-invoice'
     | '/_authenticated/ca/settings/eway-bill'
+    | '/_authenticated/ca/settings/import-clients'
     | '/_authenticated/ca/settings/referral'
     | '/_authenticated/ca/settings/tally-mappings'
     | '/_authenticated/ca/staff/$userId'
@@ -1419,6 +1432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaSettingsReferralRouteImport
       parentRoute: typeof AuthenticatedCaSettingsRoute
     }
+    '/_authenticated/ca/settings/import-clients': {
+      id: '/_authenticated/ca/settings/import-clients'
+      path: '/import-clients'
+      fullPath: '/ca/settings/import-clients'
+      preLoaderRoute: typeof AuthenticatedCaSettingsImportClientsRouteImport
+      parentRoute: typeof AuthenticatedCaSettingsRoute
+    }
     '/_authenticated/ca/settings/eway-bill': {
       id: '/_authenticated/ca/settings/eway-bill'
       path: '/eway-bill'
@@ -1721,6 +1741,7 @@ interface AuthenticatedCaSettingsRouteChildren {
   AuthenticatedCaSettingsBillingSubscriptionRoute: typeof AuthenticatedCaSettingsBillingSubscriptionRoute
   AuthenticatedCaSettingsEInvoiceRoute: typeof AuthenticatedCaSettingsEInvoiceRoute
   AuthenticatedCaSettingsEwayBillRoute: typeof AuthenticatedCaSettingsEwayBillRoute
+  AuthenticatedCaSettingsImportClientsRoute: typeof AuthenticatedCaSettingsImportClientsRoute
   AuthenticatedCaSettingsReferralRoute: typeof AuthenticatedCaSettingsReferralRoute
   AuthenticatedCaSettingsTallyMappingsRoute: typeof AuthenticatedCaSettingsTallyMappingsRoute
 }
@@ -1736,6 +1757,8 @@ const AuthenticatedCaSettingsRouteChildren: AuthenticatedCaSettingsRouteChildren
       AuthenticatedCaSettingsBillingSubscriptionRoute,
     AuthenticatedCaSettingsEInvoiceRoute: AuthenticatedCaSettingsEInvoiceRoute,
     AuthenticatedCaSettingsEwayBillRoute: AuthenticatedCaSettingsEwayBillRoute,
+    AuthenticatedCaSettingsImportClientsRoute:
+      AuthenticatedCaSettingsImportClientsRoute,
     AuthenticatedCaSettingsReferralRoute: AuthenticatedCaSettingsReferralRoute,
     AuthenticatedCaSettingsTallyMappingsRoute:
       AuthenticatedCaSettingsTallyMappingsRoute,
