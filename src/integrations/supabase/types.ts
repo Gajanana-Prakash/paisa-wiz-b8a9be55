@@ -2749,30 +2749,7 @@ export type Database = {
       }
     }
     Views: {
-      staff_profiles_rates: {
-        Row: {
-          billing_rate_per_hour: number | null
-          ca_firm_id: string | null
-          cost_rate_per_hour: number | null
-          id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          billing_rate_per_hour?: number | null
-          ca_firm_id?: string | null
-          cost_rate_per_hour?: number | null
-          id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          billing_rate_per_hour?: number | null
-          ca_firm_id?: string | null
-          cost_rate_per_hour?: number | null
-          id?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_access_client: {
